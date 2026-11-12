@@ -41,6 +41,8 @@ import org.nypl.simplified.books.book_registry.BookStatus.Revoked
 import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventChanged
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.views.Views
@@ -157,13 +159,13 @@ class CatalogFeedPagingDataAdapter(
       val targetWidth = 0
 
       when (item) {
-        is FeedEntry.FeedEntryCorrupt -> {
+        is FeedEntryCorrupt -> {
           this.view.setOnClickListener {
             // Nothing!
           }
         }
 
-        is FeedEntry.FeedEntryOPDS -> {
+        is FeedEntryBook -> {
           this.subscription =
             this@CatalogFeedPagingDataAdapter
               .registryEvents.events
@@ -178,9 +180,9 @@ class CatalogFeedPagingDataAdapter(
           Views.setVisible(this.idleCover, false)
           Views.setVisible(this.idleCoverProgress, true)
 
-          this.errorTitle.text = item.feedEntry.title
-          this.idleTitle.text = item.feedEntry.title
-          this.idleAuthor.text = item.feedEntry.authorsCommaSeparated
+          this.errorTitle.text = item.title
+          this.idleTitle.text = item.title
+          this.idleAuthor.text = item.authorsCommaSeparated
           this.idleTime.text = ""
           this.idleTimeDays.text = ""
 
@@ -208,7 +210,7 @@ class CatalogFeedPagingDataAdapter(
       }
     }
 
-    private fun onStatusChangedForFeedEntry(item: FeedEntry.FeedEntryOPDS) {
+    private fun onStatusChangedForFeedEntry(item: FeedEntryBook) {
       val status =
         CatalogBookStatus.create(
           this@CatalogFeedPagingDataAdapter.registryEvents.registry,

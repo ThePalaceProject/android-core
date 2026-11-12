@@ -75,8 +75,9 @@ import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.content.api.ContentResolverSane
 import org.nypl.simplified.content.api.ContentResolverType
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.FeedEntryParse
+import org.nypl.simplified.feeds.FeedLoader
+import org.nypl.simplified.feeds.api.FeedEntryParseType
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.notifications.NotificationTokenHTTPCalls
@@ -85,10 +86,6 @@ import org.nypl.simplified.notifications.NotificationsService
 import org.nypl.simplified.notifications.NotificationsServiceType
 import org.nypl.simplified.opds.auth_document.AuthenticationDocumentParsers
 import org.nypl.simplified.opds.auth_document.api.AuthenticationDocumentParsersType
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSFeedParser
-import org.nypl.simplified.opds.core.OPDSFeedParserType
-import org.nypl.simplified.opds.core.OPDSSearchParser
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
 import org.nypl.simplified.profiles.ProfilesDatabases
@@ -367,29 +364,17 @@ internal object MainServices {
 
   private fun createFeedLoader(
     http: LSHTTPClientType,
-    opdsFeedParser: OPDSFeedParserType,
     bookFormatSupport: BookFormatSupportType,
-    contentResolver: ContentResolverType,
   ): FeedLoaderType {
     val execCatalogFeeds =
       NamedThreadPools.namedThreadPool(1, "catalog-feed", 19)
-    val feedSearchParser =
-      OPDSSearchParser.newParser()
-    val feedTransport =
-      FeedHTTPTransport(http)
 
     return FeedLoader.create(
       bookFormatSupport = bookFormatSupport,
-      contentResolver = contentResolver,
       exec = execCatalogFeeds,
-      parser = opdsFeedParser,
-      searchParser = feedSearchParser,
-      transport = feedTransport,
+      http = http,
     )
   }
-
-  private fun createFeedParser(): OPDSFeedParserType =
-    OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
 
   private fun <T : Any> optionalFromServiceLoader(interfaceType: Class<T>): T? =
     ServiceLoader
@@ -847,15 +832,6 @@ internal object MainServices {
       },
     )
 
-    val opdsFeedParser =
-      addService(
-        message = strings.bootingGeneral("feed parser"),
-        interfaceType = OPDSFeedParserType::class.java,
-        serviceConstructor = {
-          createFeedParser()
-        },
-      )
-
     val feedLoader =
       addService(
         message = strings.bootingGeneral("feed loader"),
@@ -863,12 +839,16 @@ internal object MainServices {
         serviceConstructor = {
           createFeedLoader(
             http = lsHTTP,
-            opdsFeedParser = opdsFeedParser,
             bookFormatSupport = bookFormatService,
-            contentResolver = contentResolver,
           )
         },
       )
+
+    addService(
+      message = strings.bootingGeneral("feed entry parser"),
+      interfaceType = FeedEntryParseType::class.java,
+      serviceConstructor = { FeedEntryParse.create() },
+    )
 
     addService(
       message = strings.bootingGeneral("patron user profile parsers"),
@@ -1011,8 +991,10 @@ internal object MainServices {
         .profileEvents()
         .ofType(ProfileUpdated::class.java)
         .subscribe {
-          onProfileUpdated(profilesControllerTypeService)
+          onProfileUpdated(profilesControllerTypeService, feedLoader)
         }
+
+    onProfileUpdated(profilesControllerTypeService, feedLoader)
 
     showThreads()
 
@@ -1082,8 +1064,16 @@ internal object MainServices {
     )
   }
 
-  private fun onProfileUpdated(profiles: ProfilesControllerType) {
+  private fun onProfileUpdated(
+    profiles: ProfilesControllerType,
+    feedLoader: FeedLoaderType,
+  ) {
     this.updateReportsLibrary(profiles)
+    try {
+      feedLoader.preferOPDS20 = profiles.profileCurrent().preferences().preferOPDS20
+    } catch (e: Throwable) {
+      this.logger.debug("Failed to update feed loader preferences: ", e)
+    }
   }
 
   private fun updateReportsLibrary(profiles: ProfilesControllerType) {

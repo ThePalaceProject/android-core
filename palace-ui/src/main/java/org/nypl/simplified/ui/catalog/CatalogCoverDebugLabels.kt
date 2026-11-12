@@ -2,9 +2,8 @@ package org.nypl.simplified.ui.catalog
 
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.thepalaceproject.palace.images.BookCoverDebugLabels
 import org.thepalaceproject.palace.images.BookCoverDebugLabelsLookupType
@@ -20,13 +19,13 @@ import org.thepalaceproject.palace.images.BookCoverDebugLabelsLookupType
  */
 
 class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
-  override fun labelsForEntry(entry: FeedEntryOPDS): BookCoverDebugLabels? {
+  override fun labelsForEntry(entry: FeedEntryBook): BookCoverDebugLabels? {
     if (!this.debugLabelsEnabled()) {
       return null
     }
 
-    val format = entry.probableFormat?.shortName ?: "unknown"
-    val drm = drmNameOf(entry.feedEntry)
+    val format = formatNameOf(entry)
+    val drm = drmNameOf(entry)
     return BookCoverDebugLabels(
       format = format,
       drm = drm,
@@ -44,7 +43,29 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
 
   companion object {
     /**
-     * Derive a short name for the DRM system from the OPDS feed entry. The
+     * Derive a short format name from the entry's final content types.
+     */
+    fun formatNameOf(entry: FeedEntryBook): String {
+      val types =
+        entry.acquisitions
+          .flatMap { FeedAcquisitionPaths.linearize(it).flatMap { path -> path.asMIMETypes() } }
+          .map { it.fullType }
+          .toSet()
+
+      fun has(vararg names: String): Boolean {
+        return names.any { it in types }
+      }
+
+      return when {
+        has(StandardFormatNames.genericEPUBFiles.fullType) -> "EPUB"
+        has(StandardFormatNames.genericPDFFiles.fullType) -> "PDF"
+        has(StandardFormatNames.genericJsonAudioBook.fullType) -> "Audiobook"
+        else -> "unknown"
+      }
+    }
+
+    /**
+     * Derive a short name for the DRM system from the entry. The
      * most reliable signal is the content types of all elements of the
      * entry's acquisition paths, matched against the MIME types this codebase
      * already knows about.
@@ -55,13 +76,11 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
      * file (e.g., `application/epub+zip`). So we must consider the types of
      * all path elements, not just the final content types.
      */
-
-    fun drmNameOf(entry: OPDSAcquisitionFeedEntry): String {
+    fun drmNameOf(entry: FeedEntryBook): String {
       val licensor = entry.licensor
       val types =
-        OPDSAcquisitionPaths
-          .linearize(entry)
-          .flatMap { it.asMIMETypes() }
+        entry.acquisitions
+          .flatMap { FeedAcquisitionPaths.linearize(it).flatMap { path -> path.asMIMETypes() } }
           .map { it.fullType }
           .toSet()
 

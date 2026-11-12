@@ -1,0 +1,20 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [],
+  "facets": [
+    {
+      "metadata": {
+        "title": "Genre"
+      },
+      "links": [
+        {
+          "href": "https://example.com/feed.json?genre=fiction",
+          "rel": "self"
+        }
+      ]
+    }
+  ]
+}

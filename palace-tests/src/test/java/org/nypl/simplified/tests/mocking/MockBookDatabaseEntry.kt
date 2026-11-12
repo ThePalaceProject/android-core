@@ -11,8 +11,10 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFile
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericJsonAudioBook
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.lcpAudioBooks
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
+import org.nypl.simplified.books.api.FeedBookIDConversions
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -28,7 +30,7 @@ class MockBookDatabaseEntry(
     this.formatHandlesOf(this.bookInitial.entry).toMutableList()
 
   var entryWrites = 0
-  var entryField: OPDSAcquisitionFeedEntry = this.bookInitial.entry
+  var entryField: FeedEntryBook = this.bookInitial.entry
   var thumbnailField: File? = null
   var deleted = false
   var coverField: File? = null
@@ -59,16 +61,16 @@ class MockBookDatabaseEntry(
     this.thumbnailField = file
   }
 
-  override fun writeOPDSEntry(opdsEntry: OPDSAcquisitionFeedEntry) {
+  override fun writeOPDSEntry(entry: FeedEntryBook) {
     this.logger.debug("[{}]: writeOPDSEntry", this.bookInitial.id)
 
-    this.addNecessaryHandles(opdsEntry)
-    this.entryField = opdsEntry
+    this.addNecessaryHandles(entry)
+    this.entryField = entry
     this.entryWrites++
   }
 
-  private fun addNecessaryHandles(opdsEntry: OPDSAcquisitionFeedEntry) {
-    val handles = this.formatHandlesOf(opdsEntry)
+  private fun addNecessaryHandles(entry: FeedEntryBook) {
+    val handles = this.formatHandlesOf(entry)
     for (handle in handles) {
       if (this.formatHandlesField.find { it.javaClass == handle.javaClass } == null) {
         this.logger.debug("adding handle {}", handle.javaClass.name)
@@ -78,10 +80,10 @@ class MockBookDatabaseEntry(
   }
 
   private fun formatHandlesOf(
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): List<BookDatabaseEntryFormatHandle> {
-    val bookId = BookIDs.newFromOPDSEntry(entry)
-    val paths = OPDSAcquisitionPaths.linearize(entry)
+    val bookId = FeedBookIDConversions.toBookID(entry.bookID)
+    val paths = FeedAcquisitionPaths.linearize(entry.acquisitions)
     val finalTypes = paths.map { it.asMIMETypes().last() }
     val formats = mutableListOf<BookDatabaseEntryFormatHandle>()
     for (finalType in finalTypes) {

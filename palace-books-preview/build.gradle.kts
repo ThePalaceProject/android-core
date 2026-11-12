@@ -9,8 +9,8 @@ dependencies {
     implementation(project(":palace-books-database-api"))
     implementation(project(":palace-books-formats-api"))
     implementation(project(":palace-books-registry-api"))
+    implementation(project(":palace-feeds-api"))
     implementation(project(":palace-files"))
-    implementation(project(":palace-opds-core"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))
 

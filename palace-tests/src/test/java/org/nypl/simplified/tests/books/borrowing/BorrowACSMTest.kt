@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import com.io7m.verona.core.Version
 import io.reactivex.disposables.Disposable
@@ -69,8 +72,10 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.adobeACSMFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisition
+import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfileType
@@ -174,7 +179,7 @@ class BorrowACSMTest {
     val initialFeedEntry =
       BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericEPUBFiles.fullType)
     this.bookID =
-      BookIDs.newFromOPDSEntry(initialFeedEntry)
+      BookIDs.newFromText(initialFeedEntry.id)
     this.account =
       firstAccountOf(this.profile)
     this.accountProvider =
@@ -232,7 +237,7 @@ class BorrowACSMTest {
         account = this.account.id,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.account.id, initialFeedEntry),
         formats = listOf()
       )
 
@@ -242,7 +247,7 @@ class BorrowACSMTest {
     this.bookDatabaseEntry =
       this.bookDatabase.createOrUpdate(
         this.bookID,
-        initialFeedEntry
+        OPDS12FeedConverter.convertEntry(this.account.id, initialFeedEntry)
       )
 
     this.adobeNetProvider =
@@ -276,21 +281,21 @@ class BorrowACSMTest {
 
     this.context.adobeExecutor = this.adobeExecutor
     this.context.opdsAcquisitionPath =
-      OPDSAcquisitionPath(
-        OPDSAcquisition(
-          OPDSAcquisition.Relation.ACQUISITION_GENERIC,
+      FeedAcquisitionPath(
+        FeedAcquisition(
+          FeedAcquisitionRelation.ACQUISITION_GENERIC,
           Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
           adobeACSMFiles,
           listOf(),
           emptyMap()
         ),
         listOf(
-          OPDSAcquisitionPathElement(
+          FeedAcquisitionPathElement(
             adobeACSMFiles,
             Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
             emptyMap()
           ),
-          OPDSAcquisitionPathElement(
+          FeedAcquisitionPathElement(
             genericEPUBFiles,
             Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
             emptyMap()
@@ -300,7 +305,7 @@ class BorrowACSMTest {
 
     this.context.currentRemainingOPDSPathElements =
       listOf(
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           genericEPUBFiles,
           Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
           emptyMap()
@@ -308,7 +313,7 @@ class BorrowACSMTest {
       )
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(adobeACSMFiles, null, emptyMap())
+      FeedAcquisitionPathElement(adobeACSMFiles, null, emptyMap())
   }
 
   private fun firstAccountOf(
@@ -603,12 +608,12 @@ class BorrowACSMTest {
     this.context.opdsAcquisitionPath =
       this.context.opdsAcquisitionPath.copy(
         elements = listOf(
-          OPDSAcquisitionPathElement(
+          FeedAcquisitionPathElement(
             adobeACSMFiles,
             Link.LinkBasic(this.webServer.url("/book.acsm").toUri()),
             emptyMap()
           ),
-          OPDSAcquisitionPathElement(
+          FeedAcquisitionPathElement(
             MIMEType("text", "plain", mapOf()),
             Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
             emptyMap()
@@ -617,7 +622,7 @@ class BorrowACSMTest {
       )
     this.context.currentRemainingOPDSPathElements =
       listOf(
-        OPDSAcquisitionPathElement(
+        FeedAcquisitionPathElement(
           MIMEType("text", "plain", mapOf()),
           Link.LinkBasic(this.webServer.url("/book.epub").toUri()),
           emptyMap()

@@ -4,8 +4,8 @@ import android.app.Application
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.opds.core.OPDSJSONParserType
-import org.nypl.simplified.opds.core.OPDSJSONSerializerType
+import org.nypl.simplified.feeds.api.FeedEntryParserType
+import org.nypl.simplified.feeds.api.FeedEntrySerializerType
 import java.io.File
 
 /**
@@ -20,8 +20,8 @@ interface BookDatabaseFactoryType {
   @Throws(BookDatabaseException::class)
   fun openDatabase(
     context: Application,
-    parser: OPDSJSONParserType,
-    serializer: OPDSJSONSerializerType,
+    parser: FeedEntryParserType,
+    serializer: FeedEntrySerializerType,
     httpClient: LSHTTPClientType,
     formats: BookFormatSupportType,
     owner: AccountID,

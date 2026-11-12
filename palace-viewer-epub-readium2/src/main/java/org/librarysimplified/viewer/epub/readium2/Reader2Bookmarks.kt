@@ -15,6 +15,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.readium.r2.shared.publication.Href
 import org.slf4j.LoggerFactory
 
@@ -58,7 +59,7 @@ object Reader2Bookmarks {
    */
 
   fun fromSR2Bookmark(
-    bookEntry: FeedEntry.FeedEntryOPDS,
+    bookEntry: FeedEntryBook,
     deviceId: String,
     source: SR2Bookmark,
   ): SerializedBookmark {
@@ -88,11 +89,11 @@ object Reader2Bookmarks {
       bookChapterProgress = chapterProgress,
       bookChapterTitle = source.title,
       bookProgress = source.bookProgress ?: 0.0,
-      bookTitle = bookEntry.feedEntry.title,
+      bookTitle = bookEntry.title,
       deviceID = deviceId,
       kind = kind,
       location = location,
-      opdsId = bookEntry.feedEntry.id,
+      opdsId = bookEntry.id,
       time = source.date,
       uri = source.uri,
     )

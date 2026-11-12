@@ -18,8 +18,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.librarysimplified.ui.R
 import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
+import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
@@ -110,7 +111,7 @@ class CatalogFeedViewInfinite(
 
   fun configureFacets(
     screen: ScreenSizeInformationType,
-    feed: Feed.FeedWithoutGroups,
+    feed: FeedData,
   ) {
     this.catalogFeedHeaderTitle.text = feed.feedTitle
 

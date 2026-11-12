@@ -17,6 +17,16 @@ interface FeedLoaderType {
   var showOnlySupportedBooks: Boolean
 
   /**
+   * `true` if the client should request OPDS 2.0 serializations from the server.
+   *
+   * When `true`, the loader sends an `Accept: application/opds+json` header
+   * and parses the response as OPDS 2.0. When `false` (the default), the
+   * loader does not send the header and the server responds with OPDS 1.2.
+   */
+
+  var preferOPDS20: Boolean
+
+  /**
    * Load a feed from the given URI.
    *
    * @param uri           The URI

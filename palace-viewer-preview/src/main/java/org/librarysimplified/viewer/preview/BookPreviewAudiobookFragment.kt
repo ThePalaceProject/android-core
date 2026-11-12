@@ -26,6 +26,7 @@ import org.joda.time.Duration
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -41,25 +42,20 @@ class BookPreviewAudiobookFragment :
   private lateinit var imageLoader: ImageLoader2Type
 
   companion object {
-    private const val BUNDLE_EXTRA_FILE =
-      "org.librarysimplified.viewer.preview.BookPreviewAudiobookFragment.file"
-
-    private const val BUNDLE_EXTRA_FEED_ENTRY =
-      "org.librarysimplified.viewer.preview.BookPreviewAudiobookFragment.entry"
-
     private const val PLAYER_MOVE_THRESHOLD = 30000L
 
     fun newInstance(
       file: File,
-      feedEntry: FeedEntry.FeedEntryOPDS,
-    ): BookPreviewAudiobookFragment =
-      BookPreviewAudiobookFragment().apply {
-        this.arguments =
-          Bundle().apply {
-            this.putSerializable(this@Companion.BUNDLE_EXTRA_FILE, file)
-            this.putSerializable(this@Companion.BUNDLE_EXTRA_FEED_ENTRY, feedEntry)
-          }
+      feedEntry: FeedEntryBook,
+    ): BookPreviewAudiobookFragment {
+      return BookPreviewAudiobookFragment().apply {
+        BookPreviewModel.current =
+          BookPreviewModelData(
+            feedEntry = feedEntry,
+            audioFile = file,
+          )
       }
+    }
   }
 
   override fun onStart() {
@@ -93,7 +89,7 @@ class BookPreviewAudiobookFragment :
   private val disposables = CompositeDisposable()
 
   private lateinit var audioFile: File
-  private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
+  private lateinit var feedEntry: FeedEntryBook
   private lateinit var mediaPlayer: MediaPlayer
   private lateinit var previewAuthor: TextView
   private lateinit var previewBackwardButton: ImageView
@@ -129,14 +125,19 @@ class BookPreviewAudiobookFragment :
     this.imageLoader =
       services.requireService(ImageLoader2Type::class.java)
 
-    this.audioFile = this
-      .requireArguments()
-      .getSerializable(BUNDLE_EXTRA_FILE)
-      as? File ?: throw RuntimeException("Invalid file")
-    this.feedEntry = this
-      .requireArguments()
-      .getSerializable(BUNDLE_EXTRA_FEED_ENTRY)
-      as? FeedEntry.FeedEntryOPDS ?: throw RuntimeException("Invalid entry")
+    val data = BookPreviewModel.current
+
+    val audioFileMaybe = data?.audioFile
+    if (audioFileMaybe == null) {
+      throw RuntimeException("Invalid file")
+    }
+    this.audioFile = audioFileMaybe
+
+    val feedEntryMaybe = data?.feedEntry
+    if (feedEntryMaybe == null) {
+      throw RuntimeException("Invalid entry")
+    }
+    this.feedEntry = feedEntryMaybe
 
     this.previewAuthor = view.findViewById(R.id.player_author)
     this.previewBackwardButton = view.findViewById(R.id.player_jump_backwards)
@@ -227,8 +228,8 @@ class BookPreviewAudiobookFragment :
       height = 0,
     )
 
-    this.previewAuthor.text = this.feedEntry.feedEntry.authorsCommaSeparated
-    this.previewTitle.text = this.feedEntry.feedEntry.title
+    this.previewAuthor.text = this.feedEntry.authorsCommaSeparated
+    this.previewTitle.text = this.feedEntry.title
 
     this.mediaPlayer = MediaPlayer()
     this.mediaPlayer.setDataSource(this.requireContext(), Uri.fromFile(this.audioFile))

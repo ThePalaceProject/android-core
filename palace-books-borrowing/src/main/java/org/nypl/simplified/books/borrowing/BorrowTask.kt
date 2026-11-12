@@ -14,6 +14,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -34,10 +35,10 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -80,7 +81,7 @@ class BorrowTask private constructor(
     AtomicBoolean(false)
 
   private val bookId by lazy {
-    BookIDs.newFromOPDSEntry(this.request.opdsAcquisitionFeedEntry)
+    FeedBookIDConversions.toBookID(this.request.opdsAcquisitionFeedEntry.bookID)
   }
 
   private val bookIdBrief by lazy {
@@ -195,7 +196,7 @@ class BorrowTask private constructor(
 
   private fun executeSubtasksForPath(
     book: Book,
-    path: OPDSAcquisitionPath,
+    path: FeedAcquisitionPath,
     samlDownloadContext: SAMLDownloadContext?,
   ) {
     val currentProfile =
@@ -217,7 +218,7 @@ class BorrowTask private constructor(
         cancelled = this.cancelled,
         clock = this.requirements.clock,
         contentResolver = this.requirements.contentResolver,
-        currentOPDSAcquisitionPathElement = path.elements.first(),
+        currentFeedAcquisitionPathElement = path.elements.first(),
         httpClient = this.requirements.httpClient,
         lcpService = this.requirements.lcpService,
         logger = this.logger,
@@ -267,9 +268,9 @@ class BorrowTask private constructor(
         }
 
         val pathElement = context.opdsAcquisitionPath.elements[0]
-        context.currentOPDSAcquisitionPathElement = pathElement
+        context.currentFeedAcquisitionPathElement = pathElement
 
-        val queue: MutableList<OPDSAcquisitionPathElement> =
+        val queue: MutableList<FeedAcquisitionPathElement> =
           context.opdsAcquisitionPath.elements.toMutableList()
         queue.removeAt(0)
         context.opdsAcquisitionPath = context.opdsAcquisitionPath.copy(elements = queue.toList())
@@ -280,7 +281,7 @@ class BorrowTask private constructor(
             context = context,
             pathElement = pathElement,
             book = book,
-            remaining = queue.toList().map(OPDSAcquisitionPathElement::mimeType),
+            remaining = queue.toList().map(FeedAcquisitionPathElement::mimeType),
           )
         this.subtaskExecute(subtaskFactory, context, book)
       } catch (e: BorrowSubtaskHaltedEarly) {
@@ -356,7 +357,7 @@ class BorrowTask private constructor(
 
   private fun subtaskFindForPathElement(
     context: BorrowContext,
-    pathElement: OPDSAcquisitionPathElement,
+    pathElement: FeedAcquisitionPathElement,
     book: Book,
     remaining: List<MIMEType>,
   ): BorrowSubtaskFactoryType {
@@ -388,7 +389,7 @@ class BorrowTask private constructor(
 
   private fun createBookDatabaseEntry(
     book: Book,
-    entry: OPDSAcquisitionFeedEntry,
+    entry: FeedEntryBook,
   ): Book {
     this.taskRecorder.beginNewStep("Setting up a book database entry...")
 
@@ -449,8 +450,8 @@ class BorrowTask private constructor(
 
   private fun pickAcquisitionPath(
     book: Book,
-    entry: OPDSAcquisitionFeedEntry,
-  ): OPDSAcquisitionPath {
+    entry: FeedEntryBook,
+  ): FeedAcquisitionPath {
     this.taskRecorder.beginNewStep("Planning the borrow operation…")
 
     val path =
@@ -490,13 +491,13 @@ class BorrowTask private constructor(
     override val httpClient: LSHTTPClientType,
     override val taskRecorder: TaskRecorderType,
     @Volatile
-    override var opdsAcquisitionPath: OPDSAcquisitionPath,
+    override var opdsAcquisitionPath: FeedAcquisitionPath,
     override val samlDownloadContext: SAMLDownloadContext? = null,
     bookInitial: Book,
     private val bookRegistry: BookRegistryType,
     private val logger: Logger,
     private val temporaryDirectory: File,
-    var currentOPDSAcquisitionPathElement: OPDSAcquisitionPathElement,
+    var currentFeedAcquisitionPathElement: FeedAcquisitionPathElement,
     override val adobeExecutor: AdobeAdeptExecutorType?,
     override val boundlessService: BoundlessServiceType?,
     override val lcpService: LcpService?,
@@ -583,7 +584,7 @@ class BorrowTask private constructor(
       )
     }
 
-    override fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link {
+    override fun chooseNewAcquisitionPath(entry: FeedEntryBook): Link {
       val path = this.borrowTask.pickAcquisitionPath(this.bookCurrent, entry)
       this.logDebug("Selected a new acquisition path.")
       check(path.elements.isNotEmpty()) { "Selected acquisition path cannot be empty!" }
@@ -658,8 +659,8 @@ class BorrowTask private constructor(
       this.currentURIField = uri
     }
 
-    override val currentAcquisitionPathElement: OPDSAcquisitionPathElement
-      get() = this.currentOPDSAcquisitionPathElement
+    override val currentAcquisitionPathElement: FeedAcquisitionPathElement
+      get() = this.currentFeedAcquisitionPathElement
 
     private val bookIdBrief =
       bookInitial.id.brief()
@@ -692,7 +693,8 @@ class BorrowTask private constructor(
       throw IOException("Could not create a temporary file within 100 attempts!")
     }
 
-    override fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement> =
-      this.currentRemainingOPDSPathElements
+    override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> {
+      return this.currentRemainingOPDSPathElements
+    }
   }
 }

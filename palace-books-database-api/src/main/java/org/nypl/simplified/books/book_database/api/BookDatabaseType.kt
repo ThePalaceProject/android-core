@@ -3,7 +3,7 @@ package org.nypl.simplified.books.book_database.api
 import net.jcip.annotations.ThreadSafe
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.util.SortedSet
 
 /**
@@ -51,7 +51,7 @@ interface BookDatabaseType {
   @Throws(BookDatabaseException::class)
   fun createOrUpdate(
     id: BookID,
-    entry: OPDSAcquisitionFeedEntry,
+    entry: FeedEntryBook,
   ): BookDatabaseEntryType
 
   /**

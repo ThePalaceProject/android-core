@@ -32,7 +32,6 @@ import org.joda.time.DateTime
 import org.joda.time.Days
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
 import org.librarysimplified.ui.bottomsheet.PalaceBottomSheet
 import org.librarysimplified.ui.bottomsheet.PalaceBottomSheetType
@@ -62,9 +61,10 @@ import org.nypl.simplified.books.book_registry.BookStatus.RequestingDownload
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingLoan
 import org.nypl.simplified.books.book_registry.BookStatus.RequestingRevoke
 import org.nypl.simplified.books.book_registry.BookStatus.Revoked
-import org.nypl.simplified.feeds.api.Feed.FeedWithGroups
-import org.nypl.simplified.feeds.api.Feed.FeedWithoutGroups
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
@@ -77,6 +77,7 @@ import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.PROGRESS
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
+import java.time.format.DateTimeFormatter
 
 class CatalogFeedViewDetails2(
   override val root: ViewGroup,
@@ -96,13 +97,7 @@ class CatalogFeedViewDetails2(
     DateTimeFormat.forPattern("MMM d, yyyy")
 
   private val dateFormatter =
-    DateTimeFormatterBuilder()
-      .appendYear(4, 5)
-      .appendLiteral('-')
-      .appendMonthOfYear(2)
-      .appendLiteral('-')
-      .appendDayOfMonth(2)
-      .toFormatter()
+    DateTimeFormatter.ofPattern("uuuu-MM-dd")
 
   private val appBar =
     this.root.findViewById<AppBarLayout>(R.id.bookD2AppBar)
@@ -502,7 +497,7 @@ class CatalogFeedViewDetails2(
 
   fun bind(
     account: AccountProviderType,
-    newEntry: FeedEntry.FeedEntryOPDS,
+    newEntry: FeedEntryBook,
   ) {
     val targetHeight =
       this.root.resources.getDimensionPixelSize(R.dimen.catalogBookDetailCoverHeight)
@@ -533,17 +528,17 @@ class CatalogFeedViewDetails2(
     )
 
     this.bookTitle.text =
-      newEntry.feedEntry.title
+      newEntry.title
     this.bookSubtitle.text =
-      newEntry.feedEntry.authorsCommaSeparated
+      newEntry.authorsCommaSeparated
     this.toolbarTitle.text =
-      newEntry.feedEntry.title
+      newEntry.title
     this.toolbarSubtitle.text =
-      newEntry.feedEntry.authorsCommaSeparated
+      newEntry.authorsCommaSeparated
     this.bottomSheetTitle.text =
-      newEntry.feedEntry.title
+      newEntry.title
     this.bottomSheetSubtitle.text =
-      newEntry.feedEntry.authorsCommaSeparated
+      newEntry.authorsCommaSeparated
     this.bottomSheetLibrary.text =
       account.displayName
 
@@ -572,11 +567,11 @@ class CatalogFeedViewDetails2(
     )
   }
 
-  private fun configureMetadataTable(newEntry: FeedEntry.FeedEntryOPDS) {
+  private fun configureMetadataTable(newEntry: FeedEntryBook) {
     this.metadata.removeAllViews()
 
     val probableFormat =
-      newEntry.probableFormat
+      BookFormats.inferFormat(newEntry)
 
     val bookFormatText =
       when (probableFormat) {
@@ -608,7 +603,7 @@ class CatalogFeedViewDetails2(
     // 8. Publisher
     // 9. Distributor
 
-    val entry = newEntry.feedEntry
+    val entry = newEntry
     if (bookFormatText.isNotEmpty()) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaFormat)
@@ -661,7 +656,7 @@ class CatalogFeedViewDetails2(
     if (publishedOpt != null) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaPublicationDate)
-      rowVal.text = this.dateFormatter.print(publishedOpt)
+      rowVal.text = this.dateFormatter.format(publishedOpt)
       this.metadata.addView(row)
     }
 
@@ -689,26 +684,30 @@ class CatalogFeedViewDetails2(
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaSeries)
       rowVal.text = series.name
-      rowVal.contentDescription =
-        this.root.resources.getString(R.string.catalogAccessibilitySeriesLink, series.name)
-      rowVal.setTypeface(rowVal.typeface, Typeface.BOLD)
-      rowVal.paintFlags = rowVal.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
-      val outValue = TypedValue()
-      rowVal.context.theme.resolveAttribute(
-        android.R.attr.selectableItemBackground,
-        outValue,
-        true,
-      )
-      rowVal.setBackgroundResource(outValue.resourceId)
-      rowVal.setOnClickListener {
-        rowVal.postDelayed({
-          this.callbacks.onFeedSelected(
-            accountID = newEntry.accountID,
-            title = series.name,
-            uri = series.link,
-          )
-        }, 250L)
+      val seriesLink = series.link
+      if (seriesLink != null) {
+        rowVal.contentDescription =
+          this.root.resources.getString(R.string.catalogAccessibilitySeriesLink, series.name)
+        rowVal.setTypeface(rowVal.typeface, Typeface.BOLD)
+        rowVal.paintFlags = rowVal.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+
+        val outValue = TypedValue()
+        rowVal.context.theme.resolveAttribute(
+          android.R.attr.selectableItemBackground,
+          outValue,
+          true,
+        )
+        rowVal.setBackgroundResource(outValue.resourceId)
+        rowVal.setOnClickListener {
+          rowVal.postDelayed({
+            this.callbacks.onFeedSelected(
+              accountID = newEntry.accountID,
+              title = series.name,
+              uri = seriesLink,
+            )
+          }, 250L)
+        }
       }
       this.metadata.addView(row)
     }
@@ -733,11 +732,11 @@ class CatalogFeedViewDetails2(
 
       is FeedLoaderSuccess -> {
         when (val feed = feedResult.feed) {
-          is FeedWithGroups -> {
+          is FeedDataWithGroups -> {
             this.logger.debug("Received a grouped related feed.")
-            this.relatedAdapter.submitList(feed.feedGroupsInOrder)
+            this.relatedAdapter.submitList(feed.groups)
 
-            val laneCount = feed.feedGroupsInOrder.size
+            val laneCount = feed.groups.size
             val laneSize = this.screenSize.dpToPixels(128)
             val totalSize = (laneCount * laneSize).toInt()
 
@@ -747,7 +746,7 @@ class CatalogFeedViewDetails2(
             this.setVisibility(this.relatedListView, View.VISIBLE)
           }
 
-          is FeedWithoutGroups -> {
+          is FeedData -> {
             this.setNoRelatedFeed()
           }
         }
@@ -755,8 +754,8 @@ class CatalogFeedViewDetails2(
     }
   }
 
-  private fun configureDescription(newEntry: FeedEntry.FeedEntryOPDS) {
-    val opds = newEntry.feedEntry
+  private fun configureDescription(newEntry: FeedEntryBook) {
+    val opds = newEntry
 
     /*
      * Render the HTML present in the summary and insert it into the text view.

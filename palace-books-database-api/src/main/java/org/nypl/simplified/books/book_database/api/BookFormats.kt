@@ -2,7 +2,7 @@ package org.nypl.simplified.books.book_database.api
 
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 
 /**
  * Information about the supported book formats.
@@ -111,10 +111,9 @@ object BookFormats {
   private val formats = BookFormatDefinition.values()
 
   /**
-   * @return The probable format of the book in the given OPDS entry
+   * @return The probable format of the book in the given feed entry
    */
-
-  fun inferFormat(entry: OPDSAcquisitionFeedEntry): BookFormatDefinition? {
+  fun inferFormat(entry: FeedEntryBook): BookFormatDefinition? {
     for (acquisition in entry.acquisitions) {
       for (format in formats) {
         val available = acquisition.availableFinalContentTypes()

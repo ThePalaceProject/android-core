@@ -17,15 +17,17 @@ import org.librarysimplified.http.vanilla.internal.LSHTTPClient
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.api.FeedFacetComposite
+import org.nypl.simplified.feeds.api.FeedFacetData
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSFacet
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSFeedParserType
 import org.nypl.simplified.opds.core.OPDSSearchParser
@@ -59,7 +61,6 @@ class OPDSClientCompositeFacetTest {
   private lateinit var context: Context
   private lateinit var exec: ExecutorService
   private lateinit var feedLoader: FeedLoaderType
-  private lateinit var feedTransport: FeedHTTPTransport
   private lateinit var parser: OPDSFeedParserType
   private lateinit var searchParser: OPDSSearchParserType
   private lateinit var webServer: MockWebServer
@@ -80,20 +81,6 @@ class OPDSClientCompositeFacetTest {
       OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
     this.searchParser =
       OPDSSearchParser.newParser()
-    this.feedTransport =
-      FeedHTTPTransport(
-        LSHTTPClient(
-          context = this.context,
-          configuration = LSHTTPClientConfiguration(
-            applicationName = "palace",
-            applicationVersion = "1.0.0",
-            networkAccess = LSHTTPNetworkAccess,
-          ),
-          problemReportParsers = LSHTTPProblemReportParsers(),
-          interceptors = listOf(),
-        )
-      )
-
     this.feedLoader =
       FeedLoader.create(
         bookFormatSupport = BookFormatSupport.create(
@@ -105,11 +92,17 @@ class OPDSClientCompositeFacetTest {
             supportsLCP = true
           )
         ),
-        contentResolver = MockContentResolver(),
         exec = this.exec,
-        parser = this.parser,
-        searchParser = this.searchParser,
-        transport = this.feedTransport,
+        http = LSHTTPClient(
+          context = this.context,
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "palace",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess,
+          ),
+          problemReportParsers = LSHTTPProblemReportParsers(),
+          interceptors = listOf(),
+        ),
       )
 
     this.client =
@@ -140,7 +133,7 @@ class OPDSClientCompositeFacetTest {
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
-          FeedEntry.FeedEntryCorrupt(account0, book0, IllegalStateException())
+          FeedEntryCorrupt(account0, FeedBookIDConversions.fromBookID(book0), IllegalStateException())
         )
       ).get(5L, TimeUnit.SECONDS)
     }
@@ -171,17 +164,15 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               )
             ),
             title = "Results",
@@ -226,27 +217,23 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               ),
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "H",
-                  title = "Y",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "H",
+                title = "Y",
+                groupType = null
               )
             ),
             title = "Results",
@@ -291,27 +278,23 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-G-X.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-G-X.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               ),
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-H-Y.xml"),
-                  group = "H",
-                  title = "Y",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/facet-H-Y.xml"),
+                group = "H",
+                title = "Y",
+                groupType = null
               )
             ),
             title = "Results",
@@ -356,27 +339,23 @@ class OPDSClientCompositeFacetTest {
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
           credentials = null,
           method = "GET",
-          facet = FeedFacet.FeedFacetOPDS12Composite(
+          facet = FeedFacetComposite(
             facets = listOf(
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "G",
-                  title = "X",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "G",
+                title = "X",
+                groupType = null
               ),
-              FeedFacet.FeedFacetOPDS12Single(
+              FeedFacetData(
                 accountID = this.account0,
-                opdsFacet = OPDSFacet(
-                  isActive = true,
-                  uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
-                  group = "H",
-                  title = "Y",
-                  groupType = null
-                )
+                isActive = true,
+                uri = URI.create("http://127.0.0.1:${this.webServer.port}/feed.xml"),
+                group = "H",
+                title = "Y",
+                groupType = null
               )
             ),
             title = "Results",

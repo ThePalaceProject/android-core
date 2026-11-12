@@ -18,11 +18,12 @@ import org.librarysimplified.http.vanilla.internal.LSHTTPClient
 import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.formats.BookFormatSupport
 import org.nypl.simplified.books.formats.BookFormatSupportParameters
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
@@ -58,7 +59,6 @@ class OPDSClientTest {
   private lateinit var context: Context
   private lateinit var exec: ExecutorService
   private lateinit var feedLoader: FeedLoaderType
-  private lateinit var feedTransport: FeedHTTPTransport
   private lateinit var parser: OPDSFeedParserType
   private lateinit var searchParser: OPDSSearchParserType
   private lateinit var webServer: MockWebServer
@@ -79,20 +79,6 @@ class OPDSClientTest {
       OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
     this.searchParser =
       OPDSSearchParser.newParser()
-    this.feedTransport =
-      FeedHTTPTransport(
-        LSHTTPClient(
-          context = this.context,
-          configuration = LSHTTPClientConfiguration(
-            applicationName = "palace",
-            applicationVersion = "1.0.0",
-            networkAccess = LSHTTPNetworkAccess,
-          ),
-          problemReportParsers = LSHTTPProblemReportParsers(),
-          interceptors = listOf()
-        )
-      )
-
     this.feedLoader =
       FeedLoader.create(
         bookFormatSupport = BookFormatSupport.create(
@@ -104,11 +90,17 @@ class OPDSClientTest {
             supportsLCP = true
           )
         ),
-        contentResolver = MockContentResolver(),
         exec = this.exec,
-        parser = this.parser,
-        searchParser = this.searchParser,
-        transport = this.feedTransport,
+        http = LSHTTPClient(
+          context = this.context,
+          configuration = LSHTTPClientConfiguration(
+            applicationName = "palace",
+            applicationVersion = "1.0.0",
+            networkAccess = LSHTTPNetworkAccess,
+          ),
+          problemReportParsers = LSHTTPProblemReportParsers(),
+          interceptors = listOf()
+        ),
       )
 
     this.client =
@@ -139,7 +131,7 @@ class OPDSClientTest {
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
-          FeedEntry.FeedEntryCorrupt(account0, book0, IllegalStateException())
+          FeedEntryCorrupt(account0, FeedBookIDConversions.fromBookID(book0), IllegalStateException())
         )
       ).get(5L, TimeUnit.SECONDS)
     }
@@ -244,7 +236,7 @@ class OPDSClientTest {
   }
 
   @Test
-  fun testFeedWithoutGroups() {
+  fun testFeedData() {
     this.webServer.enqueue(
       MockResponse()
         .setResponseCode(200)
@@ -278,7 +270,7 @@ class OPDSClientTest {
   }
 
   @Test
-  fun testFeedWithGroups() {
+  fun testFeedDataWithGroups() {
     this.webServer.enqueue(
       MockResponse()
         .setResponseCode(200)
@@ -419,7 +411,7 @@ class OPDSClientTest {
     val f1 =
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
-          entry = h.handle.feed().entriesInOrder[0],
+          entry = h.handle.feed().entries[0],
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
         )
       )
@@ -483,7 +475,7 @@ class OPDSClientTest {
     val f2 =
       this.client.goTo(
         OPDSClientRequest.ExistingEntry(
-          entry = h.handle.feed().entriesInOrder[0],
+          entry = h.handle.feed().entries[0],
           historyBehavior = OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY,
         )
       )

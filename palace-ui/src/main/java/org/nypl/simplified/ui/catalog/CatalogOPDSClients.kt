@@ -9,6 +9,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
@@ -196,7 +197,7 @@ class CatalogOPDSClients(
                       facetTitleProvider = facetTitleProvider,
                       feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
                       filterByAccountID = account.id,
-                      sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
+                      sortBy = FeedFacetPseudoSorting.SortBy.SORT_BY_TITLE,
                       search = null,
                     ),
                   ).get()
@@ -218,7 +219,7 @@ class CatalogOPDSClients(
                       facetTitleProvider = facetTitleProvider,
                       feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
                       filterByAccountID = account.id,
-                      sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
+                      sortBy = FeedFacetPseudoSorting.SortBy.SORT_BY_TITLE,
                       search = null,
                     ),
                   ).get()

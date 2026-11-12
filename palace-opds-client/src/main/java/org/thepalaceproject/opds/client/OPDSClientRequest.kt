@@ -5,6 +5,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacetComposite
 import java.net.URI
 import java.util.UUID
 
@@ -93,11 +94,12 @@ sealed class OPDSClientRequest {
     override val historyBehavior: HistoryBehavior,
     val credentials: AccountAuthenticationCredentials?,
     val method: String,
-    val facet: FeedFacet.FeedFacetOPDS12Composite,
+    val facet: FeedFacetComposite,
   ) : OPDSClientRequest() {
-    override val uri =
-      this.facet.facets[0]
-        .opdsFacet.uri
+    override val uri: URI =
+      requireNotNull(this.facet.facets[0].uri) {
+        "A composite facet's first facet must have a URI."
+      }
     override val requestID: UUID =
       UUID.randomUUID()
     override val accountID: AccountID =

@@ -31,7 +31,7 @@ class CatalogFeedPagingSource(
     return try {
       val pageData = this.feedHandle.page(page).await()
       LoadResult.Page(
-        data = pageData.data.entriesInOrder,
+        data = pageData.data.entries,
         prevKey = pageData.pagePrevious,
         nextKey = pageData.pageNext,
       )

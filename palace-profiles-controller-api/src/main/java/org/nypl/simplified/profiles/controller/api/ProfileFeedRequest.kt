@@ -3,7 +3,7 @@ package org.nypl.simplified.profiles.controller.api
 import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.FeedBooksSelection
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting.SortBy
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting.SortBy
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
 import java.net.URI
 

@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":palace-books-preview"))
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-feeds-api"))
+    implementation(project(":palace-feeds-opds12"))
     implementation(project(":palace-files"))
     implementation(project(":palace-futures"))
     implementation(project(":palace-json-core"))

@@ -7,6 +7,7 @@ dependencies {
 
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-books-api"))
+    implementation(project(":palace-feeds-api"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-presentableerror-api"))
     implementation(project(":palace-taskrecorder-api"))

@@ -49,6 +49,7 @@ import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
@@ -78,9 +79,6 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
 
   companion object {
-    private const val ARG_PARAMETERS =
-      "org.librarysimplified.viewer.epub.readium2.Reader2Activity2.parameters"
-
     /**
      * Start a new reader for the given book.
      */
@@ -89,13 +87,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       activity: Activity,
       parameters: Reader2ActivityParameters,
     ) {
-      val intent = Intent(activity, Reader2Activity::class.java)
-      val bundle =
-        Bundle().apply {
-          this.putSerializable(this@Companion.ARG_PARAMETERS, parameters)
-        }
-      intent.putExtras(bundle)
-      activity.startActivity(intent)
+      Reader2Model.parameters = parameters
+      activity.startActivity(Intent(activity, Reader2Activity::class.java))
     }
   }
 
@@ -129,23 +122,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.subscriptions =
       CompositeDisposable()
 
-    val intent = this.intent
-    if (intent == null) {
-      this.logger.warn("ReaderActivity2 lacks an intent!")
-      this.finish()
-      return
-    }
-
-    val extras = intent.extras
-    if (extras == null) {
-      this.logger.warn("ReaderActivity2 intent lacks extras!")
-      this.finish()
-      return
-    }
-
-    val params = extras.getSerializable(ARG_PARAMETERS) as Reader2ActivityParameters?
+    val params = Reader2Model.parameters
     if (params == null) {
-      this.logger.warn("ReaderActivity2 intent lacks parameters!")
+      this.logger.warn("ReaderActivity2 lacks parameters!")
       this.finish()
       return
     }
@@ -171,12 +150,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
               this.parameters.accountId.uuid
                 .toString(),
             ),
-            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookID", this.parameters.entry.id),
             Pair("BookInternalID", this.parameters.bookId.value()),
-            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookTitle", this.parameters.entry.title),
             Pair(
               "BookPublisher",
-              this.parameters.entry.feedEntry.publisher
+              this.parameters.entry.publisher
                 .orEmpty(),
             ),
             Pair("BookDRM", this.parameters.drmInfo.kind.name),
@@ -212,12 +191,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
               this.account.provider.id
                 .toString(),
             ),
-            Pair("BookID", this.parameters.entry.feedEntry.id),
+            Pair("BookID", this.parameters.entry.id),
             Pair("BookInternalID", this.parameters.bookId.value()),
-            Pair("BookTitle", this.parameters.entry.feedEntry.title),
+            Pair("BookTitle", this.parameters.entry.title),
             Pair(
               "BookPublisher",
-              this.parameters.entry.feedEntry.publisher
+              this.parameters.entry.publisher
                 .orEmpty(),
             ),
             Pair("BookDRM", this.parameters.drmInfo.kind.name),
@@ -284,7 +263,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           profileUUID = profile.id.uuid,
           accountProvider = this.account.provider.id,
           accountUUID = this.account.id.uuid,
-          opdsEntry = this.parameters.entry.feedEntry,
+          opdsEntry = this.parameters.entry,
         ),
       )
     }
@@ -635,12 +614,12 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             this.account.provider.id
               .toString(),
           ),
-          Pair("BookID", this.parameters.entry.feedEntry.id),
+          Pair("BookID", this.parameters.entry.id),
           Pair("BookInternalID", this.parameters.bookId.value()),
-          Pair("BookTitle", this.parameters.entry.feedEntry.title),
+          Pair("BookTitle", this.parameters.entry.title),
           Pair(
             "BookPublisher",
-            this.parameters.entry.feedEntry.publisher
+            this.parameters.entry.publisher
               .orEmpty(),
           ),
           Pair("BookDRM", this.parameters.drmInfo.kind.name),

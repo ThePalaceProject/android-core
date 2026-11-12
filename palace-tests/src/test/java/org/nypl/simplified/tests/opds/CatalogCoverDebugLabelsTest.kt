@@ -2,8 +2,10 @@ package org.nypl.simplified.tests.opds
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeed
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser.Companion.newParser
 import org.nypl.simplified.opds.core.OPDSFeedParser.Companion.newParser
 import org.nypl.simplified.ui.catalog.CatalogCoverDebugLabels
@@ -37,8 +39,11 @@ class CatalogCoverDebugLabelsTest {
     return feedParser.parse(uri, stream)
   }
 
-  private fun allEntries(feed: OPDSAcquisitionFeed): List<OPDSAcquisitionFeedEntry> =
-    feed.feedEntries + feed.feedGroups.values.flatMap { it.entries }
+  private fun allEntries(feed: OPDSAcquisitionFeed): List<FeedEntryBook> {
+    return (feed.feedEntries + feed.feedGroups.values.flatMap { it.entries }).map {
+      OPDS12FeedConverter.convertEntry(AccountID.generate(), it)
+    }
+  }
 
   /**
    * An Adobe-DRM-protected EPUB. The acquisition path is

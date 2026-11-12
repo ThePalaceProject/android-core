@@ -5,6 +5,7 @@ plugins {
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
+    implementation(project(":palace-feeds-api"))
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-accounts-database-api"))
     implementation(project(":palace-analytics-api"))

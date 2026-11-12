@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 
@@ -63,7 +64,7 @@ interface ImageLoader2Type {
    */
 
   fun loadThumbnailInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
     height: Int,
@@ -83,7 +84,7 @@ interface ImageLoader2Type {
    */
 
   fun loadCoverInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     hasBadge: Boolean,
     width: Int,
@@ -107,7 +108,7 @@ interface ImageLoader2Type {
    */
 
   fun loadCoverBackgroundInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
     height: Int,
@@ -126,7 +127,7 @@ interface ImageLoader2Type {
    */
 
   fun loadCoverAsBitmap(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     onBitmapLoaded: (Bitmap) -> Unit,
     @DrawableRes defaultResource: Int,
   ): CompletableFuture<Unit>

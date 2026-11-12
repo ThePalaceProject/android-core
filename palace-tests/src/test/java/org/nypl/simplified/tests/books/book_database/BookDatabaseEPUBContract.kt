@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.book_database
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.Context
 import one.irradia.mime.vanilla.MIMEParser
@@ -33,7 +36,9 @@ import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.feeds.opds12.FeedEntryParser
 import org.nypl.simplified.opds.core.OPDSJSONParser
+import org.nypl.simplified.feeds.opds12.FeedEntrySerializer
 import org.nypl.simplified.opds.core.OPDSJSONSerializer
 import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.slf4j.LoggerFactory
@@ -75,8 +80,8 @@ abstract class BookDatabaseEPUBContract {
 
   @Test
   fun testEntryLastReadLocation() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(context = context(),
       parser = parser,
@@ -89,7 +94,7 @@ abstract class BookDatabaseEPUBContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle =
@@ -133,8 +138,8 @@ abstract class BookDatabaseEPUBContract {
 
   @Test
   fun testBookmarks() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(context = context(),
       parser = parser,
@@ -147,7 +152,7 @@ abstract class BookDatabaseEPUBContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
-    val databaseEntry0 = database0.createOrUpdate(bookID, feedEntry)
+    val databaseEntry0 = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     val bookmark0 =
       SerializedBookmarks.createWithCurrentFormat(
@@ -232,7 +237,7 @@ abstract class BookDatabaseEPUBContract {
         httpClient = this.httpClient
       )
     val databaseEntry1 =
-      database1.createOrUpdate(bookID, feedEntry)
+      database1.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle =
@@ -260,8 +265,8 @@ abstract class BookDatabaseEPUBContract {
 
   @Test
   fun testEntryDRM() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(context = context(),
       parser = parser,
@@ -274,7 +279,7 @@ abstract class BookDatabaseEPUBContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithEPUB()
     val bookID = BookIDs.newFromText("abcd")
-    val entry = database0.createOrUpdate(bookID, feedEntry)
+    val entry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle = entry.findFormatHandle(BookDatabaseEntryFormatHandleEPUB::class.java)!!

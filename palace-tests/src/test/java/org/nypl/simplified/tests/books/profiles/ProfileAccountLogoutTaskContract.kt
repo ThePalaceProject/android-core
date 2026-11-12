@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.profiles
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.content.Context
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -136,8 +139,8 @@ abstract class ProfileAccountLogoutTaskContract {
         .addAcquisition(acquisition)
         .build()
 
-    this.bookDatabase.createOrUpdate(BookID.create("a"), opdsEntry)
-    this.bookDatabase.createOrUpdate(BookID.create("b"), opdsEntry)
+    this.bookDatabase.createOrUpdate(BookID.create("a"), OPDS12FeedConverter.convertEntry(this.accountID, opdsEntry))
+    this.bookDatabase.createOrUpdate(BookID.create("b"), OPDS12FeedConverter.convertEntry(this.accountID, opdsEntry))
 
     this.profile =
       Mockito.mock(ProfileReadableType::class.java)

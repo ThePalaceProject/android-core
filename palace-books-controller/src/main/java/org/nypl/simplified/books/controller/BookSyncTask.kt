@@ -1,11 +1,8 @@
 package org.nypl.simplified.books.controller
 
 import org.librarysimplified.http.api.LSHTTPClientType
-import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
@@ -13,18 +10,25 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.registry.api.AccountProviderRegistryType
 import org.nypl.simplified.books.api.BookID
-import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
+import org.nypl.simplified.feeds.api.FeedEntryGroupRef
+import org.nypl.simplified.feeds.api.FeedLoaderResult
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedLoading
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
-import org.nypl.simplified.opds.core.OPDSFeedParserType
-import org.nypl.simplified.opds.core.OPDSParseException
 import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.patron.api.PatronUserProfile
@@ -33,9 +37,7 @@ import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
-import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 class BookSyncTask(
@@ -47,7 +49,6 @@ class BookSyncTask(
   private val feedLoader: FeedLoaderType,
   private val patronParsers: PatronUserProfileParsersType,
   private val http: LSHTTPClientType,
-  private val feedParser: OPDSFeedParserType,
 ) : AbstractBookTask(accountID, profiles) {
   override val logger =
     LoggerFactory.getLogger(BookSyncTask::class.java)
@@ -83,59 +84,183 @@ class BookSyncTask(
       return this.taskRecorder.finishSuccess(Unit)
     }
 
-    val request =
-      this.http
-        .newRequest(loansURI)
-        .setAuthorization(AccountAuthenticatedHTTP.createAuthorization(credentials))
-        .addBasicTokenPropertiesIfApplicable(credentials)
-        .build()
+    this.fetchLoansFeed(account = account, provider = provider, credentials = credentials)
 
-    val response = request.execute()
-    return when (val status = response.status) {
-      is LSHTTPResponseStatus.Responded.OK -> {
-        this.onHTTPOK(
-          stream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0)),
-          provider = provider,
-          account = account,
-          accessToken = status.getAccessToken(),
-        )
-        this.taskRecorder.finishSuccess(Unit)
+    return this.taskRecorder.finishSuccess(Unit)
+  }
+
+  private fun fetchLoansFeed(
+    account: AccountType,
+    provider: AccountProviderType,
+    credentials: AccountAuthenticationCredentials,
+  ) {
+    val loansURI = provider.loansURI
+    if (loansURI == null) {
+      this.logger.debug("no loans URI, aborting!")
+      return
+    }
+
+    val feedResult =
+      this.feedLoader
+        .fetchURI(
+          accountID = this.accountID,
+          uri = loansURI,
+          credentials = credentials,
+          method = "GET",
+        ).get(60L, TimeUnit.SECONDS)
+
+    when (feedResult) {
+      is FeedLoaderSuccess -> {
+        account.updateBasicTokenCredentials(feedResult.accessToken)
+        this.processFeed(account, feedResult.feed)
       }
 
-      is LSHTTPResponseStatus.Responded.Error -> {
-        val message =
-          String.format(
-            "%s: %d: %s",
-            provider.loansURI,
-            status.properties.status,
-            status.properties.message,
-          )
+      is FeedLoaderFailedAuthentication -> {
+        when (AccountAuthenticatedHTTP.handle401Error(feedResult.problemReport)) {
+          Handled401.ErrorIsRecoverableCredentialsExpired -> {
+            account.expireCredentialsIfApplicable()
+          }
 
-        if (status.properties.status == 401) {
-          when (AccountAuthenticatedHTTP.handle401Error(response.status.properties?.problemReport)) {
-            Handled401.ErrorIsRecoverableCredentialsExpired -> {
-              account.expireCredentialsIfApplicable()
-            }
-
-            Handled401.ErrorIsUnrecoverable -> {
-              // Treat this as a hard error.
-            }
+          Handled401.ErrorIsUnrecoverable -> {
+            // Treat this as a hard error.
           }
         }
 
-        val exception = IOException(message)
+        val message = feedResult.message
+        this.taskRecorder.currentStepFailed(
+          message = message,
+          errorCode = "syncAuthentication",
+          exception = feedResult.exception,
+          extraMessages = listOf(),
+        )
+        throw TaskFailedHandled(feedResult.exception)
+      }
+
+      is FeedLoaderFailedGeneral -> {
+        val message = feedResult.message
         this.taskRecorder.currentStepFailed(
           message = message,
           errorCode = "syncFailed",
-          exception = exception,
+          exception = feedResult.exception,
           extraMessages = listOf(),
         )
-        throw TaskFailedHandled(exception)
+        throw TaskFailedHandled(feedResult.exception)
+      }
+    }
+  }
+
+  private fun processFeed(
+    account: AccountType,
+    feed: org.nypl.simplified.feeds.api.Feed,
+  ) {
+    /*
+     * Obtain the set of books that are on disk already. If any
+     * of these books are not in the received feed, then they have
+     * expired and should be deleted.
+     */
+
+    val bookDatabase = account.bookDatabase
+    val existing = bookDatabase.books()
+
+    /*
+     * Collect all entries from the feed, whether flat or grouped.
+     */
+
+    val allEntries: List<FeedEntryBook> =
+      when (feed) {
+        is FeedData -> feed.entries.filterIsInstance<FeedEntryBook>()
+        is FeedDataWithGroups -> feed.groups.flatMap { it.groupEntries }.filterIsInstance<FeedEntryBook>()
       }
 
-      is LSHTTPResponseStatus.Failed -> {
-        throw IOException(status.exception)
+    /*
+     * Handle each book in the received feed.
+     */
+
+    val received = HashSet<BookID>(64)
+    for (entry in allEntries) {
+      val bookId = FeedBookIDConversions.toBookID(entry.bookID)
+      received.add(bookId)
+      this.logger.debug("[{}] updating", bookId.brief())
+
+      try {
+        val databaseEntry = bookDatabase.createOrUpdate(bookId, entry)
+        val book = databaseEntry.book
+        this.bookRegistry.update(BookWithStatus(book, BookStatus.fromBook(book)))
+      } catch (e: BookDatabaseException) {
+        this.logger.error("[{}] unable to update database entry: ", bookId.brief(), e)
       }
+    }
+
+    /*
+     * Now delete/revoke any book that previously existed, but is not in the
+     * received set.
+     */
+
+    val revoking = HashSet<BookID>(existing.size)
+    for (existingId in existing) {
+      try {
+        this.logger.debug("[{}] checking for deletion", existingId.brief())
+
+        if (!received.contains(existingId)) {
+          val dbEntry = bookDatabase.entry(existingId)
+          val a = dbEntry.book.entry.availability
+          if (a is FeedAvailabilityRevoked) {
+            revoking.add(existingId)
+          } else {
+            this.logger.debug("[{}] deleting", existingId.brief())
+            this.updateRegistryForBook(account, dbEntry)
+            dbEntry.delete()
+          }
+        } else {
+          this.logger.debug("[{}] keeping", existingId.brief())
+        }
+      } catch (x: Throwable) {
+        this.logger.error("[{}]: unable to delete entry: ", existingId.value(), x)
+      }
+    }
+
+    /*
+     * Finish the revocation of any books that need it.
+     */
+
+    for (revoke_id in revoking) {
+      this.logger.debug("[{}] revoking", revoke_id.brief())
+      this.booksController.bookRevoke(account.id, revoke_id)
+    }
+  }
+
+  private fun updateRegistryForBook(
+    account: AccountType,
+    dbEntry: BookDatabaseEntryType,
+  ) {
+    this.logger.debug("attempting to fetch book permalink to update registry")
+    val alternate = dbEntry.book.entry.alternate
+    return if (alternate != null) {
+      val entry =
+        FeedLoading.loadSingleEntryFeed(
+          feedLoader = this.feedLoader,
+          taskRecorder = this.taskRecorder,
+          accountID = this.accountID,
+          uri = alternate,
+          timeout = Pair(30L, TimeUnit.SECONDS),
+          method = "GET",
+        )
+
+      /*
+       * Write a new book database entry based on the server state, and pretend that all the
+       * books have been deleted. The code will delete the entire database entry after this
+       * method returns anyway, so this code ensures that something sensible goes into the
+       * book registry.
+       */
+
+      dbEntry.writeOPDSEntry(entry)
+      val newBook = dbEntry.book.copy(formats = emptyList())
+      val status = BookStatus.fromBook(newBook)
+
+      this.logger.debug("book's new state is {}", status)
+      this.bookRegistry.update(BookWithStatus(newBook, status))
+    } else {
+      throw IOException("No alternate link is available")
     }
   }
 
@@ -212,10 +337,6 @@ class BookSyncTask(
       }
     }
 
-  override fun onFailure(result: TaskResult.Failure<Unit>) {
-    // Nothing to do
-  }
-
   private fun updateAccountProvider(account: AccountType): AccountProviderType {
     this.logger.debug("resolving the existing account provider")
 
@@ -251,126 +372,7 @@ class BookSyncTask(
     }
   }
 
-  @Throws(IOException::class)
-  private fun onHTTPOK(
-    stream: InputStream,
-    provider: AccountProviderType,
-    account: AccountType,
-    accessToken: String?,
-  ) {
-    account.updateBasicTokenCredentials(accessToken)
-    stream.use { ok ->
-      this.parseFeed(ok, provider, account)
-    }
-  }
-
-  @Throws(OPDSParseException::class)
-  private fun parseFeed(
-    stream: InputStream,
-    provider: AccountProviderType,
-    account: AccountType,
-  ) {
-    val feed = this.feedParser.parse(provider.loansURI, stream)
-
-    /*
-     * Obtain the set of books that are on disk already. If any
-     * of these books are not in the received feed, then they have
-     * expired and should be deleted.
-     */
-
-    val bookDatabase = account.bookDatabase
-    val existing = bookDatabase.books()
-
-    /*
-     * Handle each book in the received feed.
-     */
-
-    val received = HashSet<BookID>(64)
-    val entries = feed.feedEntries
-    for (opdsEntry in entries) {
-      val bookId = BookIDs.newFromOPDSEntry(opdsEntry)
-      received.add(bookId)
-      this.logger.debug("[{}] updating", bookId.brief())
-
-      try {
-        val databaseEntry = bookDatabase.createOrUpdate(bookId, opdsEntry)
-        val book = databaseEntry.book
-        this.bookRegistry.update(BookWithStatus(book, BookStatus.fromBook(book)))
-      } catch (e: BookDatabaseException) {
-        this.logger.error("[{}] unable to update database entry: ", bookId.brief(), e)
-      }
-    }
-
-    /*
-     * Now delete/revoke any book that previously existed, but is not in the
-     * received set.
-     */
-
-    val revoking = HashSet<BookID>(existing.size)
-    for (existingId in existing) {
-      try {
-        this.logger.debug("[{}] checking for deletion", existingId.brief())
-
-        if (!received.contains(existingId)) {
-          val dbEntry = bookDatabase.entry(existingId)
-          val a = dbEntry.book.entry.availability
-          if (a is OPDSAvailabilityRevoked) {
-            revoking.add(existingId)
-          } else {
-            this.logger.debug("[{}] deleting", existingId.brief())
-            this.updateRegistryForBook(account, dbEntry)
-            dbEntry.delete()
-          }
-        } else {
-          this.logger.debug("[{}] keeping", existingId.brief())
-        }
-      } catch (x: Throwable) {
-        this.logger.error("[{}]: unable to delete entry: ", existingId.value(), x)
-      }
-    }
-
-    /*
-     * Finish the revocation of any books that need it.
-     */
-
-    for (revoke_id in revoking) {
-      this.logger.debug("[{}] revoking", revoke_id.brief())
-      this.booksController.bookRevoke(account.id, revoke_id)
-    }
-  }
-
-  private fun updateRegistryForBook(
-    account: AccountType,
-    dbEntry: BookDatabaseEntryType,
-  ) {
-    this.logger.debug("attempting to fetch book permalink to update registry")
-    val alternate = dbEntry.book.entry.alternate
-    return if (alternate != null) {
-      val entry =
-        FeedLoading.loadSingleEntryFeed(
-          feedLoader = this.feedLoader,
-          taskRecorder = this.taskRecorder,
-          accountID = this.accountID,
-          uri = alternate,
-          timeout = Pair(30L, TimeUnit.SECONDS),
-          method = "GET",
-        )
-
-      /*
-       * Write a new book database entry based on the server state, and pretend that all the
-       * books have been deleted. The code will delete the entire database entry after this
-       * method returns anyway, so this code ensures that something sensible goes into the
-       * book registry.
-       */
-
-      dbEntry.writeOPDSEntry(entry.feedEntry)
-      val newBook = dbEntry.book.copy(formats = emptyList())
-      val status = BookStatus.fromBook(newBook)
-
-      this.logger.debug("book's new state is {}", status)
-      this.bookRegistry.update(BookWithStatus(newBook, status))
-    } else {
-      throw IOException("No alternate link is available")
-    }
+  override fun onFailure(result: TaskResult.Failure<Unit>) {
+    // Nothing to do
   }
 }

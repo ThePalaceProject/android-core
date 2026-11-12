@@ -1,6 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AdobeAdeptLoan
@@ -25,22 +24,24 @@ import org.nypl.simplified.books.controller.api.BookRevokeExceptionDeviceNotActi
 import org.nypl.simplified.books.controller.api.BookRevokeExceptionNotRevocable
 import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.feeds.api.Feed
-import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryCorrupt
-import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
+import org.nypl.simplified.feeds.api.FeedAvailability
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
+import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
+import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedBookIDs
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedHTTPTransportException
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
 import org.nypl.simplified.feeds.api.FeedLoaderType
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
-import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
-import org.nypl.simplified.opds.core.OPDSAvailabilityType
 import org.nypl.simplified.profiles.api.ProfileID
 import org.nypl.simplified.profiles.api.ProfilesDatabaseType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -49,6 +50,7 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -136,13 +138,36 @@ class BookRevokeTask(
        */
 
       val entry =
-        OPDSAcquisitionFeedEntry
-          .newBuilder(
-            this.bookID.value(),
-            "",
-            DateTime.now(),
-            OPDSAvailabilityLoanable.get(),
-          ).build()
+        FeedEntryBook(
+          accountID = this.accountID,
+          id = this.bookID.value(),
+          title = "",
+          updated = OffsetDateTime.now(),
+          authors = listOf(),
+          availability = FeedAvailabilityLoanable,
+          acquisitions = listOf(),
+          categories = listOf(),
+          cover = null,
+          previewAcquisitions = listOf(),
+          annotations = null,
+          groups = setOf(),
+          issues = null,
+          related = null,
+          published = null,
+          publisher = null,
+          distribution = "",
+          summary = "",
+          narrators = listOf(),
+          thumbnail = null,
+          timeTrackingUri = null,
+          alternate = null,
+          analytics = null,
+          licensor = null,
+          duration = null,
+          language = null,
+          audience = null,
+          series = null,
+        )
 
       Book(
         this.bookID,
@@ -173,29 +198,29 @@ class BookRevokeTask(
 
     val newEntry =
       when (availability) {
-        is OPDSAvailabilityHeldReady -> {
+        is FeedAvailabilityHeldReady -> {
           val uriOpt = availability.revoke
           if (uriOpt != null) {
             this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
           } else {
             this.debug("no revoke URI, nothing to do")
             this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-            this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityLoanable.get())
+            this.feedEntryWithAvailability(accountID, feedEntry, FeedAvailabilityLoanable)
           }
         }
 
-        is OPDSAvailabilityHeld -> {
+        is FeedAvailabilityHeld -> {
           val uriOpt = availability.revoke
           if (uriOpt != null) {
             this.revokeNotifyServerURI(uriOpt, RevokeType.HOLD, account)
           } else {
             this.debug("no revoke URI, nothing to do")
             this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-            this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityHoldable.get())
+            this.feedEntryWithAvailability(accountID, feedEntry, FeedAvailabilityHoldable)
           }
         }
 
-        is OPDSAvailabilityHoldable -> {
+        is FeedAvailabilityHoldable -> {
           val exception = BookRevokeExceptionNotRevocable()
           val message =
             this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
@@ -208,18 +233,18 @@ class BookRevokeTask(
           throw TaskFailedHandled(exception)
         }
 
-        is OPDSAvailabilityLoaned -> {
+        is FeedAvailabilityLoaned -> {
           val uriOpt = availability.revoke
           if (uriOpt != null) {
             this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
           } else {
             this.debug("no revoke URI, nothing to do")
             this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-            this.feedEntryWithAvailability(accountID, feedEntry, OPDSAvailabilityLoanable.get())
+            this.feedEntryWithAvailability(accountID, feedEntry, FeedAvailabilityLoanable)
           }
         }
 
-        is OPDSAvailabilityLoanable -> {
+        is FeedAvailabilityLoanable -> {
           val exception = BookRevokeExceptionNotRevocable()
           val message =
             this.revokeStrings.revokeServerNotifyNotRevocable(availability.javaClass.simpleName)
@@ -232,18 +257,18 @@ class BookRevokeTask(
           throw TaskFailedHandled(exception)
         }
 
-        is OPDSAvailabilityOpenAccess -> {
+        is FeedAvailabilityOpenAccess -> {
           val uriOpt = availability.revoke
           if (uriOpt != null) {
             this.revokeNotifyServerURI(uriOpt, RevokeType.LOAN, account)
           } else {
             this.debug("no revoke URI, nothing to do")
             this.taskRecorder.currentStepSucceeded(this.revokeStrings.revokeServerNotifyNoURI)
-            FeedEntryOPDS(accountID, feedEntry)
+            feedEntry.copy(availability = FeedAvailabilityLoanable)
           }
         }
 
-        is OPDSAvailabilityRevoked -> {
+        is FeedAvailabilityRevoked -> {
           this.revokeNotifyServerURI(availability.revoke, RevokeType.LOAN, account)
         }
       }
@@ -253,23 +278,17 @@ class BookRevokeTask(
 
   private fun feedEntryWithAvailability(
     accountID: AccountID,
-    oldEntry: OPDSAcquisitionFeedEntry,
-    availability: OPDSAvailabilityType,
-  ): FeedEntryOPDS {
-    val acquisitionFeedEntry =
-      oldEntry
-        .toBuilder()
-        .setAvailability(availability)
-        .build()
-
-    return FeedEntryOPDS(accountID, acquisitionFeedEntry)
+    oldEntry: FeedEntryBook,
+    availability: FeedAvailability,
+  ): FeedEntryBook {
+    return oldEntry.copy(availability = availability)
   }
 
   private fun revokeNotifyServerURI(
     targetURI: URI,
     revokeType: RevokeType,
     account: AccountType,
-  ): FeedEntryOPDS {
+  ): FeedEntryBook {
     this.debug("notifying server of {} revocation via {}", revokeType, targetURI)
     this.taskRecorder.beginNewStep(this.revokeStrings.revokeServerNotifyURI(targetURI))
     this.publishRequestingRevokeStatus()
@@ -282,13 +301,13 @@ class BookRevokeTask(
     return entry
   }
 
-  private fun revokeNotifyServerSaveNewEntry(entry: FeedEntryOPDS) {
+  private fun revokeNotifyServerSaveNewEntry(entry: FeedEntryBook) {
     this.debug("saving received OPDS entry")
     this.taskRecorder.beginNewStep(this.revokeStrings.revokeServerNotifySavingEntry)
     this.publishRequestingRevokeStatus()
 
     try {
-      this.databaseEntry.writeOPDSEntry(entry.feedEntry)
+      this.databaseEntry.writeOPDSEntry(entry)
     } catch (e: Exception) {
       this.taskRecorder.currentStepFailed(
         message = this.revokeStrings.revokeServerNotifySavingEntryFailed,
@@ -402,7 +421,7 @@ class BookRevokeTask(
     }
   }
 
-  private fun revokeNotifyServerURIProcessFeed(feed: Feed): FeedEntryOPDS {
+  private fun revokeNotifyServerURIProcessFeed(feed: Feed): FeedEntryBook {
     this.debug("processing server revocation feed")
     this.taskRecorder.beginNewStep(this.revokeStrings.revokeServerNotifyProcessingFeed)
     this.publishRequestingRevokeStatus()
@@ -420,8 +439,8 @@ class BookRevokeTask(
     }
 
     return when (feed) {
-      is Feed.FeedWithoutGroups -> {
-        when (val feedEntry = feed.entriesInOrder[0]) {
+      is FeedData -> {
+        when (val feedEntry = feed.entries[0]) {
           is FeedEntryCorrupt -> {
             val exception = BookRevokeExceptionBadFeed()
             val message = this.revokeStrings.revokeServerNotifyFeedCorrupt
@@ -434,13 +453,13 @@ class BookRevokeTask(
             throw TaskFailedHandled(exception)
           }
 
-          is FeedEntryOPDS -> {
+          is FeedEntryBook -> {
             feedEntry
           }
         }
       }
 
-      is Feed.FeedWithGroups -> {
+      is FeedDataWithGroups -> {
         val exception = BookRevokeExceptionBadFeed()
         val message = this.revokeStrings.revokeServerNotifyFeedWithGroups
         this.taskRecorder.currentStepFailed(

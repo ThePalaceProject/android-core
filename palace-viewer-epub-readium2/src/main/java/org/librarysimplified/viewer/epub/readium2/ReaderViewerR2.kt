@@ -5,6 +5,8 @@ import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import java.net.URI
@@ -44,7 +46,7 @@ class ReaderViewerR2 : ViewerProviderType {
     val file =
       (format as BookFormat.BookFormatEPUB).file!!
     val entry =
-      FeedEntry.FeedEntryOPDS(book.account, book.entry)
+      book.entry
 
     val parameters =
       Reader2ActivityParameters(

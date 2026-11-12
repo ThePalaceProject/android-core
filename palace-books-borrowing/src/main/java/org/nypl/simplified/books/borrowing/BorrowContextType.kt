@@ -18,10 +18,10 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.bearerToken
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.readium.r2.lcp.LcpService
@@ -142,7 +142,7 @@ interface BorrowContextType {
    * The current acquisition path element. This will be updated once for each subtask.
    */
 
-  val currentAcquisitionPathElement: OPDSAcquisitionPathElement
+  val currentAcquisitionPathElement: FeedAcquisitionPathElement
 
   /**
    * Convenience method to log at debug level.
@@ -182,14 +182,14 @@ interface BorrowContextType {
    * The full OPDS acquisition path that we are currently traversing.
    */
 
-  val opdsAcquisitionPath: OPDSAcquisitionPath
+  val opdsAcquisitionPath: FeedAcquisitionPath
 
   /**
    * The possibly-empty list of acquisition path elements that will be processed after the
    * current subtask completes.
    */
 
-  fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement>
+  fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement>
 
   /**
    * The current book database entry.
@@ -266,7 +266,7 @@ interface BorrowContextType {
    * Choose a new acquisition path to follow based on the given received entry.
    */
 
-  fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link
+  fun chooseNewAcquisitionPath(entry: FeedEntryBook): Link
 
   /**
    * Indicate that downloading the current book failed. Implementations should base the

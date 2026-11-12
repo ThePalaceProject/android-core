@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.bookmarks
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.subjects.Subject
 import okhttp3.mockwebserver.MockResponse
@@ -513,7 +516,7 @@ class BookmarkServiceTest {
           account = account.id,
           cover = null,
           thumbnail = null,
-          entry = initialFeedEntry,
+          entry = OPDS12FeedConverter.convertEntry(account.id, initialFeedEntry),
           formats = listOf(format)
         )
       )

@@ -1,0 +1,19 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:1111111111",
+        "title": "Book With Subjects",
+        "subject": [
+          "Fiction"
+        ]
+      },
+      "links": []
+    }
+  ]
+}

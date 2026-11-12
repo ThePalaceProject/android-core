@@ -6,6 +6,8 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
@@ -48,7 +50,7 @@ class PdfViewerProvider : ViewerProviderType {
     val formatPDF =
       format as BookFormat.BookFormatPDF
     val entry =
-      FeedEntry.FeedEntryOPDS(book.account, book.entry)
+      book.entry
 
     PdfReaderActivity.startActivity(
       context = activity,

@@ -1,0 +1,29 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:5050505050",
+        "title": "Book With DRM Licensor"
+      },
+      "links": [
+        {
+          "href": "https://example.com/book.epub",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition/borrow",
+          "properties": {
+            "licensor": {
+              "vendor": "adobe",
+              "clientToken": "test-token",
+              "deviceManager": "https://example.com/devices"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.subjects.PublishSubject
 import okhttp3.mockwebserver.MockResponse
@@ -166,7 +168,7 @@ class BugPP2325Test {
     val request =
       BorrowRequest.Start(
         accountId = account.id,
-        opdsAcquisitionFeedEntry = entryStart(),
+        opdsAcquisitionFeedEntry = OPDS12FeedConverter.convertEntry(account.id, entryStart()),
         samlDownloadContext = null
       )
 

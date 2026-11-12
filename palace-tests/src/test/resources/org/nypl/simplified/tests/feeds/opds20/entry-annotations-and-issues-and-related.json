@@ -1,0 +1,29 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:5555555555",
+        "title": "Book With Links"
+      },
+      "links": [
+        {
+          "href": "https://example.com/annotations",
+          "rel": "http://www.w3.org/ns/oa#annotationService"
+        },
+        {
+          "href": "https://example.com/issues",
+          "rel": "issues"
+        },
+        {
+          "href": "https://example.com/related",
+          "rel": "related"
+        }
+      ]
+    }
+  ]
+}

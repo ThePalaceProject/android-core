@@ -4,6 +4,8 @@ import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMECompatibility.applicationOctetStream
 import one.irradia.mime.api.MIMEType
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
@@ -28,22 +30,24 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.allOPDSFeeds
+import org.nypl.simplified.books.formats.api.StandardFormatNames.opds20Publication
+import org.nypl.simplified.feeds.FeedEntryParse
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
+import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
+import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryParseType
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
-import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
-import org.nypl.simplified.opds.core.OPDSParseException
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * A task that creates an OPDS loan by hitting an acquisition URI.
@@ -68,6 +72,9 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         if (MIMECompatibility.isCompatibleStrictWithoutAttributes(opdsType, type)) {
           return true
         }
+      }
+      if (MIMECompatibility.isCompatibleStrictWithoutAttributes(opds20Publication, type)) {
+        return true
       }
       return false
     }
@@ -194,9 +201,8 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     }
 
     val inputStream = status.bodyStream ?: ByteArrayInputStream(ByteArray(0))
-    val entry = this.parseOPDSFeedEntry(context, inputStream, uri)
+    val entry = this.parseFeedEntry(context, inputStream, uri, status.properties.contentType)
     context.bookDatabaseEntry.writeOPDSEntry(entry)
-
     this.checkAvailability(context, entry)
     val nextURI = this.findNextLink(context, entry)
     context.receivedNewURI(nextURI)
@@ -204,31 +210,31 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun checkAvailability(
     context: BorrowContextType,
-    entry: OPDSAcquisitionFeedEntry,
+    entry: FeedEntryBook,
   ) {
     context.taskRecorder.beginNewStep("Checking OPDS availability...")
 
     return when (val availability = entry.availability) {
-      is OPDSAvailabilityHeld -> {
+      is FeedAvailabilityHeld -> {
         context.taskRecorder.currentStepSucceeded("Book is held.")
         context.bookPublishStatus(
           HeldInQueue(
             id = context.bookCurrent.id,
             queuePosition = availability.position,
-            startDate = availability.startDate,
+            startDate = toJodaOrNull(availability.startDate),
             isRevocable = availability.revoke != null,
-            endDate = availability.endDate,
+            endDate = toJodaOrNull(availability.endDate),
           ),
         )
         throw BorrowSubtaskHaltedEarly()
       }
 
-      is OPDSAvailabilityHeldReady -> {
+      is FeedAvailabilityHeldReady -> {
         context.taskRecorder.currentStepSucceeded("Book is held and ready.")
         context.bookPublishStatus(
           HeldReady(
             id = context.bookCurrent.id,
-            endDate = availability.endDate,
+            endDate = toJodaOrNull(availability.endDate),
             isRevocable = availability.revoke != null,
           ),
         )
@@ -243,7 +249,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
        * unreachable?
        */
 
-      is OPDSAvailabilityHoldable -> {
+      is FeedAvailabilityHoldable -> {
         context.taskRecorder.currentStepFailed(
           message = "Book is unexpectedly holdable.",
           errorCode = opdsFeedEntryHoldable,
@@ -260,7 +266,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
        * unreachable?
        */
 
-      is OPDSAvailabilityLoanable -> {
+      is FeedAvailabilityLoanable -> {
         context.taskRecorder.currentStepFailed(
           message = "Book is unexpectedly loanable.",
           errorCode = opdsFeedEntryLoanable,
@@ -269,24 +275,24 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         throw BorrowSubtaskFailed()
       }
 
-      is OPDSAvailabilityLoaned -> {
+      is FeedAvailabilityLoaned -> {
         context.taskRecorder.currentStepSucceeded("Book is loaned.")
         context.bookPublishStatus(
           LoanedNotDownloaded(
             id = context.bookCurrent.id,
-            loanExpiryDate = availability.endDate,
+            loanExpiryDate = toJodaOrNull(availability.endDate),
             returnable = availability.revoke != null,
             isOpenAccess = false,
           ),
         )
       }
 
-      is OPDSAvailabilityOpenAccess -> {
+      is FeedAvailabilityOpenAccess -> {
         context.taskRecorder.currentStepSucceeded("Book is open access.")
         context.bookPublishStatus(
           LoanedNotDownloaded(
             id = context.bookCurrent.id,
-            loanExpiryDate = availability.endDate,
+            loanExpiryDate = toJodaOrNull(availability.endDate),
             returnable = availability.revoke != null,
             isOpenAccess = true,
           ),
@@ -298,28 +304,29 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
        * this code indicates a serious bug in the application.
        */
 
-      is OPDSAvailabilityRevoked -> {
+      is FeedAvailabilityRevoked -> {
         throw UnreachableCodeException()
       }
     }
   }
 
-  private fun parseOPDSFeedEntry(
+  private fun parseFeedEntry(
     context: BorrowContextType,
     inputStream: InputStream,
     uri: URI,
-  ): OPDSAcquisitionFeedEntry {
-    context.taskRecorder.beginNewStep("Parsing the OPDS feed entry...")
-    val parser = OPDSAcquisitionFeedEntryParser.newParser()
+    contentType: one.irradia.mime.api.MIMEType?,
+  ): FeedEntryBook {
+    context.taskRecorder.beginNewStep("Parsing the feed entry...")
+    val parser: FeedEntryParseType = FeedEntryParse.create()
 
     return try {
-      inputStream.use {
-        parser.parseEntryStream(uri, it)
+      inputStream.use { stream ->
+        parser.parseEntry(context.account.id, stream, uri, contentType)
       }
-    } catch (e: OPDSParseException) {
-      context.logError("OPDS feed parse error: ", e)
+    } catch (e: Exception) {
+      context.logError("Feed entry parse error: ", e)
       context.taskRecorder.currentStepFailed(
-        message = "Failed to parse the OPDS feed entry (${e.message}).",
+        message = "Failed to parse the feed entry (${e.message}).",
         errorCode = opdsFeedEntryParseError,
         exception = e,
         extraMessages = listOf(),
@@ -330,12 +337,12 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun findNextLink(
     context: BorrowContextType,
-    entry: OPDSAcquisitionFeedEntry,
+    entry: FeedEntryBook,
   ): Link {
     context.taskRecorder.beginNewStep("Finding the next URI in the OPDS feed entry...")
 
     val remaining = context.opdsAcquisitionPathRemaining()
-    val nextPaths = OPDSAcquisitionPaths.linearize(entry)
+    val nextPaths = FeedAcquisitionPaths.linearize(entry.acquisitions)
     for (nextPath in nextPaths) {
       val nextElements = nextPath.elements
       if (nextElements.size == remaining.size) {
@@ -360,6 +367,18 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     return context.chooseNewAcquisitionPath(entry)
   }
 
-  private fun typesAreCompatible(pair: Pair<OPDSAcquisitionPathElement, OPDSAcquisitionPathElement>) =
-    MIMECompatibility.isCompatibleStrictWithoutAttributes(pair.first.mimeType, pair.second.mimeType)
+  private fun typesAreCompatible(pair: Pair<FeedAcquisitionPathElement, FeedAcquisitionPathElement>): Boolean {
+    return MIMECompatibility.isCompatibleStrictWithoutAttributes(pair.first.mimeType, pair.second.mimeType)
+  }
+
+  /**
+   * Convert a nullable java.time [OffsetDateTime] from [palace-feeds-api] into a
+   * nullable Joda [DateTime] for [BookStatus].
+   */
+  private fun toJodaOrNull(offset: OffsetDateTime?): DateTime? {
+    if (offset == null) {
+      return null
+    }
+    return DateTime(offset.toInstant().toEpochMilli(), DateTimeZone.forOffsetMillis(offset.offset.totalSeconds * 1000))
+  }
 }

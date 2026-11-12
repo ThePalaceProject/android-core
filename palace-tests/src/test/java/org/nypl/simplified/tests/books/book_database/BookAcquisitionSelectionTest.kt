@@ -2,7 +2,9 @@ package org.nypl.simplified.tests.books.book_database
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.book_database.api.BookAcquisitionSelection
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
 import org.nypl.simplified.opds.core.OPDSFeedParser
 import org.nypl.simplified.opds.core.OPDSGroup
@@ -37,7 +39,8 @@ class BookAcquisitionSelectionTest {
     val group = groupEntry.value
     val entry = group.entries[0]
 
-    val acquisition = BookAcquisitionSelection.preferredAcquisition(entry.acquisitions)
+    val feedEntry = OPDS12FeedConverter.convertEntry(AccountID.generate(), entry)
+    val acquisition = BookAcquisitionSelection.preferredAcquisition(feedEntry.acquisitions)
     Assertions.assertNotNull(acquisition)
   }
 }

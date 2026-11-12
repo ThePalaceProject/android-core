@@ -1,14 +1,16 @@
 package org.nypl.simplified.feeds.api
 
 import org.librarysimplified.http.api.LSHTTPProblemReport
-import org.nypl.simplified.opds.core.OPDSFeedTransportException
 
 /**
- * The type of exceptions caused by HTTP errors.
+ * An exception caused by an HTTP transport error during feed loading.
+ *
+ * @param message The message.
+ * @param code The HTTP status code.
+ * @param report The problem report, if one was returned by the server.
  */
-
 class FeedHTTPTransportException(
-  override val message: String,
+  message: String,
   val code: Int,
   val report: LSHTTPProblemReport?,
-) : OPDSFeedTransportException(message)
+) : Exception(message)

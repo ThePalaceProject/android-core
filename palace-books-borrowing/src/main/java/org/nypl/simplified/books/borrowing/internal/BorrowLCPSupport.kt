@@ -1,25 +1,28 @@
 package org.nypl.simplified.books.borrowing.internal
 
-import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCancelled
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer
 import org.librarysimplified.http.downloads.LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME
 import org.librarysimplified.http.downloads.LSHTTPDownloads
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.addBasicTokenPropertiesIfApplicable
-import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.books.borrowing.BorrowContextType
 import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.lcpNotSupported
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskCancelled
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskFailed
-import org.nypl.simplified.opds.core.OPDSAcquisitionPaths
-import org.nypl.simplified.opds.core.OPDSFeedParserType
+import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedLoaderResult
+import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.readium.r2.shared.util.Error
 import org.readium.r2.shared.util.Try
 import org.readium.r2.shared.util.http.HttpError
 import java.net.URI
+import java.util.concurrent.TimeUnit
 
 /**
  * Support functionality for LCP books.
@@ -121,88 +124,64 @@ object BorrowLCPSupport {
       throw BorrowSubtaskFailed()
     }
 
-    val credentials =
-      context.takeSubtaskCredentialsRequiringAccount()
-    val auth =
-      AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
+    val feedLoader = context.services.requireService(FeedLoaderType::class.java)
+    val credentials = context.takeSubtaskCredentialsRequiringAccount()
 
-    val request =
-      context.httpClient
-        .newRequest(loansURI)
-        .setAuthorization(auth)
-        .addBasicTokenPropertiesIfApplicable(credentials)
-        .build()
+    val result =
+      feedLoader
+        .fetchURI(
+          accountID = context.account.id,
+          uri = loansURI,
+          credentials = credentials,
+          method = "GET",
+        ).get(30L, TimeUnit.SECONDS)
 
-    return request.execute().use { response ->
-      context.bookDownloadIsRunning("Locating passphrase…")
+    context.bookDownloadIsRunning("Locating passphrase…")
 
-      when (val status = response.status) {
-        is LSHTTPResponseStatus.Responded.OK -> {
-          context.account.updateBasicTokenCredentials(status.getAccessToken())
-          this.findPassphraseHandleOK(context, loansURI, status)
+    when (result) {
+      is FeedLoaderResult.FeedLoaderSuccess -> {
+        val accessToken = result.accessToken
+        if (accessToken != null) {
+          context.account.updateBasicTokenCredentials(accessToken)
         }
+        return this.findPassphraseInFeed(context, result.feed)
+      }
 
-        is LSHTTPResponseStatus.Responded.Error -> {
-          this.findPassphraseHandleError(context, status)
-        }
+      is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication -> {
+        context.taskRecorder.currentStepFailed(
+          message = "Authentication failed when fetching loans feed.",
+          errorCode = BorrowErrorCodes.httpRequestFailed,
+          exception = result.exception,
+          extraMessages = listOf(),
+        )
+        throw BorrowSubtaskFailed()
+      }
 
-        is LSHTTPResponseStatus.Failed -> {
-          this.findPassphraseHandleFailure(context, status)
-        }
+      is FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral -> {
+        context.taskRecorder.currentStepFailed(
+          message = result.message,
+          errorCode = BorrowErrorCodes.httpRequestFailed,
+          exception = result.exception,
+          extraMessages = listOf(),
+        )
+        throw BorrowSubtaskFailed()
       }
     }
   }
 
-  private fun findPassphraseHandleFailure(
+  private fun findPassphraseInFeed(
     context: BorrowContextType,
-    status: LSHTTPResponseStatus.Failed,
+    feed: Feed,
   ): String {
-    context.taskRecorder.currentStepFailed(
-      message = status.exception.message ?: "Exception raised during connection attempt.",
-      errorCode = BorrowErrorCodes.httpConnectionFailed,
-      exception = status.exception,
-      extraMessages = listOf(),
-    )
-    throw BorrowSubtaskFailed()
-  }
-
-  private fun findPassphraseHandleError(
-    context: BorrowContextType,
-    status: LSHTTPResponseStatus.Responded.Error,
-  ): String {
-    val report = status.properties.problemReport
-    if (report != null) {
-      context.taskRecorder.addAttributes(report.toMap())
-    }
-    context.taskRecorder.currentStepFailed(
-      message = "HTTP request failed: ${status.properties.originalStatus} ${status.properties.message}",
-      errorCode = BorrowErrorCodes.httpRequestFailed,
-      exception = null,
-      extraMessages = listOf(),
-    )
-    throw BorrowSubtaskFailed()
-  }
-
-  private fun findPassphraseHandleOK(
-    context: BorrowContextType,
-    loansURI: URI,
-    status: LSHTTPResponseStatus.Responded.OK,
-  ): String {
-    val feedParser =
-      context.services.requireService(OPDSFeedParserType::class.java)
-
     val entryFound =
-      try {
-        val result = feedParser.parse(loansURI, status.bodyStream)
-        result.feedEntries.find { entry -> entry.id == context.bookCurrent.entry.id }
-      } catch (e: Exception) {
-        context.taskRecorder.currentStepFailed(
-          message = "Unable to parse loans feed (${e.message})",
-          errorCode = "lcpUnparseableLoansFeed",
-          exception = e,
-          extraMessages = listOf(),
-        )
-        throw BorrowSubtaskFailed()
+      when (feed) {
+        is FeedData -> {
+          findEntryByID(feed.entries, context.bookCurrent.entry.id)
+        }
+
+        is FeedDataWithGroups -> {
+          findEntryByIDInGroups(feed.groups, context.bookCurrent.entry.id)
+        }
       }
 
     if (entryFound == null) {
@@ -215,7 +194,7 @@ object BorrowLCPSupport {
       throw BorrowSubtaskFailed()
     }
 
-    val linearized = OPDSAcquisitionPaths.linearize(entryFound)
+    val linearized = FeedAcquisitionPaths.linearize(entryFound.acquisitions)
     for (path in linearized) {
       for (element in path.elements) {
         val passphrase = element.properties["lcp:hashed_passphrase"]
@@ -232,6 +211,35 @@ object BorrowLCPSupport {
       extraMessages = listOf(),
     )
     throw BorrowSubtaskFailed()
+  }
+
+  private fun findEntryByID(
+    entries: List<FeedEntry>,
+    bookID: String,
+  ): FeedEntryBook? {
+    for (entry in entries) {
+      when (entry) {
+        is FeedEntryBook -> {
+          if (entry.id == bookID) return entry
+        }
+
+        is org.nypl.simplified.feeds.api.FeedEntryCorrupt -> {
+          Unit
+        }
+      }
+    }
+    return null
+  }
+
+  private fun findEntryByIDInGroups(
+    groups: List<org.nypl.simplified.feeds.api.FeedGroup>,
+    bookID: String,
+  ): FeedEntryBook? {
+    for (group in groups) {
+      val found = findEntryByID(group.groupEntries, bookID)
+      if (found != null) return found
+    }
+    return null
   }
 
   fun fetchAllR2ErrorMessages(failure: Try.Failure<*, Error>): List<String> {

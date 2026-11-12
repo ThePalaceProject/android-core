@@ -1,5 +1,9 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+import org.nypl.simplified.books.api.FeedBookIDConversions
+
 import android.app.Application
 import android.content.ContentResolver
 import io.reactivex.disposables.Disposable
@@ -149,7 +153,7 @@ class BorrowTaskTest {
   private fun createTask(request: BorrowRequest): BorrowTaskType {
     this.book =
       Book(
-        id = BookIDs.newFromOPDSEntry(request.opdsAcquisitionFeedEntry),
+        id = FeedBookIDConversions.toBookID(request.opdsAcquisitionFeedEntry.bookID),
         account = request.accountId,
         cover = null,
         thumbnail = null,
@@ -260,7 +264,7 @@ class BorrowTaskTest {
       )
 
     this.bookID =
-      BookIDs.newFromOPDSEntry(this.opdsOpenEPUBFeedEntry)
+      BookIDs.newFromText(this.opdsOpenEPUBFeedEntry.id)
 
     this.androidContext =
       Mockito.mock(Application::class.java)
@@ -354,7 +358,7 @@ class BorrowTaskTest {
   @Test
   fun testBrokenBookDatabase() {
     val request =
-      BorrowRequest.Start(this.account.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, this.opdsEmptyFeedEntry))
     val task =
       this.createTask(request)
 
@@ -383,7 +387,7 @@ class BorrowTaskTest {
   @Test
   fun testNoAccount() {
     val request =
-      BorrowRequest.Start(AccountID.generate(), this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(AccountID.generate(), OPDS12FeedConverter.convertEntry(AccountID.generate(), this.opdsEmptyFeedEntry))
     val task =
       this.createTask(request)
 
@@ -400,7 +404,7 @@ class BorrowTaskTest {
   @Test
   fun testNoAvailableAcquisitions() {
     val request =
-      BorrowRequest.Start(this.account.id, this.opdsEmptyFeedEntry)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, this.opdsEmptyFeedEntry))
     val task =
       this.createTask(request)
 
@@ -418,12 +422,12 @@ class BorrowTaskTest {
   fun testNoAvailableBorrowAcquisitions() {
     val feedEntry = BorrowTestFeeds.opdsOpenAccessFeedEntryWithNoBorrowLink()
     this.bookID =
-      BookIDs.newFromOPDSEntry(feedEntry)
+      BookIDs.newFromText(feedEntry.id)
 
     assertEquals(0, feedEntry.acquisitions.size)
 
     val request =
-      BorrowRequest.Start(this.account.id, feedEntry)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, feedEntry))
     val task =
       this.createTask(request)
 
@@ -451,12 +455,12 @@ class BorrowTaskTest {
       genericEPUBFiles.fullType
     )
     this.bookID =
-      BookIDs.newFromOPDSEntry(feedEntry)
+      BookIDs.newFromText(feedEntry.id)
 
     assertEquals(2, feedEntry.acquisitions.size)
 
     val request =
-      BorrowRequest.Start(this.account.id, feedEntry)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, feedEntry))
     val task =
       this.createTask(request)
 
@@ -484,7 +488,7 @@ class BorrowTaskTest {
   @Test
   fun testNoSubtasks() {
     val request =
-      BorrowRequest.Start(this.account.id, this.opdsOpenEPUBFeedEntry)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, this.opdsOpenEPUBFeedEntry))
     val task =
       this.createTask(request)
 
@@ -509,7 +513,7 @@ class BorrowTaskTest {
     )
 
     val request =
-      BorrowRequest.Start(this.account.id, this.opdsOpenEPUBFeedEntry)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, this.opdsOpenEPUBFeedEntry))
     val task =
       this.createTask(request)
 
@@ -573,7 +577,7 @@ class BorrowTaskTest {
     )
 
     val request =
-      BorrowRequest.Start(this.account.id, loanable)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, loanable))
     val task =
       this.createTask(request)
 
@@ -658,7 +662,7 @@ class BorrowTaskTest {
     }
 
     val request =
-      BorrowRequest.Start(this.account.id, loanable)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, loanable))
     val task =
       this.createTask(request)
 
@@ -746,7 +750,7 @@ class BorrowTaskTest {
     }
 
     val request =
-      BorrowRequest.Start(this.account.id, loanable)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, loanable))
     val task =
       this.createTask(request)
 
@@ -809,7 +813,7 @@ class BorrowTaskTest {
       this.findMockBookDatabase()
 
     val request =
-      BorrowRequest.Start(this.account.id, loanable)
+      BorrowRequest.Start(this.account.id, OPDS12FeedConverter.convertEntry(this.account.id, loanable))
     val task =
       this.createTask(request)
 

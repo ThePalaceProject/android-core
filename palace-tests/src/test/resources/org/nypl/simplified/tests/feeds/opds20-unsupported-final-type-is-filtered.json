@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "title": "PDF Feed"
+  },
+  "publications": [
+    {
+      "metadata": {
+        "identifier": "urn:test:pdf1",
+        "title": "PDF Book"
+      },
+      "links": [
+        {
+          "href": "https://example.com/acquire/pdf1",
+          "type": "application/opds-publication+json",
+          "rel": "http://opds-spec.org/acquisition/borrow",
+          "properties": {
+            "indirectAcquisition": [
+              {
+                "type": "application/pdf",
+                "properties": {}
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 
 internal object PdfReaderBookmarks {
   /**
@@ -76,7 +77,7 @@ internal object PdfReaderBookmarks {
    */
 
   fun fromPdfBookmark(
-    bookEntry: FeedEntry.FeedEntryOPDS,
+    bookEntry: FeedEntryBook,
     deviceId: String,
     source: PdfBookmark,
   ): SerializedBookmark =
@@ -84,7 +85,7 @@ internal object PdfReaderBookmarks {
       bookChapterProgress = 0.0,
       bookChapterTitle = "",
       bookProgress = 0.0,
-      bookTitle = bookEntry.feedEntry.title,
+      bookTitle = bookEntry.title,
       deviceID = deviceId,
       kind =
         when (source.kind) {
@@ -92,7 +93,7 @@ internal object PdfReaderBookmarks {
           PdfBookmarkKind.LAST_READ -> BookmarkLastReadLocation
         },
       location = SerializedLocatorPage1(source.pageNumber),
-      opdsId = bookEntry.feedEntry.id,
+      opdsId = bookEntry.id,
       time = source.time,
       uri = null,
     )

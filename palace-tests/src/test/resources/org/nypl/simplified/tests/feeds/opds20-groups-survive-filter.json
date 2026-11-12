@@ -1,0 +1,98 @@
+{
+  "metadata": {
+    "title": "Grouped Feed"
+  },
+  "groups": [
+    {
+      "metadata": {
+        "title": "Group A",
+        "identifier": "https://example.com/groupA"
+      },
+      "links": [
+        {
+          "href": "https://example.com/groupA",
+          "rel": "self"
+        }
+      ],
+      "publications": [
+        {
+          "metadata": {
+            "identifier": "urn:test:bookA1",
+            "title": "Book A1"
+          },
+          "links": [
+            {
+              "href": "https://example.com/acquire/a1",
+              "type": "application/opds-publication+json",
+              "rel": "http://opds-spec.org/acquisition/borrow",
+              "properties": {
+                "indirectAcquisition": [
+                  {
+                    "type": "application/epub+zip",
+                    "properties": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "metadata": {
+            "identifier": "urn:test:bookA2",
+            "title": "Book A2"
+          },
+          "links": [
+            {
+              "href": "https://example.com/acquire/a2",
+              "type": "application/opds-publication+json",
+              "rel": "http://opds-spec.org/acquisition/borrow",
+              "properties": {
+                "indirectAcquisition": [
+                  {
+                    "type": "application/epub+zip",
+                    "properties": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "title": "Group B",
+        "identifier": "https://example.com/groupB"
+      },
+      "links": [
+        {
+          "href": "https://example.com/groupB",
+          "rel": "self"
+        }
+      ],
+      "publications": [
+        {
+          "metadata": {
+            "identifier": "urn:test:bookB1",
+            "title": "Book B1"
+          },
+          "links": [
+            {
+              "href": "https://example.com/acquire/b1",
+              "type": "application/opds-publication+json",
+              "rel": "http://opds-spec.org/acquisition/borrow",
+              "properties": {
+                "indirectAcquisition": [
+                  {
+                    "type": "application/epub+zip",
+                    "properties": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

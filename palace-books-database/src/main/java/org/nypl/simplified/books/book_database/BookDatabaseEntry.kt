@@ -14,11 +14,10 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntrySerializerType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
-import org.nypl.simplified.json.core.JSONSerializerUtilities
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -33,7 +32,7 @@ import java.util.EnumMap
 internal class BookDatabaseEntry internal constructor(
   private val context: Application,
   private val bookDir: File,
-  private val serializer: OPDSJSONSerializerType,
+  private val serializer: FeedEntrySerializerType,
   private val httpClient: LSHTTPClientType,
   private val formats: BookFormatSupportType,
   @GuardedBy("bookLock")
@@ -139,7 +138,7 @@ internal class BookDatabaseEntry internal constructor(
   private val deleted: Boolean = false
 
   @Throws(BookDatabaseException::class)
-  override fun writeOPDSEntry(opdsEntry: OPDSAcquisitionFeedEntry) {
+  override fun writeOPDSEntry(entry: FeedEntryBook) {
     synchronized(this.bookLock) {
       Preconditions.checkArgument(!this.deleted, "Entry must not have been deleted")
 
@@ -152,12 +151,10 @@ internal class BookDatabaseEntry internal constructor(
         FileUtilities.fileWriteUTF8Atomically(
           fileMeta,
           fileMetaTmp,
-          JSONSerializerUtilities.serializeToString(
-            this.serializer.serializeFeedEntry(opdsEntry),
-          ),
+          this.serializer.serializeEntry(entry),
         )
 
-        this.bookRef = this.bookRef.copy(entry = opdsEntry)
+        this.bookRef = this.bookRef.copy(entry = entry)
       } catch (e: IOException) {
         throw BookDatabaseException(e.message, listOf<Exception>(e))
       } finally {

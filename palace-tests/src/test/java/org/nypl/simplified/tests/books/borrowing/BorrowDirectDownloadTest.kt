@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
@@ -47,7 +50,7 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -164,7 +167,7 @@ class BorrowDirectDownloadTest {
     val initialFeedEntry =
       BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericEPUBFiles.fullType)
     this.bookID =
-      BookIDs.newFromOPDSEntry(initialFeedEntry)
+      BookIDs.newFromText(initialFeedEntry.id)
 
     val bookInitial =
       Book(
@@ -172,7 +175,7 @@ class BorrowDirectDownloadTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountId, initialFeedEntry),
         formats = listOf()
       )
 
@@ -226,7 +229,7 @@ class BorrowDirectDownloadTest {
     val task = BorrowDirectDownload.createSubtask()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -254,7 +257,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -282,7 +285,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.webServer.enqueue(MockResponse().setResponseCode(404))
 
@@ -312,7 +315,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.webServer.enqueue(MockResponse().setResponseCode(401))
 
@@ -339,7 +342,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.webServer.enqueue(
       MockResponse()
@@ -382,7 +385,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     val response =
       MockResponse()
@@ -417,10 +420,10 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     this.bookDatabaseEntry.writeOPDSEntry(
-      BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType)
+      OPDS12FeedConverter.convertEntry(this.accountId, BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType))
     )
     this.bookDatabaseEntry.entryWrites = 0
     this.bookDatabaseEntry.formatHandlesField.clear()
@@ -460,7 +463,7 @@ class BorrowDirectDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)

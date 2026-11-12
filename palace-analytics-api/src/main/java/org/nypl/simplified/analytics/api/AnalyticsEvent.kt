@@ -2,7 +2,7 @@ package org.nypl.simplified.analytics.api
 
 import org.joda.time.LocalDateTime
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.net.URI
 import java.util.SortedMap
 import java.util.UUID
@@ -232,7 +232,7 @@ sealed class AnalyticsEvent {
      * The OPDS entry of the book.
      */
 
-    val opdsEntry: OPDSAcquisitionFeedEntry,
+    val opdsEntry: FeedEntryBook,
     /**
      * A URI that should be used for submitting "book opened" events.
      */
@@ -270,7 +270,7 @@ sealed class AnalyticsEvent {
      * The OPDS entry of the book.
      */
 
-    val opdsEntry: OPDSAcquisitionFeedEntry,
+    val opdsEntry: FeedEntryBook,
     /**
      * The current page of the book.
      */
@@ -314,7 +314,7 @@ sealed class AnalyticsEvent {
      * The OPDS entry of the book.
      */
 
-    val opdsEntry: OPDSAcquisitionFeedEntry,
+    val opdsEntry: FeedEntryBook,
   ) : AnalyticsEvent()
 
   /**

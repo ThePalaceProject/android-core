@@ -4,8 +4,8 @@ import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.formats.api.StandardFormatNames
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedPreviewAcquisition
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
@@ -17,7 +17,7 @@ import java.net.URL
 class BookPreviewTask(
   private val bookPreviewRegistry: BookPreviewRegistryType,
   private val bookPreviewRequirements: BookPreviewRequirements,
-  private val feedEntry: OPDSAcquisitionFeedEntry,
+  private val feedEntry: FeedEntryBook,
   private val format: BookFormats.BookFormatDefinition?,
 ) {
   private lateinit var taskRecorder: TaskRecorderType
@@ -50,7 +50,7 @@ class BookPreviewTask(
 
   private fun handleBookPreviewDownload(
     onPreviewFileReady: (File) -> Unit,
-    previewAcquisition: OPDSPreviewAcquisition,
+    previewAcquisition: FeedPreviewAcquisition,
   ): TaskResult<*> {
     val taskName = "BookPreviewDownloadTask"
     val step = this.taskRecorder.beginNewStep("Executing subtask $taskName...")
@@ -113,8 +113,8 @@ class BookPreviewTask(
     )
   }
 
-  private fun handlePreviewDownload(previewAcquisition: OPDSPreviewAcquisition): TaskResult<*> =
-    when (format) {
+  private fun handlePreviewDownload(previewAcquisition: FeedPreviewAcquisition): TaskResult<*> {
+    return when (format) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO,
       BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB,
       -> {
@@ -146,6 +146,7 @@ class BookPreviewTask(
         this.taskRecorder.finishFailure<Unit>()
       }
     }
+  }
 
   private fun startBookPreviewHandling(): TaskResult<*> {
     this.taskRecorder.addAttribute("Book", feedEntry.title)
@@ -168,10 +169,10 @@ class BookPreviewTask(
     }
   }
 
-  private fun pickPreviewAcquisition(): OPDSPreviewAcquisition {
+  private fun pickPreviewAcquisition(): FeedPreviewAcquisition {
     this.taskRecorder.beginNewStep("Planning the preview operation…")
 
-    if (feedEntry.previewAcquisitions.isNullOrEmpty()) {
+    if (feedEntry.previewAcquisitions.isEmpty()) {
       this.bookPreviewRegistry.updatePreviewStatus(
         BookPreviewStatus.None,
       )

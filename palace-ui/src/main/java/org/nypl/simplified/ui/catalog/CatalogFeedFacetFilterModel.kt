@@ -1,7 +1,11 @@
 package org.nypl.simplified.ui.catalog
 
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
+import org.nypl.simplified.feeds.api.FeedFacetComposite
+import org.nypl.simplified.feeds.api.FeedFacetData
+import org.nypl.simplified.feeds.api.FeedFacetPseudoFiltering
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
+import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.slf4j.LoggerFactory
 import java.util.SortedMap
 
@@ -19,32 +23,32 @@ class CatalogFeedFacetFilterModel private constructor(
     }
 
     return when (this.facets[0].feedFacets[0]) {
-      is FeedFacet.FeedFacetOPDS12Single -> {
+      is FeedFacetData -> {
         val facetValues =
           this.facets
-            .filter { f -> f.feedFacets.all { ff -> ff is FeedFacet.FeedFacetOPDS12Single } }
-            .map { f -> f.feedFacets[f.selectedIndex] as FeedFacet.FeedFacetOPDS12Single }
+            .filter { f -> f.feedFacets.all { ff -> ff is FeedFacetData } }
+            .map { f -> f.feedFacets[f.selectedIndex] as FeedFacetData }
 
         for (value in facetValues) {
           CatalogFeedFacetFilterModelLog.logger.debug(
             "Result: Facet[{}]: Value '{}'",
-            value.opdsFacet.group,
+            value.group,
             value.title,
           )
         }
 
-        FeedFacet.FeedFacetOPDS12Composite(
+        FeedFacetComposite(
           facetValues,
           title,
           true,
         )
       }
 
-      is FeedFacet.FeedFacetPseudo.FilteringForAccount -> {
+      is FeedFacetPseudoFiltering -> {
         this.findSelectedFacetValue(this.facets[0])
       }
 
-      is FeedFacet.FeedFacetPseudo.Sorting -> {
+      is FeedFacetPseudoSorting -> {
         throw IllegalStateException("Sorting facets are not permitted.")
       }
     }

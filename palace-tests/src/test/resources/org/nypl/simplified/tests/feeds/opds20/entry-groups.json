@@ -1,0 +1,27 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:8888888888",
+        "title": "Book In Groups"
+      },
+      "links": [
+        {
+          "href": "https://example.com/group/scifi",
+          "rel": "collection",
+          "title": "Sci-Fi"
+        },
+        {
+          "href": "https://example.com/group/favorites",
+          "rel": "collection",
+          "title": "Favorites"
+        }
+      ]
+    }
+  ]
+}
