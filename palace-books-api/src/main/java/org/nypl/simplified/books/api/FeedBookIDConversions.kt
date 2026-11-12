@@ -17,6 +17,6 @@ object FeedBookIDConversions {
    * Convert a [FeedBookID] to a [BookID].
    */
   fun toBookID(feedBookID: FeedBookID): BookID {
-    return BookID.create(feedBookID.value())
+    return BookID.create(feedBookID.value)
   }
 }
