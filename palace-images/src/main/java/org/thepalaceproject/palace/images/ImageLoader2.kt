@@ -106,12 +106,20 @@ class ImageLoader2 private constructor(
 
   private fun coverURIOf(entry: FeedEntryBook): URI? {
     val bookWithStatus = this.bookRegistry.bookOrNull(FeedBookIDConversions.toBookID(entry.bookID))
-    return bookWithStatus?.book?.cover?.toURI() ?: entry.cover
+    val bookCoverURI = bookWithStatus?.book?.cover?.toURI()
+    if (bookCoverURI != null) {
+      return bookCoverURI
+    }
+    return entry.cover
   }
 
   private fun thumbnailURIOf(entry: FeedEntryBook): URI? {
     val bookWithStatus = this.bookRegistry.bookOrNull(FeedBookIDConversions.toBookID(entry.bookID))
-    return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.thumbnail
+    val bookThumbnailURI = bookWithStatus?.book?.thumbnail?.toURI()
+    if (bookThumbnailURI != null) {
+      return bookThumbnailURI
+    }
+    return entry.thumbnail
   }
 
   private abstract class BaseListener<T>(

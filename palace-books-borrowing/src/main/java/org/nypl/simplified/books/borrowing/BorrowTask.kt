@@ -693,7 +693,8 @@ class BorrowTask private constructor(
       throw IOException("Could not create a temporary file within 100 attempts!")
     }
 
-    override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> =
-      this.currentRemainingOPDSPathElements
+    override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> {
+      return this.currentRemainingOPDSPathElements
+    }
   }
 }

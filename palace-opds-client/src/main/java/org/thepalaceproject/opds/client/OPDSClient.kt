@@ -167,7 +167,9 @@ class OPDSClient private constructor(
       @Volatile
       lateinit var feed: FeedDataWithGroups
 
-      override fun feed(): FeedDataWithGroups = this.feed
+      override fun feed(): FeedDataWithGroups {
+        return this.feed
+      }
 
       override fun refresh(): CompletableFuture<Unit> = this@OPDSClient.executeWithFuture(this@RequestHandler)
     }
@@ -261,7 +263,9 @@ class OPDSClient private constructor(
         return pageFuture
       }
 
-      override fun feed(): FeedData = this.feedInitial
+      override fun feed(): FeedData {
+        return this.feedInitial
+      }
 
       override fun scrollPositionSave(position: Int) {
         this.positionSaved = position

@@ -8,6 +8,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedData
@@ -33,12 +34,13 @@ class OPDS20FeedConverterTest {
   /**
    * Parse the given JSON string and convert to a PalaceFeed.
    */
-  private fun parseAndConvert(json: String) =
-    OPDS20FeedConverter.convert(
+  private fun parseAndConvert(json: String): Feed {
+    return OPDS20FeedConverter.convert(
       accountID = this.accountID,
       feed = OPDS20FeedConverter.parse(ByteArrayInputStream(json.toByteArray(StandardCharsets.UTF_8))),
       feedURI = this.feedURI
     )
+  }
 
   @Test
   fun testEmptyFeed() {

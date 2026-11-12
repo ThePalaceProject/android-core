@@ -199,7 +199,9 @@ object SettingsDebugModel {
   }
 
   @UiThread
-  fun preferOPDS20(): Boolean = this.preferences().preferOPDS20
+  fun preferOPDS20(): Boolean {
+    return this.preferences().preferOPDS20
+  }
 
   @UiThread
   fun setPreferOPDS20(prefer: Boolean) {

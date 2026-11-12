@@ -52,7 +52,9 @@ class CatalogCoverDebugLabels : BookCoverDebugLabelsLookupType {
           .map { it.fullType }
           .toSet()
 
-      fun has(vararg names: String): Boolean = names.any { it in types }
+      fun has(vararg names: String): Boolean {
+        return names.any { it in types }
+      }
 
       return when {
         has(StandardFormatNames.genericEPUBFiles.fullType) -> "EPUB"

@@ -83,9 +83,10 @@ class FeedEntryParse(
     /**
      * Create a new [FeedEntryParse] instance.
      */
-    fun create(): FeedEntryParseType =
-      FeedEntryParse(
+    fun create(): FeedEntryParseType {
+      return FeedEntryParse(
         opds12Parser = OPDSAcquisitionFeedEntryParser.newParser(),
       )
+    }
   }
 }

@@ -28,7 +28,9 @@ data class FeedData(
   val entriesByID: Map<FeedBookID, FeedEntry>
     get() = this.entries.associateBy { it.bookID }
 
-  fun containsBook(bookID: FeedBookID): Boolean = this.entries.any { it.bookID == bookID }
+  fun containsBook(bookID: FeedBookID): Boolean {
+    return this.entries.any { it.bookID == bookID }
+  }
 
   companion object {
     /**
@@ -41,8 +43,8 @@ data class FeedData(
       feedURI: URI,
       feedFacets: List<FeedFacetSingle>,
       feedFacetGroups: Map<String, List<FeedFacetSingle>>,
-    ): FeedData =
-      FeedData(
+    ): FeedData {
+      return FeedData(
         feedID = feedID,
         feedSearch = feedSearch,
         feedTitle = feedTitle,
@@ -58,5 +60,6 @@ data class FeedData(
         facetsOrder = feedFacets,
         entries = emptyList(),
       )
+    }
   }
 }

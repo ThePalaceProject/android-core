@@ -64,11 +64,12 @@ data class CatalogBookStatus<S : BookStatus>(
       }
     }
 
-    private fun bookPreviewStatusOf(entry: FeedEntryBook): BookPreviewStatus =
+    private fun bookPreviewStatusOf(entry: FeedEntryBook): BookPreviewStatus {
       if (!entry.previewAcquisitions.isNullOrEmpty()) {
-        BookPreviewStatus.HasPreview()
+        return BookPreviewStatus.HasPreview()
       } else {
-        BookPreviewStatus.None
+        return BookPreviewStatus.None
       }
+    }
   }
 }

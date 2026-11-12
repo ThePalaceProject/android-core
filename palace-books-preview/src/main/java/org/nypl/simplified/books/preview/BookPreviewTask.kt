@@ -113,8 +113,8 @@ class BookPreviewTask(
     )
   }
 
-  private fun handlePreviewDownload(previewAcquisition: FeedPreviewAcquisition): TaskResult<*> =
-    when (format) {
+  private fun handlePreviewDownload(previewAcquisition: FeedPreviewAcquisition): TaskResult<*> {
+    return when (format) {
       BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO,
       BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB,
       -> {
@@ -146,6 +146,7 @@ class BookPreviewTask(
         this.taskRecorder.finishFailure<Unit>()
       }
     }
+  }
 
   private fun startBookPreviewHandling(): TaskResult<*> {
     this.taskRecorder.addAttribute("Book", feedEntry.title)

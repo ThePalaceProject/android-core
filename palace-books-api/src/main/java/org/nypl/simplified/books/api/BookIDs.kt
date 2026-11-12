@@ -41,5 +41,7 @@ object BookIDs {
    * @return A new book ID
    */
   @JvmStatic
-  fun newFromFeedEntry(e: FeedEntryBook): BookID = newFromText(e.id)
+  fun newFromFeedEntry(e: FeedEntryBook): BookID {
+    return newFromText(e.id)
+  }
 }

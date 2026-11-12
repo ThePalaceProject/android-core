@@ -173,7 +173,7 @@ class Controller private constructor(
    * Respond to account registry events.
    */
 
-  private fun onAccountRegistryEvent(event: AccountProviderRegistryEvent) =
+  private fun onAccountRegistryEvent(event: AccountProviderRegistryEvent) {
     when (event) {
       is AccountProviderRegistryEvent.Updated -> {
         this.onAccountRegistryProviderUpdatedEvent(event)
@@ -184,6 +184,7 @@ class Controller private constructor(
       -> {
       }
     }
+  }
 
   private fun onAccountRegistryProviderUpdatedEvent(event: AccountProviderRegistryEvent.Updated) {
     val profileCurrent = this.profiles.currentProfile()
@@ -229,14 +230,19 @@ class Controller private constructor(
     return sortedMapOf(Pair(p.id, p as ProfileReadableType))
   }
 
-  override fun profileCurrent(): ProfileReadableType = this.profiles.currentProfile()
+  override fun profileCurrent(): ProfileReadableType {
+    return this.profiles.currentProfile()
+  }
 
-  override fun profileEvents(): Observable<ProfileEvent> = this.profileEvents
+  override fun profileEvents(): Observable<ProfileEvent> {
+    return this.profileEvents
+  }
 
-  override fun profileAccountLogin(request: ProfileAccountLoginRequest): FluentFuture<TaskResult<Unit>> =
-    this
+  override fun profileAccountLogin(request: ProfileAccountLoginRequest): FluentFuture<TaskResult<Unit>> {
+    return this
       .submitTask { this.runProfileAccountLogin(request) }
       .flatMap { result -> this.runSyncIfLoginSucceeded(result, request.accountId) }
+  }
 
   private fun runProfileAccountLogin(request: ProfileAccountLoginRequest): TaskResult<Unit> {
     val profile = this.profileCurrent()
@@ -255,8 +261,8 @@ class Controller private constructor(
   private fun runSyncIfLoginSucceeded(
     result: TaskResult<Unit>,
     accountID: AccountID,
-  ): FluentFuture<TaskResult<Unit>> =
-    when (result) {
+  ): FluentFuture<TaskResult<Unit>> {
+    return when (result) {
       is TaskResult.Success -> {
         this.logger.debug("logging in succeeded: syncing account")
         this.booksSync(accountID).map { result }
@@ -267,9 +273,10 @@ class Controller private constructor(
         FluentFutureExtensions.fluentFutureOfValue(result)
       }
     }
+  }
 
-  override fun profileAccountCreateOrReturnExisting(provider: URI): FluentFuture<TaskResult<AccountType>> =
-    this.submitTask(
+  override fun profileAccountCreateOrReturnExisting(provider: URI): FluentFuture<TaskResult<AccountType>> {
+    return this.submitTask(
       ProfileAccountCreateOrReturnExistingTask(
         accountEvents = this.accountEvents,
         accountProviderID = provider,
@@ -278,9 +285,10 @@ class Controller private constructor(
         strings = this.profileAccountCreationStringResources,
       ),
     )
+  }
 
-  override fun profileAccountCreateCustomOPDS(opdsFeed: URI): FluentFuture<TaskResult<AccountType>> =
-    this.submitTask(
+  override fun profileAccountCreateCustomOPDS(opdsFeed: URI): FluentFuture<TaskResult<AccountType>> {
+    return this.submitTask(
       ProfileAccountCreateCustomOPDSTask(
         accountEvents = this.accountEvents,
         accountProviderRegistry = this.accountProviders,
@@ -291,9 +299,10 @@ class Controller private constructor(
         strings = this.profileAccountCreationStringResources,
       ),
     )
+  }
 
-  override fun profileAccountCreate(provider: URI): FluentFuture<TaskResult<AccountType>> =
-    this.submitTask(
+  override fun profileAccountCreate(provider: URI): FluentFuture<TaskResult<AccountType>> {
+    return this.submitTask(
       ProfileAccountCreateTask(
         accountEvents = this.accountEvents,
         accountProviderID = provider,
@@ -302,9 +311,10 @@ class Controller private constructor(
         strings = this.profileAccountCreationStringResources,
       ),
     )
+  }
 
-  override fun profileAccountDeleteByProvider(provider: URI): FluentFuture<TaskResult<Unit>> =
-    this.submitTask(
+  override fun profileAccountDeleteByProvider(provider: URI): FluentFuture<TaskResult<Unit>> {
+    return this.submitTask(
       ProfileAccountDeleteTask(
         accountEvents = this.accountEvents,
         accountProviderID = provider,
@@ -313,6 +323,7 @@ class Controller private constructor(
         strings = this.profileAccountDeletionStringResources,
       ),
     )
+  }
 
   @Throws(AccountsDatabaseNonexistentException::class)
   override fun profileAccountFindByProvider(provider: URI): AccountType {
@@ -321,20 +332,23 @@ class Controller private constructor(
       ?: throw AccountsDatabaseNonexistentException("No account with provider: $provider")
   }
 
-  override fun accountEvents(): Observable<AccountEvent> = this.accountEvents
+  override fun accountEvents(): Observable<AccountEvent> {
+    return this.accountEvents
+  }
 
   @Throws(ProfileNonexistentAccountProviderException::class)
-  override fun profileCurrentlyUsedAccountProviders(): ImmutableList<AccountProviderType> =
-    ImmutableList.sortedCopyOf(
+  override fun profileCurrentlyUsedAccountProviders(): ImmutableList<AccountProviderType> {
+    return ImmutableList.sortedCopyOf(
       this
         .profileCurrent()
         .accountsByProvider()
         .values
         .map { account -> account.provider },
     )
+  }
 
-  override fun profileAccountLogout(accountID: AccountID): FluentFuture<TaskResult<Unit>> =
-    this.submitTask {
+  override fun profileAccountLogout(accountID: AccountID): FluentFuture<TaskResult<Unit>> {
+    return this.submitTask {
       val profile = this.profileCurrent()
       val account = profile.account(accountID)
       ProfileAccountLogoutTask(
@@ -349,18 +363,20 @@ class Controller private constructor(
         profile = profile,
       ).call()
     }
+  }
 
-  override fun profileUpdate(update: (ProfileDescription) -> ProfileDescription): FluentFuture<ProfileUpdated> =
-    this.submitTask(
+  override fun profileUpdate(update: (ProfileDescription) -> ProfileDescription): FluentFuture<ProfileUpdated> {
+    return this.submitTask(
       ProfileUpdateTask(
         this.profileEvents,
         profiles = this.profiles,
         update = update,
       ),
     )
+  }
 
-  override fun profileFeed(request: ProfileFeedRequest): FluentFuture<FeedData> =
-    this.submitTask(
+  override fun profileFeed(request: ProfileFeedRequest): FluentFuture<FeedData> {
+    return this.submitTask(
       ProfileFeedTask(
         bookFormatSupport = this.bookFormatSupport,
         bookRegistry = this.bookRegistry,
@@ -368,6 +384,7 @@ class Controller private constructor(
         request = request,
       ),
     )
+  }
 
   @Throws(AccountsDatabaseNonexistentException::class)
   override fun profileAccountForBook(bookID: BookID): AccountType {
@@ -400,8 +417,8 @@ class Controller private constructor(
     bookID: BookID,
     entry: FeedEntryBook,
     samlDownloadContext: SAMLDownloadContext?,
-  ): FluentFuture<TaskResult<*>> =
-    this.submitTask(
+  ): FluentFuture<TaskResult<*>> {
+    return this.submitTask(
       Callable<TaskResult<*>> {
         val request =
           BorrowRequest.Start(
@@ -415,6 +432,7 @@ class Controller private constructor(
         borrowTask.execute()
       },
     )
+  }
 
   override fun bookBorrowFailedDismiss(
     accountID: AccountID,
@@ -442,10 +460,12 @@ class Controller private constructor(
     accountID: AccountID,
     feedEntry: FeedEntryBook,
     reportType: String,
-  ): FluentFuture<TaskResult<Unit>> = throw NotImplementedError()
+  ): FluentFuture<TaskResult<Unit>> {
+    throw NotImplementedError()
+  }
 
-  override fun booksSync(accountID: AccountID): FluentFuture<TaskResult<Unit>> =
-    this.submitTask(
+  override fun booksSync(accountID: AccountID): FluentFuture<TaskResult<Unit>> {
+    return this.submitTask(
       BookSyncTask(
         accountID = accountID,
         profiles = this.profiles,
@@ -457,6 +477,7 @@ class Controller private constructor(
         http = this.lsHttp,
       ),
     )
+  }
 
   override fun bookRevoke(
     accountID: AccountID,
@@ -516,8 +537,8 @@ class Controller private constructor(
   override fun bookRevokeFailedDismiss(
     accountID: AccountID,
     bookID: BookID,
-  ): FluentFuture<TaskResult<Unit>> =
-    this.submitTask(
+  ): FluentFuture<TaskResult<Unit>> {
+    return this.submitTask(
       BookRevokeFailedDismissTask(
         accountID = accountID,
         profileID = this.profileCurrent().id,
@@ -526,6 +547,7 @@ class Controller private constructor(
         bookRegistry = this.bookRegistry,
       ),
     )
+  }
 
   override fun handleBookPreviewStatus(entry: FeedEntryBook): FluentFuture<TaskResult<*>> {
     val requirements =
@@ -554,7 +576,9 @@ class Controller private constructor(
    * `V <: VB`.
    */
 
-  private fun <K, VB, V : VB> castMap(m: SortedMap<K, V>): SortedMap<K, VB> = m as SortedMap<K, VB>
+  private fun <K, VB, V : VB> castMap(m: SortedMap<K, V>): SortedMap<K, VB> {
+    return m as SortedMap<K, VB>
+  }
 
   companion object {
     fun createFromServiceDirectory(
@@ -564,8 +588,8 @@ class Controller private constructor(
       accountEvents: Subject<AccountEvent>,
       profileEvents: Subject<ProfileEvent>,
       cacheDirectory: File,
-    ): Controller =
-      Controller(
+    ): Controller {
+      return Controller(
         application = application,
         cacheDirectory = cacheDirectory,
         accountEvents = accountEvents,
@@ -573,5 +597,6 @@ class Controller private constructor(
         services = services,
         taskExecutor = MoreExecutors.listeningDecorator(executorService),
       )
+    }
   }
 }

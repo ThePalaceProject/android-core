@@ -103,12 +103,13 @@ class PdfReaderActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val params =
-      PdfReaderModel.parameters ?: run {
-        this.log.warn("PdfReaderActivity lacks parameters!")
-        this.finish()
-        return
-      }
+    val paramsMaybe = PdfReaderModel.parameters
+    if (paramsMaybe == null) {
+      this.log.warn("PdfReaderActivity lacks parameters!")
+      this.finish()
+      return
+    }
+    val params = paramsMaybe
 
     this.setContentView(R.layout.pdfjs_reader)
     this.createToolbar(params.documentTitle)

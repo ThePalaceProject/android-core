@@ -51,7 +51,9 @@ object FeedFacets {
    * @return A list of facets, or nothing if no entry point group is available
    */
   @JvmStatic
-  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? = findEntryPointFacetGroup(feed.facetsByGroup)
+  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? {
+    return findEntryPointFacetGroup(feed.facetsByGroup)
+  }
 
   /**
    * Find the list of facets that represent an "entry point" group.

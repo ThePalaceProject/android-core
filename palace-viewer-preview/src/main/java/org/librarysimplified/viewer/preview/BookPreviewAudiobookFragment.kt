@@ -121,8 +121,17 @@ class BookPreviewAudiobookFragment :
     this.imageLoader =
       services.requireService(ImageLoader2Type::class.java)
 
-    this.audioFile = BookPreviewModel.audioFile ?: throw RuntimeException("Invalid file")
-    this.feedEntry = BookPreviewModel.feedEntry ?: throw RuntimeException("Invalid entry")
+    val audioFileMaybe = BookPreviewModel.audioFile
+    if (audioFileMaybe == null) {
+      throw RuntimeException("Invalid file")
+    }
+    this.audioFile = audioFileMaybe
+
+    val feedEntryMaybe = BookPreviewModel.feedEntry
+    if (feedEntryMaybe == null) {
+      throw RuntimeException("Invalid entry")
+    }
+    this.feedEntry = feedEntryMaybe
 
     this.previewAuthor = view.findViewById(R.id.player_author)
     this.previewBackwardButton = view.findViewById(R.id.player_jump_backwards)

@@ -35,16 +35,21 @@ object BookAcquisitionSelection {
     return null
   }
 
-  private fun relationIsSupported(acquisition: FeedAcquisition): Boolean =
-    when (acquisition.relation) {
+  private fun relationIsSupported(acquisition: FeedAcquisition): Boolean {
+    return when (acquisition.relation) {
       FeedAcquisitionRelation.ACQUISITION_BORROW,
       FeedAcquisitionRelation.ACQUISITION_GENERIC,
       FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS,
-      -> true
+      -> {
+        true
+      }
 
       FeedAcquisitionRelation.ACQUISITION_BUY,
       FeedAcquisitionRelation.ACQUISITION_SAMPLE,
       FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE,
-      -> false
+      -> {
+        false
+      }
     }
+  }
 }

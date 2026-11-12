@@ -39,10 +39,11 @@ class CatalogCoverDebugLabelsTest {
     return feedParser.parse(uri, stream)
   }
 
-  private fun allEntries(feed: OPDSAcquisitionFeed): List<FeedEntryBook> =
-    (feed.feedEntries + feed.feedGroups.values.flatMap { it.entries }).map {
+  private fun allEntries(feed: OPDSAcquisitionFeed): List<FeedEntryBook> {
+    return (feed.feedEntries + feed.feedGroups.values.flatMap { it.entries }).map {
       OPDS12FeedConverter.convertEntry(AccountID.generate(), it)
     }
+  }
 
   /**
    * An Adobe-DRM-protected EPUB. The acquisition path is

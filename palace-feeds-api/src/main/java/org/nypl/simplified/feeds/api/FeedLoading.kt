@@ -82,10 +82,10 @@ object FeedLoading {
   private fun checkEntry(
     taskRecorder: TaskRecorderType,
     entry: FeedEntryBook?,
-  ): FeedEntryBook =
+  ): FeedEntryBook {
     if (entry != null) {
       taskRecorder.currentStepSucceeded("Found feed entry.")
-      entry
+      return entry
     } else {
       val message = "Expected a feed containing at least one entry"
       val exception = IllegalArgumentException(message)
@@ -97,6 +97,7 @@ object FeedLoading {
       )
       throw exception
     }
+  }
 
   private fun findFirst(feedEntries: List<FeedEntry>): FeedEntryBook? {
     for (entry in feedEntries) {

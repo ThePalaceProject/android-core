@@ -60,8 +60,8 @@ class FeedLoaderContentTypeDispatchTest {
   private fun createLoader(
     body: String,
     contentType: MIMEType?,
-  ): FeedLoader =
-    FeedLoader(
+  ): FeedLoader {
+    return FeedLoader(
       bookFormatSupport =
         BookFormatSupport.create(
           BookFormatSupportParameters(
@@ -82,14 +82,17 @@ class FeedLoaderContentTypeDispatchTest {
           )
         },
     )
+  }
 
-  private fun opds12Body(): String =
-    javaClass.getResource("feed-opds12-dispatch.xml")!!
+  private fun opds12Body(): String {
+    return javaClass.getResource("feed-opds12-dispatch.xml")!!
       .readText(StandardCharsets.UTF_8)
+  }
 
-  private fun opds20Body(): String =
-    javaClass.getResource("feed-opds20-dispatch.json")!!
+  private fun opds20Body(): String {
+    return javaClass.getResource("feed-opds20-dispatch.json")!!
       .readText(StandardCharsets.UTF_8)
+  }
 
   /**
    * preferOPDS20=true, server responds with OPDS 2.0 content type.

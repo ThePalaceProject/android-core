@@ -364,6 +364,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
     return context.chooseNewAcquisitionPath(entry)
   }
 
-  private fun typesAreCompatible(pair: Pair<FeedAcquisitionPathElement, FeedAcquisitionPathElement>) =
-    MIMECompatibility.isCompatibleStrictWithoutAttributes(pair.first.mimeType, pair.second.mimeType)
+  private fun typesAreCompatible(pair: Pair<FeedAcquisitionPathElement, FeedAcquisitionPathElement>): Boolean {
+    return MIMECompatibility.isCompatibleStrictWithoutAttributes(pair.first.mimeType, pair.second.mimeType)
+  }
 }

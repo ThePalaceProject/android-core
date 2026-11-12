@@ -10,8 +10,9 @@ object BookPreviewAcquisitions {
    * acquisition, effectively allowing the server to set preferences.
    */
 
-  fun pickBestPreviewAcquisition(entry: FeedEntryBook): FeedPreviewAcquisition? =
-    entry.previewAcquisitions.firstOrNull {
+  fun pickBestPreviewAcquisition(entry: FeedEntryBook): FeedPreviewAcquisition? {
+    return entry.previewAcquisitions.firstOrNull {
       StandardFormatNames.bookPreviewFiles.contains(it.type)
     }
+  }
 }

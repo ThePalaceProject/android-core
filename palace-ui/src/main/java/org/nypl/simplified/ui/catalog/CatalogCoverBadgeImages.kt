@@ -21,8 +21,8 @@ class CatalogCoverBadgeImages private constructor(
   private val screenSize: ScreenSizeInformationType,
   private val audioBookIcon: Bitmap,
 ) : BookCoverBadgeLookupType {
-  override fun badgeForEntry(entry: FeedEntryBook): BookCoverBadge? =
-    when (BookFormats.inferFormat(entry)) {
+  override fun badgeForEntry(entry: FeedEntryBook): BookCoverBadge? {
+    return when (BookFormats.inferFormat(entry)) {
       BOOK_FORMAT_EPUB -> {
         null
       }
@@ -43,6 +43,7 @@ class CatalogCoverBadgeImages private constructor(
         null
       }
     }
+  }
 
   companion object {
     /**

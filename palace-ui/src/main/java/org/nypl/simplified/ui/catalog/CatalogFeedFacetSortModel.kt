@@ -22,9 +22,10 @@ object CatalogFeedFacetSortModel {
     this.facetValues[catalogPart] = sortBy.toList()
   }
 
-  fun facetSelected(catalogPart: CatalogPart): FeedFacetSingle? =
-    this.facetValues[catalogPart]
+  fun facetSelected(catalogPart: CatalogPart): FeedFacetSingle? {
+    return this.facetValues[catalogPart]
       ?.find { s -> s.isActive }
+  }
 
   fun facetSelectedPseudo(catalogPart: CatalogPart): FeedFacetPseudoSorting? {
     val selected = this.facetSelected(catalogPart)

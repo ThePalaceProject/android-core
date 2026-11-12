@@ -9,10 +9,14 @@ object FeedBookIDConversions {
   /**
    * Convert a [BookID] to a [FeedBookID].
    */
-  fun fromBookID(bookID: BookID): FeedBookID = FeedBookID.create(bookID.value())
+  fun fromBookID(bookID: BookID): FeedBookID {
+    return FeedBookID.create(bookID.value())
+  }
 
   /**
    * Convert a [FeedBookID] to a [BookID].
    */
-  fun toBookID(feedBookID: FeedBookID): BookID = BookID.create(feedBookID.value())
+  fun toBookID(feedBookID: FeedBookID): BookID {
+    return BookID.create(feedBookID.value())
+  }
 }

@@ -239,8 +239,8 @@ class FeedLoader(
     }
   }
 
-  private fun isRelationSupported(relation: FeedAcquisitionRelation): Boolean =
-    when (relation) {
+  private fun isRelationSupported(relation: FeedAcquisitionRelation): Boolean {
+    return when (relation) {
       FeedAcquisitionRelation.ACQUISITION_BORROW -> true
       FeedAcquisitionRelation.ACQUISITION_BUY -> false
       FeedAcquisitionRelation.ACQUISITION_GENERIC -> true
@@ -248,9 +248,11 @@ class FeedLoader(
       FeedAcquisitionRelation.ACQUISITION_SAMPLE -> false
       FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE -> false
     }
+  }
 
-  private fun isTypePathSupported(path: FeedAcquisitionPath): Boolean =
-    this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
+  private fun isTypePathSupported(path: FeedAcquisitionPath): Boolean {
+    return this.bookFormatSupport.isSupportedPath(path.asMIMETypes())
+  }
 
   private fun fetchSearchLink(
     searchLink: OPDSSearchLink?,
@@ -278,11 +280,12 @@ class FeedLoader(
   private fun errorAttributesOf(
     uri: URI,
     method: String,
-  ): SortedMap<String, String> =
-    sortedMapOf(
+  ): SortedMap<String, String> {
+    return sortedMapOf(
       Pair("Feed", uri.toString()),
       Pair("Method", method),
     )
+  }
 
   companion object {
     /**
@@ -292,18 +295,19 @@ class FeedLoader(
       bookFormatSupport: BookFormatSupportType,
       exec: ExecutorService,
       http: LSHTTPClientType,
-    ): FeedLoaderType =
-      FeedLoader(
+    ): FeedLoaderType {
+      return FeedLoader(
         bookFormatSupport = bookFormatSupport,
         exec = exec,
         fetch = httpFetch(http),
       )
+    }
 
     /**
      * Create a [FeedFetchType] backed by an [LSHTTPClientType].
      */
-    fun httpFetch(http: LSHTTPClientType): FeedFetchType =
-      FeedFetchType { uri, credentials, acceptHeader ->
+    fun httpFetch(http: LSHTTPClientType): FeedFetchType {
+      return FeedFetchType { uri, credentials, acceptHeader ->
         val auth = AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
         var builder: LSHTTPRequestBuilderType =
@@ -359,5 +363,6 @@ class FeedLoader(
           }
         }
       }
+    }
   }
 }

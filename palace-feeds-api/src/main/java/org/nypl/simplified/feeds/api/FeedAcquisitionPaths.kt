@@ -72,5 +72,7 @@ object FeedAcquisitionPaths {
   /**
    * Transform the given acquisition into a list of acquisition paths.
    */
-  fun linearize(acquisition: FeedAcquisition): List<FeedAcquisitionPath> = acquisitionPaths(acquisition)
+  fun linearize(acquisition: FeedAcquisition): List<FeedAcquisitionPath> {
+    return acquisitionPaths(acquisition)
+  }
 }

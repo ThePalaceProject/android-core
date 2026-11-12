@@ -53,8 +53,8 @@ class FeedLoaderOPDS20FilterTest {
   private fun createLoader(
     body: String,
     contentType: MIMEType?,
-  ): FeedLoader =
-    FeedLoader(
+  ): FeedLoader {
+    return FeedLoader(
       bookFormatSupport =
         BookFormatSupport.create(
           BookFormatSupportParameters(
@@ -75,6 +75,7 @@ class FeedLoaderOPDS20FilterTest {
           )
         },
     )
+  }
 
   /**
    * An OPDS 2.0 feed with a single publication whose acquisition link
