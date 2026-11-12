@@ -1588,6 +1588,7 @@
         <c:change date="2026-11-03T00:00:00+00:00" summary="Fix the debug cover labels showing no DRM for Adobe- and LCP-protected books."/>
         <c:change date="2026-11-06T17:45:07+00:00" summary="Switch to WIPRO DRM."/>
         <c:change date="2026-11-09T16:55:15+00:00" summary="Report boot process failures to the diagnostics backend."/>
+        <c:change date="2026-11-12T17:36:00+00:00" summary="Fix the catalog not updating a book's status (for example, the borrow button) after borrowing completes."/>
       </c:changes>
     </c:release>
   </c:releases>

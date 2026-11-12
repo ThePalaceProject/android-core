@@ -29,6 +29,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
@@ -444,9 +445,11 @@ sealed class CatalogFragment :
         val catalogBookRegistry =
           services.requireService(CatalogBookRegistryEvents::class.java)
 
+        val bookID = FeedBookIDConversions.toBookID(entry.bookID)
+
         val statusSubscription =
           catalogBookRegistry.events
-            .filter { e -> e.bookId == entry.bookID }
+            .filter { e -> e.bookId == bookID }
             .filter { e -> e.statusNow != null }
             .subscribe { e ->
               UIThread.checkIsUIThread()

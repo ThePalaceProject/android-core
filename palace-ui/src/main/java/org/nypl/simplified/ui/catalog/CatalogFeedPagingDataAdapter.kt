@@ -19,6 +19,7 @@ import org.joda.time.format.DateTimeFormat
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadExternalAuthenticationInProgress
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadWaitingForExternalAuthentication
@@ -166,11 +167,13 @@ class CatalogFeedPagingDataAdapter(
         }
 
         is FeedEntryBook -> {
+          val bookID = FeedBookIDConversions.toBookID(item.bookID)
+
           this.subscription =
             this@CatalogFeedPagingDataAdapter
               .registryEvents.events
               .ofType(BookStatusEventChanged::class.java)
-              .filter { event -> event.bookId == item.bookID }
+              .filter { event -> event.bookId == bookID }
               .subscribe { event -> this.onStatusChangedForFeedEntry(item) }
 
           for (v in listOf(this.view, this.idle, this.error, this.corrupt, this.progress)) {
