@@ -1,7 +1,7 @@
 package org.nypl.simplified.feeds.api
 
-import org.joda.time.DateTime
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * A parsed or locally-generated feed.
@@ -25,7 +25,7 @@ sealed interface Feed {
   /**
    * The last time the feed was updated.
    */
-  val feedUpdated: DateTime
+  val feedUpdated: OffsetDateTime
 
   /**
    * The URI of the feed.

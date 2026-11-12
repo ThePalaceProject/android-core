@@ -1,8 +1,8 @@
 package org.nypl.simplified.feeds.api
 
-import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * A book entry in a feed.
@@ -23,7 +23,7 @@ data class FeedEntryBook(
   /**
    * The time of the last update.
    */
-  val updated: DateTime,
+  val updated: OffsetDateTime,
   /**
    * The list of authors.
    */
@@ -67,7 +67,7 @@ data class FeedEntryBook(
   /**
    * The entry publication date.
    */
-  val published: DateTime?,
+  val published: OffsetDateTime?,
   /**
    * The publisher.
    */

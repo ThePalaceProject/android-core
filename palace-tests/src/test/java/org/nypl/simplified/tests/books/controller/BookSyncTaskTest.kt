@@ -23,7 +23,7 @@ import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.BookSyncTask
-import org.joda.time.DateTime
+import java.time.OffsetDateTime
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
 import org.nypl.simplified.feeds.api.FeedBookIDs
 import org.nypl.simplified.feeds.api.FeedData
@@ -521,11 +521,11 @@ class BookSyncTaskTest {
         accountID = accountID,
         id = "urn:uuid:1234",
         title = "Test Book",
-        updated = DateTime.now(),
+        updated = OffsetDateTime.now(),
         authors = listOf("Author"),
         availability = FeedAvailabilityLoaned(
-          startDate = DateTime.now(),
-          endDate = DateTime.now().plusDays(14),
+          startDate = OffsetDateTime.now(),
+          endDate = OffsetDateTime.now().plusDays(14),
           revoke = null,
         ),
         acquisitions = listOf(),
@@ -557,7 +557,7 @@ class BookSyncTaskTest {
         feedID = "test-feed",
         feedSearch = null,
         feedTitle = "Loans",
-        feedUpdated = DateTime.now(),
+        feedUpdated = OffsetDateTime.now(),
         feedURI = this.server.url("/loans").toUri(),
         feedTermsOfService = null,
         feedPrivacyPolicy = null,
@@ -657,11 +657,11 @@ class BookSyncTaskTest {
         accountID = accountID,
         id = "urn:uuid:5678",
         title = "Grouped Book",
-        updated = DateTime.now(),
+        updated = OffsetDateTime.now(),
         authors = listOf("Author"),
         availability = FeedAvailabilityLoaned(
-          startDate = DateTime.now(),
-          endDate = DateTime.now().plusDays(14),
+          startDate = OffsetDateTime.now(),
+          endDate = OffsetDateTime.now().plusDays(14),
           revoke = null,
         ),
         acquisitions = listOf(),
@@ -701,7 +701,7 @@ class BookSyncTaskTest {
         feedID = "test-feed",
         feedSearch = null,
         feedTitle = "Loans",
-        feedUpdated = DateTime.now(),
+        feedUpdated = OffsetDateTime.now(),
         feedURI = this.server.url("/loans").toUri(),
         feedTermsOfService = null,
         feedPrivacyPolicy = null,

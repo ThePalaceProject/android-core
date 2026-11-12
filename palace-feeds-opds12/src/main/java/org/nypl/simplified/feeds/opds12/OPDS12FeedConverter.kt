@@ -1,5 +1,6 @@
 package org.nypl.simplified.feeds.opds12
 
+import org.joda.time.DateTime
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedAcquisition
@@ -45,6 +46,9 @@ import org.nypl.simplified.opds.core.OPDSIndirectAcquisition
 import org.nypl.simplified.opds.core.OPDSOpenSearch1_1
 import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
 import org.nypl.simplified.opds.core.OPDSSeries
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
 
 /**
  * Functions to convert OPDS 1.2 types from [palace-opds-core] into the
@@ -95,7 +99,7 @@ object OPDS12FeedConverter {
         feedID = feed.feedID,
         feedSearch = feedSearch,
         feedTitle = feed.feedTitle,
-        feedUpdated = feed.feedUpdated,
+        feedUpdated = toOffset(feed.feedUpdated),
         feedURI = feed.feedURI,
         feedTermsOfService = feed.feedTermsOfService,
         feedPrivacyPolicy = feed.feedPrivacyPolicy,
@@ -124,7 +128,7 @@ object OPDS12FeedConverter {
         feedID = feed.feedID,
         feedSearch = feedSearch,
         feedTitle = feed.feedTitle,
-        feedUpdated = feed.feedUpdated,
+        feedUpdated = toOffset(feed.feedUpdated),
         feedURI = feed.feedURI,
         feedTermsOfService = feed.feedTermsOfService,
         feedPrivacyPolicy = feed.feedPrivacyPolicy,
@@ -159,7 +163,7 @@ object OPDS12FeedConverter {
       accountID = accountID,
       id = entry.id,
       title = entry.title,
-      updated = entry.updated,
+      updated = toOffset(entry.updated),
       authors = entry.authors,
       availability = convertAvailability(entry.availability),
       acquisitions = entry.acquisitions.map { convertAcquisition(it) },
@@ -170,7 +174,7 @@ object OPDS12FeedConverter {
       groups = entry.groups.map { (name, uri) -> FeedEntryGroupRef(name, uri) }.toSet(),
       issues = entry.issues,
       related = entry.related,
-      published = entry.published,
+      published = toOffsetOrNull(entry.published),
       publisher = entry.publisher,
       distribution = entry.distribution,
       summary = entry.summary,
@@ -213,16 +217,16 @@ object OPDS12FeedConverter {
     return when (availability) {
       is OPDSAvailabilityHeld -> {
         FeedAvailabilityHeld(
-          startDate = availability.startDate,
+          startDate = toOffsetOrNull(availability.startDate),
           position = availability.position,
-          endDate = availability.endDate,
+          endDate = toOffsetOrNull(availability.endDate),
           revoke = availability.revoke,
         )
       }
 
       is OPDSAvailabilityHeldReady -> {
         FeedAvailabilityHeldReady(
-          endDate = availability.endDate,
+          endDate = toOffsetOrNull(availability.endDate),
           revoke = availability.revoke,
         )
       }
@@ -237,22 +241,22 @@ object OPDS12FeedConverter {
 
       is OPDSAvailabilityLoaned -> {
         FeedAvailabilityLoaned(
-          startDate = availability.startDate,
-          endDate = availability.endDate,
+          startDate = toOffsetOrNull(availability.startDate),
+          endDate = toOffsetOrNull(availability.endDate),
           revoke = availability.revoke,
         )
       }
 
       is OPDSAvailabilityOpenAccess -> {
         FeedAvailabilityOpenAccess(
-          endDate = availability.endDate,
+          endDate = toOffsetOrNull(availability.endDate),
           revoke = availability.revoke,
         )
       }
 
       is OPDSAvailabilityRevoked -> {
         FeedAvailabilityRevoked(
-          endDate = availability.endDate,
+          endDate = toOffsetOrNull(availability.endDate),
           revoke = availability.revoke,
         )
       }
@@ -301,5 +305,24 @@ object OPDS12FeedConverter {
       uri = preview.uri,
       type = preview.type,
     )
+  }
+
+  /**
+   * Convert a Joda [DateTime] from [palace-opds-core] into a java.time
+   * [OffsetDateTime], preserving the original offset.
+   */
+  private fun toOffset(date: DateTime): OffsetDateTime {
+    return OffsetDateTime.ofInstant(Instant.ofEpochMilli(date.millis), ZoneId.of(date.zone.getID()))
+  }
+
+  /**
+   * Convert a nullable Joda [DateTime] from [palace-opds-core] into a
+   * nullable java.time [OffsetDateTime].
+   */
+  private fun toOffsetOrNull(date: DateTime?): OffsetDateTime? {
+    if (date == null) {
+      return null
+    }
+    return toOffset(date)
   }
 }

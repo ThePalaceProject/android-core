@@ -50,6 +50,10 @@ import org.nypl.simplified.opds.core.OPDSSeries
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.net.URI
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.UUID
 
 /**
@@ -71,6 +75,14 @@ class OPDS12FeedConverterTest {
 
   private val date20240410T160000Z: DateTime =
     DateTime(2024, 4, 10, 16, 0, 0, DateTimeZone.UTC)
+
+  /**
+   * Convert a Joda [DateTime] (an [palace-opds-core] input value) into the java.time
+   * [OffsetDateTime] that the converter produces, for comparison against outputs.
+   */
+  private fun toOffset(date: DateTime): OffsetDateTime {
+    return OffsetDateTime.ofInstant(Instant.ofEpochMilli(date.millis), ZoneId.of(date.zone.getID()))
+  }
 
   @Test
   fun testFeedBasics() {
@@ -99,7 +111,7 @@ class OPDS12FeedConverterTest {
 
     assertEquals("feed-id-1", data.feedID)
     assertEquals("Test Feed", data.feedTitle)
-    assertEquals(date20240115T103000Z, data.feedUpdated)
+    assertEquals(toOffset(date20240115T103000Z), data.feedUpdated)
     assertEquals(URI.create("http://example.com/feed"), data.feedURI)
     assertEquals(URI.create("http://example.com/feed?page=2"), data.feedNext)
     assertEquals(URI.create("http://example.com/about"), data.feedAbout)
@@ -212,8 +224,8 @@ class OPDS12FeedConverterTest {
     assertEquals(this.accountID, converted.accountID)
 
     // Date/time fields
-    assertEquals(date20240115T103000Z, converted.updated)
-    assertEquals(date20240220T144530Z, converted.published)
+    assertEquals(toOffset(date20240115T103000Z), converted.updated)
+    assertEquals(toOffset(date20240220T144530Z), converted.published)
 
     // String fields
     assertEquals(listOf("Author One", "Author Two"), converted.authors)
@@ -367,8 +379,8 @@ class OPDS12FeedConverterTest {
 
     assertEquals(
       FeedAvailabilityLoaned(
-        startDate = date20240115T103000Z,
-        endDate = date20240325T080000Z,
+        startDate = toOffset(date20240115T103000Z),
+        endDate = toOffset(date20240325T080000Z),
         revoke = revokeUri
       ),
       converted.availability
@@ -416,9 +428,9 @@ class OPDS12FeedConverterTest {
 
     assertEquals(
       FeedAvailabilityHeld(
-        startDate = date20240115T103000Z,
+        startDate = toOffset(date20240115T103000Z),
         position = 5,
-        endDate = date20240410T160000Z,
+        endDate = toOffset(date20240410T160000Z),
         revoke = revokeUri
       ),
       converted.availability
@@ -464,7 +476,7 @@ class OPDS12FeedConverterTest {
 
     assertEquals(
       FeedAvailabilityHeldReady(
-        endDate = date20240325T080000Z,
+        endDate = toOffset(date20240325T080000Z),
         revoke = revokeUri
       ),
       converted.availability
@@ -636,7 +648,7 @@ class OPDS12FeedConverterTest {
     for (group in data.groups) {
       for (e in group.groupEntries) {
         val book = e as FeedEntryBook
-        assertEquals(date20240115T103000Z, book.updated)
+        assertEquals(toOffset(date20240115T103000Z), book.updated)
       }
     }
   }
@@ -744,8 +756,8 @@ class OPDS12FeedConverterTest {
     val data = result as FeedData
     val converted = data.entries[0] as FeedEntryBook
 
-    assertEquals(utc, converted.updated)
-    assertEquals(DateTimeZone.UTC, converted.updated.zone)
+    assertEquals(toOffset(utc), converted.updated)
+    assertEquals(ZoneOffset.UTC, converted.updated.offset)
   }
 
   @Test
@@ -779,7 +791,7 @@ class OPDS12FeedConverterTest {
     val converted = data.entries[0] as FeedEntryBook
 
     assertNotNull(converted.updated)
-    assertEquals(date20240115T103000Z, converted.updated)
+    assertEquals(toOffset(date20240115T103000Z), converted.updated)
     assertNull(converted.published)
 
     val availability = converted.availability

@@ -1,5 +1,7 @@
 package org.nypl.simplified.feeds.opds12
 
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.nypl.simplified.feeds.api.FeedAcquisition
 import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
 import org.nypl.simplified.feeds.api.FeedAvailability
@@ -29,6 +31,7 @@ import org.nypl.simplified.opds.core.OPDSCategory
 import org.nypl.simplified.opds.core.OPDSIndirectAcquisition
 import org.nypl.simplified.opds.core.OPDSPreviewAcquisition
 import org.nypl.simplified.opds.core.OPDSSeries
+import java.time.OffsetDateTime
 
 /**
  * Convert a [FeedEntryBook] back into an [OPDSAcquisitionFeedEntry].
@@ -43,7 +46,7 @@ object FeedEntryBookToOPDS {
       OPDSAcquisitionFeedEntry.newBuilder(
         id = entry.id,
         title = entry.title,
-        updated = entry.updated,
+        updated = toJoda(entry.updated),
         availability = toOPDS(entry.availability),
       )
 
@@ -55,7 +58,7 @@ object FeedEntryBookToOPDS {
     entry.groups.forEach { (name, uri) -> builder.addGroup(uri, name) }
 
     val published = entry.published
-    if (published != null) builder.setPublishedOption(published)
+    if (published != null) builder.setPublishedOption(toJoda(published))
 
     val publisher = entry.publisher
     if (publisher != null) builder.setPublisherOption(publisher)
@@ -109,15 +112,15 @@ object FeedEntryBookToOPDS {
     return when (availability) {
       is FeedAvailabilityHeld -> {
         OPDSAvailabilityHeld.get(
-          availability.startDate,
+          toJodaOrNull(availability.startDate),
           availability.position,
-          availability.endDate,
+          toJodaOrNull(availability.endDate),
           availability.revoke,
         )
       }
 
       is FeedAvailabilityHeldReady -> {
-        OPDSAvailabilityHeldReady.get(availability.endDate, availability.revoke)
+        OPDSAvailabilityHeldReady.get(toJodaOrNull(availability.endDate), availability.revoke)
       }
 
       is FeedAvailabilityHoldable -> {
@@ -130,8 +133,8 @@ object FeedEntryBookToOPDS {
 
       is FeedAvailabilityLoaned -> {
         OPDSAvailabilityLoaned.get(
-          availability.startDate,
-          availability.endDate,
+          toJodaOrNull(availability.startDate),
+          toJodaOrNull(availability.endDate),
           availability.revoke,
         )
       }
@@ -188,5 +191,23 @@ object FeedEntryBookToOPDS {
       uri = preview.uri,
       type = preview.type,
     )
+  }
+
+  /**
+   * Convert a java.time [OffsetDateTime] from [palace-feeds-api] into a Joda
+   * [DateTime] for [palace-opds-core], preserving the original offset.
+   */
+  private fun toJoda(offset: OffsetDateTime): DateTime {
+    return DateTime(offset.toInstant().toEpochMilli(), DateTimeZone.forOffsetMillis(offset.offset.totalSeconds * 1000))
+  }
+
+  /**
+   * Convert a nullable java.time [OffsetDateTime] into a nullable Joda [DateTime].
+   */
+  private fun toJodaOrNull(offset: OffsetDateTime?): DateTime? {
+    if (offset == null) {
+      return null
+    }
+    return toJoda(offset)
   }
 }

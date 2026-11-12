@@ -32,7 +32,6 @@ import org.joda.time.DateTime
 import org.joda.time.Days
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.ui.R
 import org.librarysimplified.ui.bottomsheet.PalaceBottomSheet
 import org.librarysimplified.ui.bottomsheet.PalaceBottomSheetType
@@ -78,6 +77,7 @@ import org.nypl.simplified.ui.catalog.CatalogFeedViewDetails2.InfoState.PROGRESS
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.slf4j.LoggerFactory
+import java.time.format.DateTimeFormatter
 
 class CatalogFeedViewDetails2(
   override val root: ViewGroup,
@@ -97,13 +97,7 @@ class CatalogFeedViewDetails2(
     DateTimeFormat.forPattern("MMM d, yyyy")
 
   private val dateFormatter =
-    DateTimeFormatterBuilder()
-      .appendYear(4, 5)
-      .appendLiteral('-')
-      .appendMonthOfYear(2)
-      .appendLiteral('-')
-      .appendDayOfMonth(2)
-      .toFormatter()
+    DateTimeFormatter.ofPattern("uuuu-MM-dd")
 
   private val appBar =
     this.root.findViewById<AppBarLayout>(R.id.bookD2AppBar)
@@ -662,7 +656,7 @@ class CatalogFeedViewDetails2(
     if (publishedOpt != null) {
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaPublicationDate)
-      rowVal.text = this.dateFormatter.print(publishedOpt)
+      rowVal.text = this.dateFormatter.format(publishedOpt)
       this.metadata.addView(row)
     }
 

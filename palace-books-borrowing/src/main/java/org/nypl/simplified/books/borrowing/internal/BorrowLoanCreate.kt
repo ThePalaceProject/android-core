@@ -4,6 +4,8 @@ import com.io7m.junreachable.UnreachableCodeException
 import one.irradia.mime.api.MIMECompatibility
 import one.irradia.mime.api.MIMECompatibility.applicationOctetStream
 import one.irradia.mime.api.MIMEType
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Put
 import org.librarysimplified.http.api.LSHTTPResponseStatus
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
@@ -45,6 +47,7 @@ import org.nypl.simplified.links.Link
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * A task that creates an OPDS loan by hitting an acquisition URI.
@@ -218,9 +221,9 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
           HeldInQueue(
             id = context.bookCurrent.id,
             queuePosition = availability.position,
-            startDate = availability.startDate,
+            startDate = toJodaOrNull(availability.startDate),
             isRevocable = availability.revoke != null,
-            endDate = availability.endDate,
+            endDate = toJodaOrNull(availability.endDate),
           ),
         )
         throw BorrowSubtaskHaltedEarly()
@@ -231,7 +234,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         context.bookPublishStatus(
           HeldReady(
             id = context.bookCurrent.id,
-            endDate = availability.endDate,
+            endDate = toJodaOrNull(availability.endDate),
             isRevocable = availability.revoke != null,
           ),
         )
@@ -277,7 +280,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         context.bookPublishStatus(
           LoanedNotDownloaded(
             id = context.bookCurrent.id,
-            loanExpiryDate = availability.endDate,
+            loanExpiryDate = toJodaOrNull(availability.endDate),
             returnable = availability.revoke != null,
             isOpenAccess = false,
           ),
@@ -289,7 +292,7 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
         context.bookPublishStatus(
           LoanedNotDownloaded(
             id = context.bookCurrent.id,
-            loanExpiryDate = availability.endDate,
+            loanExpiryDate = toJodaOrNull(availability.endDate),
             returnable = availability.revoke != null,
             isOpenAccess = true,
           ),
@@ -366,5 +369,16 @@ class BorrowLoanCreate private constructor() : BorrowSubtaskType {
 
   private fun typesAreCompatible(pair: Pair<FeedAcquisitionPathElement, FeedAcquisitionPathElement>): Boolean {
     return MIMECompatibility.isCompatibleStrictWithoutAttributes(pair.first.mimeType, pair.second.mimeType)
+  }
+
+  /**
+   * Convert a nullable java.time [OffsetDateTime] from [palace-feeds-api] into a
+   * nullable Joda [DateTime] for [BookStatus].
+   */
+  private fun toJodaOrNull(offset: OffsetDateTime?): DateTime? {
+    if (offset == null) {
+      return null
+    }
+    return DateTime(offset.toInstant().toEpochMilli(), DateTimeZone.forOffsetMillis(offset.offset.totalSeconds * 1000))
   }
 }

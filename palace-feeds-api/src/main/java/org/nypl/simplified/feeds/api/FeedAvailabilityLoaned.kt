@@ -1,13 +1,13 @@
 package org.nypl.simplified.feeds.api
 
-import org.joda.time.DateTime
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * The book is loaned out to the user.
  */
 data class FeedAvailabilityLoaned(
-  val startDate: DateTime?,
-  override val endDate: DateTime?,
+  val startDate: OffsetDateTime?,
+  override val endDate: OffsetDateTime?,
   val revoke: URI?,
 ) : FeedAvailability

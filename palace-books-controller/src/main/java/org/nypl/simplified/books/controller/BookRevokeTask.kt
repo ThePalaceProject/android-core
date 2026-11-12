@@ -1,6 +1,5 @@
 package org.nypl.simplified.books.controller
 
-import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.drm.core.AdobeAdeptLoan
@@ -51,6 +50,7 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -142,7 +142,7 @@ class BookRevokeTask(
           accountID = this.accountID,
           id = this.bookID.value(),
           title = "",
-          updated = DateTime.now(),
+          updated = OffsetDateTime.now(),
           authors = listOf(),
           availability = FeedAvailabilityLoanable,
           acquisitions = listOf(),

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser.Companion.parseRaisingException
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.FeedAcquisition
 import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
@@ -44,6 +42,9 @@ import org.thepalaceproject.webpub.core.WPMSeries
 import org.thepalaceproject.webpub.core.WPMSubjectOrString
 import java.io.InputStream
 import java.net.URI
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import org.nypl.simplified.feeds.api.Feed as PalaceFeed
 
 /**
@@ -114,13 +115,8 @@ object OPDS20FeedConverter {
     feed: WPMFeed,
     feedURI: URI,
   ): PalaceFeed {
-    val feedUpdated: DateTime
-    val feedModified = feed.metadata.modified
-    if (feedModified == null) {
-      feedUpdated = DateTime(0, DateTimeZone.UTC)
-    } else {
-      feedUpdated = offsetToDateTime(feedModified)
-    }
+    val feedUpdated: OffsetDateTime =
+      orEpoch(feed.metadata.modified)
 
     val feedTitle: String =
       languageMapToString(feed.metadata.title)
@@ -264,21 +260,11 @@ object OPDS20FeedConverter {
     val title: String =
       languageMapToString(metadata.title)
 
-    val updated: DateTime
-    val entryModified = metadata.modified
-    if (entryModified == null) {
-      updated = DateTime(0, DateTimeZone.UTC)
-    } else {
-      updated = offsetToDateTime(entryModified)
-    }
+    val updated: OffsetDateTime =
+      orEpoch(metadata.modified)
 
-    val published: DateTime?
-    val entryPublished = metadata.published
-    if (entryPublished == null) {
-      published = null
-    } else {
-      published = offsetToDateTime(entryPublished)
-    }
+    val published: OffsetDateTime? =
+      metadata.published
 
     val authors: List<String> =
       metadata.author.map { contributorToString(it) }.filter { it.isNotEmpty() }
@@ -610,16 +596,16 @@ object OPDS20FeedConverter {
 
       "reserved" -> {
         FeedAvailabilityHeld(
-          startDate = availability.since?.let { offsetToDateTime(it) },
+          startDate = availability.since,
           position = null,
-          endDate = availability.until?.let { offsetToDateTime(it) },
+          endDate = availability.until,
           revoke = null,
         )
       }
 
       "ready" -> {
         FeedAvailabilityHeldReady(
-          endDate = availability.until?.let { offsetToDateTime(it) },
+          endDate = availability.until,
           revoke = null,
         )
       }
@@ -747,9 +733,12 @@ object OPDS20FeedConverter {
   }
 
   /**
-   * Convert a java.time [java.time.OffsetDateTime] to a Joda [DateTime] in UTC.
+   * Return [offset], or the epoch instant in UTC if it is null.
    */
-  private fun offsetToDateTime(offset: java.time.OffsetDateTime): DateTime {
-    return DateTime(offset.toInstant().toEpochMilli(), DateTimeZone.UTC)
+  private fun orEpoch(offset: OffsetDateTime?): OffsetDateTime {
+    if (offset == null) {
+      return Instant.EPOCH.atOffset(ZoneOffset.UTC)
+    }
+    return offset
   }
 }

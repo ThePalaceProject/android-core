@@ -1,10 +1,10 @@
 package org.nypl.simplified.feeds.api
 
-import org.joda.time.DateTime
+import java.time.OffsetDateTime
 
 /**
  * The book is available for borrowing.
  */
 object FeedAvailabilityLoanable : FeedAvailability {
-  override val endDate: DateTime? = null
+  override val endDate: OffsetDateTime? = null
 }

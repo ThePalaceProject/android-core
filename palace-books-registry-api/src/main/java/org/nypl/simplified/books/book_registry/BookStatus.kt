@@ -1,6 +1,7 @@
 package org.nypl.simplified.books.book_registry
 
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
@@ -15,6 +16,7 @@ import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.presentableerror.api.PresentableErrorType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import java.net.URI
+import java.time.OffsetDateTime
 
 sealed class BookStatus {
   /**
@@ -462,13 +464,13 @@ sealed class BookStatus {
       if (downloaded) {
         Loaned.LoanedDownloaded(
           id = book.id,
-          loanExpiryDate = a.endDate,
+          loanExpiryDate = toJodaOrNull(a.endDate),
           returnable = a.revoke != null,
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
-          loanExpiryDate = a.endDate,
+          loanExpiryDate = toJodaOrNull(a.endDate),
           returnable = a.revoke != null,
           isOpenAccess = true,
         )
@@ -487,13 +489,13 @@ sealed class BookStatus {
       return if (downloaded) {
         Loaned.LoanedDownloaded(
           id = book.id,
-          loanExpiryDate = a.endDate,
+          loanExpiryDate = toJodaOrNull(a.endDate),
           returnable = returnable,
         )
       } else {
         Loaned.LoanedNotDownloaded(
           id = book.id,
-          loanExpiryDate = a.endDate,
+          loanExpiryDate = toJodaOrNull(a.endDate),
           returnable = returnable,
           isOpenAccess = false,
         )
@@ -509,8 +511,8 @@ sealed class BookStatus {
       Held.HeldInQueue(
         id = book.id,
         queuePosition = a.position,
-        startDate = a.startDate,
-        endDate = a.endDate,
+        startDate = toJodaOrNull(a.startDate),
+        endDate = toJodaOrNull(a.endDate),
         isRevocable = a.revoke != null,
       )
 
@@ -520,7 +522,7 @@ sealed class BookStatus {
     ): BookStatus =
       Held.HeldReady(
         id = book.id,
-        endDate = a.endDate,
+        endDate = toJodaOrNull(a.endDate),
         isRevocable = a.revoke != null,
       )
 
@@ -550,6 +552,20 @@ sealed class BookStatus {
           }
         }
       } ?: false
+    }
+
+    /**
+     * Convert a nullable java.time [OffsetDateTime] from [palace-feeds-api] into a
+     * nullable Joda [DateTime] for the status model.
+     */
+    private fun toJodaOrNull(offset: OffsetDateTime?): DateTime? {
+      if (offset == null) {
+        return null
+      }
+      return DateTime(
+        offset.toInstant().toEpochMilli(),
+        DateTimeZone.forOffsetMillis(offset.offset.totalSeconds * 1000),
+      )
     }
   }
 }

@@ -1,7 +1,7 @@
 package org.nypl.simplified.feeds.api
 
-import org.joda.time.DateTime
 import java.net.URI
+import java.time.OffsetDateTime
 
 /**
  * A feed without groups. Entries are listed directly.
@@ -10,7 +10,7 @@ data class FeedData(
   override val feedID: String,
   override val feedSearch: FeedSearch?,
   override val feedTitle: String,
-  override val feedUpdated: DateTime,
+  override val feedUpdated: OffsetDateTime,
   override val feedURI: URI,
   override val feedTermsOfService: URI?,
   override val feedPrivacyPolicy: URI?,
@@ -48,7 +48,7 @@ data class FeedData(
         feedID = feedID,
         feedSearch = feedSearch,
         feedTitle = feedTitle,
-        feedUpdated = DateTime.now(),
+        feedUpdated = OffsetDateTime.now(),
         feedURI = feedURI,
         feedTermsOfService = null,
         feedPrivacyPolicy = null,
