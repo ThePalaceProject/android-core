@@ -52,7 +52,9 @@ import org.nypl.simplified.feeds.api.Feed as PalaceFeed
  * convert the result into the generic [PalaceFeed] types from [palace-feeds-api].
  */
 object OPDS20FeedConverter {
+  private const val REL_ACQUIRE = "http://opds-spec.org/acquisition"
   private const val REL_ACQUIRE_PREFIX = "http://opds-spec.org/acquisition/"
+  private const val REL_ACQUIRE_BORROW = "http://opds-spec.org/acquisition/borrow"
   private const val REL_ACQUIRE_SAMPLE = "http://opds-spec.org/acquisition/sample"
   private const val REL_ACQUIRE_OPEN_ACCESS = "http://opds-spec.org/acquisition/open-access"
   private const val REL_ACQUIRE_BUY = "http://opds-spec.org/acquisition/buy"
@@ -302,7 +304,7 @@ object OPDS20FeedConverter {
      * Separate acquisitions from preview acquisitions.
      */
     val allAcquisitionLinks: List<WPMLink> =
-      links.filter { it.relation.any { rel -> REL_ACQUIRE_PREFIX in rel } }
+      links.filter { it.relation.any { rel -> rel == REL_ACQUIRE || rel.startsWith(REL_ACQUIRE_PREFIX) } }
 
     val previewAcquisitionLinks: List<WPMLink> =
       allAcquisitionLinks.filter { it.relation.any { it.endsWith(REL_ACQUIRE_SAMPLE) } }
@@ -555,28 +557,24 @@ object OPDS20FeedConverter {
     )
   }
 
+  /**
+   * Map the relation of an acquisition link to a [FeedAcquisitionRelation].
+   * This mirrors the OPDS 1.2 parser: the bare `http://opds-spec.org/acquisition`
+   * relation is `ACQUISITION_GENERIC`, and each suffixed relation maps to its
+   * corresponding type. Any unrecognised relation is treated as generic.
+   */
   private fun inferRelation(rels: List<String>): FeedAcquisitionRelation {
-    return when {
-      rels.any { it.endsWith(REL_ACQUIRE_OPEN_ACCESS) } -> {
-        FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS
-      }
-
-      rels.any { it.endsWith(REL_ACQUIRE_SAMPLE) } -> {
-        FeedAcquisitionRelation.ACQUISITION_SAMPLE
-      }
-
-      rels.any { it.endsWith(REL_ACQUIRE_BUY) } -> {
-        FeedAcquisitionRelation.ACQUISITION_BUY
-      }
-
-      rels.any { it.endsWith(REL_ACQUIRE_SUBSCRIBE) } -> {
-        FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE
-      }
-
-      else -> {
-        FeedAcquisitionRelation.ACQUISITION_BORROW
+    for (rel in rels) {
+      when (rel) {
+        REL_ACQUIRE -> return FeedAcquisitionRelation.ACQUISITION_GENERIC
+        REL_ACQUIRE_BORROW -> return FeedAcquisitionRelation.ACQUISITION_BORROW
+        REL_ACQUIRE_BUY -> return FeedAcquisitionRelation.ACQUISITION_BUY
+        REL_ACQUIRE_OPEN_ACCESS -> return FeedAcquisitionRelation.ACQUISITION_OPEN_ACCESS
+        REL_ACQUIRE_SAMPLE -> return FeedAcquisitionRelation.ACQUISITION_SAMPLE
+        REL_ACQUIRE_SUBSCRIBE -> return FeedAcquisitionRelation.ACQUISITION_SUBSCRIBE
       }
     }
+    return FeedAcquisitionRelation.ACQUISITION_GENERIC
   }
 
   private fun convertAvailability(links: List<WPMLink>): FeedAvailability {
@@ -612,7 +610,7 @@ object OPDS20FeedConverter {
 
       null -> {
         val hasOpenAccess =
-          links.any { it.relation.any { rel -> REL_ACQUIRE_PREFIX in rel && rel.endsWith(REL_ACQUIRE_OPEN_ACCESS) } }
+          links.any { it.relation.any { rel -> rel == REL_ACQUIRE_OPEN_ACCESS } }
         if (hasOpenAccess) {
           FeedAvailabilityOpenAccess(endDate = null, revoke = null)
         } else {

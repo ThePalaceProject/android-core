@@ -172,6 +172,49 @@ class FeedLoaderOPDS20FilterTest {
   }
 
   /**
+   * Regression test: the server's loans feed uses the bare
+   * `http://opds-spec.org/acquisition` relation (no suffix) for its
+   * fulfill links, exactly as the OPDS 1.2 serialization of the same
+   * data does. With `showOnlySupportedBooks` at its default of `true`,
+   * every loan entry must survive the filter. If they do not, the sync
+   * task sees an empty loans feed and deletes every borrowed book.
+   *
+   * The fixture is the actual loans document returned by the server.
+   */
+
+  @Test
+  fun testOPDS20LoanFeedWithBareAcquisitionSurvivesFilter() {
+    val json =
+      String(
+        this::class.java
+          .getResourceAsStream("/org/nypl/simplified/tests/feeds/opds20/loans-feed-bare-acquisition.json")!!
+          .readAllBytes(),
+        StandardCharsets.UTF_8,
+      )
+
+    val loader = this.createLoader(json, this.opds20ContentType)
+    loader.preferOPDS20 = true
+
+    val result =
+      loader
+        .fetchURI(accountID = this.accountID, uri = this.testURI, credentials = null, method = "GET")
+        .get()
+
+    Assertions.assertTrue(result is FeedLoaderResult.FeedLoaderSuccess)
+    val feed = (result as FeedLoaderResult.FeedLoaderSuccess).feed
+    val feedData = feed as org.nypl.simplified.feeds.api.FeedData
+    Assertions.assertEquals(3, feedData.size)
+
+    for (entry in feedData.entries) {
+      val book = entry as FeedEntryBook
+      Assertions.assertEquals(
+        org.nypl.simplified.feeds.api.FeedAcquisitionRelation.ACQUISITION_GENERIC,
+        book.acquisitions[0].relation,
+      )
+    }
+  }
+
+  /**
    * Verify that `application/opds-publication+json` is registered
    * as a known type in `BookFormatSupport`.
    */

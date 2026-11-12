@@ -9,6 +9,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedAcquisitionRelation
 import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
 import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
 import org.nypl.simplified.feeds.api.FeedData
@@ -397,6 +398,51 @@ class OPDS20FeedConverterTest {
     val entry = feedData.entries[0] as FeedEntryBook
 
     assertTrue(entry.availability is org.nypl.simplified.feeds.api.FeedAvailabilityHoldable)
+  }
+
+  /**
+   * Regression test: the server's loans feed is an OPDS 2.0 feed whose
+   * publications use the bare `http://opds-spec.org/acquisition` relation
+   * (no suffix) for their fulfill links. This is the same data as the
+   * OPDS 1.2 loans feed, where the bare relation is parsed as
+   * `ACQUISITION_GENERIC`.
+   *
+   * The converter must not drop these links: every loan entry must come
+   * out with a single `ACQUISITION_GENERIC` acquisition. If the
+   * acquisitions are lost, the `showOnlySupportedBooks` filter in
+   * `FeedLoader` strips every entry, `BookSyncTask` sees an empty feed,
+   * and deletes every borrowed book from the database.
+   *
+   * The fixture is the actual loans document returned by the server.
+   */
+  @Test
+  fun testLoanFeedBareAcquisitionRelation() {
+    val json = this.resource("loans-feed-bare-acquisition.json")
+
+    val converted = this.parseAndConvert(json)
+
+    assertTrue(converted is FeedData)
+    val feedData = converted as FeedData
+    assertEquals(3, feedData.size)
+
+    val expectedIds = setOf(
+      "urn:uuid:66a9cf92-a05c-448c-9205-8f3875caca7b",
+      "urn:uuid:6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b",
+      "urn:uuid:656de7cb-dfad-4438-891b-6f2cfe78b8d6",
+    )
+
+    val seenIds = mutableSetOf<String>()
+    for (entry in feedData.entries) {
+      val book = entry as FeedEntryBook
+      seenIds.add(book.id)
+
+      assertEquals(1, book.acquisitions.size)
+      val acquisition = book.acquisitions[0]
+      assertEquals(FeedAcquisitionRelation.ACQUISITION_GENERIC, acquisition.relation)
+      assertEquals("application/epub+zip", acquisition.type.fullType)
+    }
+
+    assertEquals(expectedIds, seenIds)
   }
 
   private fun resource(
