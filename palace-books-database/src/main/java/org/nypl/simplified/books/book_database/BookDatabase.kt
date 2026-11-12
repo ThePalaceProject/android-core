@@ -273,8 +273,8 @@ class BookDatabase private constructor(
         val bookId = BookID.create(name)
         val fileMeta = File(directory, "meta.json")
         val entry: FeedEntryBook =
-          FileInputStream(fileMeta).bufferedReader().use { reader ->
-            parser.parseEntry(accountID, reader.readText())
+          FileInputStream(fileMeta).use { stream ->
+            parser.parseEntry(accountID, stream)
           }
 
         val cover = fileOrNull(directory, BookDatabaseEntry.COVER_FILENAME)

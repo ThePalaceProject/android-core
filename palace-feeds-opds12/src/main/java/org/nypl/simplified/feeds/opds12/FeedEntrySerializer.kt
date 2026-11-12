@@ -16,7 +16,10 @@ class FeedEntrySerializer(
 ) : FeedEntrySerializerType {
   @Throws(IOException::class)
   override fun serializeEntry(entry: FeedEntryBook): String {
-    val objectNode = this.opdsSerializer.serializeFeedEntry(entry.toOPDSAcquisitionFeedEntry())
+    val objectNode =
+      this.opdsSerializer.serializeFeedEntry(
+        FeedEntryBookToOPDS.toOPDSAcquisitionFeedEntry(entry),
+      )
     val baos = ByteArrayOutputStream()
     this.opdsSerializer.serializeToStream(objectNode, baos)
     return baos.toString(Charsets.UTF_8)

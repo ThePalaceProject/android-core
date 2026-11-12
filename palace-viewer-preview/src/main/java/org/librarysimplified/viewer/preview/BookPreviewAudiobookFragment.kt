@@ -47,11 +47,15 @@ class BookPreviewAudiobookFragment :
     fun newInstance(
       file: File,
       feedEntry: FeedEntryBook,
-    ): BookPreviewAudiobookFragment =
-      BookPreviewAudiobookFragment().apply {
-        BookPreviewModel.feedEntry = feedEntry
-        BookPreviewModel.audioFile = file
+    ): BookPreviewAudiobookFragment {
+      return BookPreviewAudiobookFragment().apply {
+        BookPreviewModel.current =
+          BookPreviewModelData(
+            feedEntry = feedEntry,
+            audioFile = file,
+          )
       }
+    }
   }
 
   override fun onStart() {
@@ -121,13 +125,15 @@ class BookPreviewAudiobookFragment :
     this.imageLoader =
       services.requireService(ImageLoader2Type::class.java)
 
-    val audioFileMaybe = BookPreviewModel.audioFile
+    val data = BookPreviewModel.current
+
+    val audioFileMaybe = data?.audioFile
     if (audioFileMaybe == null) {
       throw RuntimeException("Invalid file")
     }
     this.audioFile = audioFileMaybe
 
-    val feedEntryMaybe = BookPreviewModel.feedEntry
+    val feedEntryMaybe = data?.feedEntry
     if (feedEntryMaybe == null) {
       throw RuntimeException("Invalid entry")
     }

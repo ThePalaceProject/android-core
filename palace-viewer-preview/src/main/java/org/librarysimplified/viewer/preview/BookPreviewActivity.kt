@@ -76,7 +76,11 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       context: Activity,
       feedEntry: FeedEntryBook,
     ) {
-      BookPreviewModel.feedEntry = feedEntry
+      BookPreviewModel.current =
+        BookPreviewModelData(
+          feedEntry = feedEntry,
+          audioFile = null,
+        )
       context.startActivity(Intent(context, BookPreviewActivity::class.java))
     }
   }
@@ -128,7 +132,7 @@ class BookPreviewActivity : AppCompatActivity(R.layout.activity_book_preview) {
       return
     }
 
-    val entry = BookPreviewModel.feedEntry
+    val entry = BookPreviewModel.current?.feedEntry
     if (entry == null) {
       this.logger.warn("BookPreviewActivity lacks entry!")
       this.finish()

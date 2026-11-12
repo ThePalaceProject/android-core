@@ -21,6 +21,7 @@ import org.nypl.simplified.feeds.api.FeedEntry
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedFetchResult
 import org.nypl.simplified.feeds.api.FeedFetchType
+import org.nypl.simplified.feeds.api.FeedFetchVersion
 import org.nypl.simplified.feeds.api.FeedHTTPTransportException
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure
@@ -113,13 +114,13 @@ class FeedLoader(
     method: String,
   ): FeedLoaderResult {
     try {
-      val acceptHeader: String?
+      val version: FeedFetchVersion
       if (this.preferOPDS20) {
-        acceptHeader = StandardFormatNames.opds20Feed.fullType
+        version = FeedFetchVersion.OPDS_2_0
       } else {
-        acceptHeader = null
+        version = FeedFetchVersion.OPDS_1_2
       }
-      val result = this.fetch.fetch(uri, credentials, acceptHeader)
+      val result = this.fetch.fetch(uri, credentials, version)
       val body = result.body
       val accessToken = result.accessToken
       val contentType: MIMEType? = result.contentType
@@ -260,7 +261,7 @@ class FeedLoader(
     method: String,
   ): OPDSOpenSearch1_1? {
     return if (searchLink != null) {
-      val result = this.fetch.fetch(searchLink.uri, credentials, null)
+      val result = this.fetch.fetch(searchLink.uri, credentials, FeedFetchVersion.OPDS_1_2)
       result.body.use { stream ->
         this.opds12SearchParser.parse(searchLink.uri, stream)
       }
@@ -307,7 +308,7 @@ class FeedLoader(
      * Create a [FeedFetchType] backed by an [LSHTTPClientType].
      */
     fun httpFetch(http: LSHTTPClientType): FeedFetchType {
-      return FeedFetchType { uri, credentials, acceptHeader ->
+      return FeedFetchType { uri, credentials, version ->
         val auth = AccountAuthenticatedHTTP.createAuthorizationIfPresent(credentials)
 
         var builder: LSHTTPRequestBuilderType =
@@ -317,8 +318,14 @@ class FeedLoader(
             .addBasicTokenPropertiesIfApplicable(credentials)
             .setMethod(LSHTTPRequestBuilderType.Method.Get)
 
-        if (acceptHeader != null) {
-          builder = builder.addHeader("Accept", acceptHeader)
+        when (version) {
+          FeedFetchVersion.OPDS_2_0 -> {
+            builder = builder.addHeader("Accept", StandardFormatNames.opds20Feed.fullType)
+          }
+
+          FeedFetchVersion.OPDS_1_2 -> {
+            // no Accept header: the server serves its default (OPDS 1.2) representation
+          }
         }
 
         val request = builder.build()

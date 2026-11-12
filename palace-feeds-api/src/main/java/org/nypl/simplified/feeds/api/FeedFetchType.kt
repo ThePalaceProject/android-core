@@ -11,6 +11,6 @@ fun interface FeedFetchType {
   fun fetch(
     uri: URI,
     credentials: AccountAuthenticationCredentials?,
-    acceptHeader: String?,
+    version: FeedFetchVersion,
   ): FeedFetchResult
 }

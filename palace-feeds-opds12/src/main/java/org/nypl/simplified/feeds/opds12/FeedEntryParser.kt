@@ -4,8 +4,8 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedEntryParserType
 import org.nypl.simplified.opds.core.OPDSJSONParserType
-import java.io.ByteArrayInputStream
 import java.io.IOException
+import java.io.InputStream
 
 /**
  * A [FeedEntryParserType] implementation that uses the OPDS 1.2 JSON parser.
@@ -17,9 +17,8 @@ class FeedEntryParser(
   @Throws(IOException::class)
   override fun parseEntry(
     accountID: AccountID,
-    json: String,
+    stream: InputStream,
   ): FeedEntryBook {
-    val stream = ByteArrayInputStream(json.toByteArray(Charsets.UTF_8))
     val opdsEntry = this.opdsParser.parseAcquisitionFeedEntryFromStream(stream)
     return OPDS12FeedConverter.convertEntry(accountID, opdsEntry)
   }
