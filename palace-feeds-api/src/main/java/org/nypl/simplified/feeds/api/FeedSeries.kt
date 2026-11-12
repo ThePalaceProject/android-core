@@ -8,5 +8,8 @@ import java.net.URI
 data class FeedSeries(
   val name: String,
   val position: Int?,
-  val link: URI,
+  /**
+   * The URI of the series page, if any.
+   */
+  val link: URI?,
 )

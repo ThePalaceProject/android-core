@@ -1,6 +1,8 @@
 package org.nypl.simplified.books.controller
 
 import org.librarysimplified.http.api.LSHTTPClientType
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.Handled401
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderAuthenticationDescription
@@ -114,6 +116,16 @@ class BookSyncTask(
       }
 
       is FeedLoaderFailedAuthentication -> {
+        when (AccountAuthenticatedHTTP.handle401Error(feedResult.problemReport)) {
+          Handled401.ErrorIsRecoverableCredentialsExpired -> {
+            account.expireCredentialsIfApplicable()
+          }
+
+          Handled401.ErrorIsUnrecoverable -> {
+            // Treat this as a hard error.
+          }
+        }
+
         val message = feedResult.message
         this.taskRecorder.currentStepFailed(
           message = message,
@@ -121,7 +133,6 @@ class BookSyncTask(
           exception = feedResult.exception,
           extraMessages = listOf(),
         )
-        account.expireCredentialsIfApplicable()
         throw TaskFailedHandled(feedResult.exception)
       }
 

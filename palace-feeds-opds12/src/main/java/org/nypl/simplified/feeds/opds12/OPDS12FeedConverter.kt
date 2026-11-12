@@ -67,7 +67,7 @@ object OPDS12FeedConverter {
   ): Feed {
     val feedSearch: FeedSearch? =
       if (search != null) {
-        FeedSearchOpen1_1(queryFn = search::getQueryURIForTerms)
+        FeedSearchOpen1_1.fromTemplate(search.template())
       } else {
         null
       }

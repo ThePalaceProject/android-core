@@ -96,9 +96,10 @@ sealed class OPDSClientRequest {
     val method: String,
     val facet: FeedFacetComposite,
   ) : OPDSClientRequest() {
-    override val uri =
-      this.facet.facets[0]
-        .uri
+    override val uri: URI =
+      requireNotNull(this.facet.facets[0].uri) {
+        "A composite facet's first facet must have a URI."
+      }
     override val requestID: UUID =
       UUID.randomUUID()
     override val accountID: AccountID =

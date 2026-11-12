@@ -1267,18 +1267,21 @@ sealed class CatalogFragment :
 
     when (feedFacet) {
       is FeedFacetData -> {
-        val credentials =
-          this.credentialsOf(feedFacet.accountID)
+        val facetURI = feedFacet.uri
+        if (facetURI != null) {
+          val credentials =
+            this.credentialsOf(feedFacet.accountID)
 
-        this.opdsClient.goTo(
-          OPDSClientRequest.NewFeed(
-            accountID = feedFacet.accountID,
-            uri = feedFacet.uri,
-            credentials = credentials,
-            historyBehavior = ADD_TO_HISTORY,
-            method = "GET",
-          ),
-        )
+          this.opdsClient.goTo(
+            OPDSClientRequest.NewFeed(
+              accountID = feedFacet.accountID,
+              uri = facetURI,
+              credentials = credentials,
+              historyBehavior = ADD_TO_HISTORY,
+              method = "GET",
+            ),
+          )
+        }
       }
 
       is FeedFacetComposite -> {

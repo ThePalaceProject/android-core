@@ -690,26 +690,30 @@ class CatalogFeedViewDetails2(
       val (row, rowKey, rowVal) = this.bookInfoViewOf()
       rowKey.text = this.root.resources.getString(R.string.catalogMetaSeries)
       rowVal.text = series.name
-      rowVal.contentDescription =
-        this.root.resources.getString(R.string.catalogAccessibilitySeriesLink, series.name)
-      rowVal.setTypeface(rowVal.typeface, Typeface.BOLD)
-      rowVal.paintFlags = rowVal.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
-      val outValue = TypedValue()
-      rowVal.context.theme.resolveAttribute(
-        android.R.attr.selectableItemBackground,
-        outValue,
-        true,
-      )
-      rowVal.setBackgroundResource(outValue.resourceId)
-      rowVal.setOnClickListener {
-        rowVal.postDelayed({
-          this.callbacks.onFeedSelected(
-            accountID = newEntry.accountID,
-            title = series.name,
-            uri = series.link,
-          )
-        }, 250L)
+      val seriesLink = series.link
+      if (seriesLink != null) {
+        rowVal.contentDescription =
+          this.root.resources.getString(R.string.catalogAccessibilitySeriesLink, series.name)
+        rowVal.setTypeface(rowVal.typeface, Typeface.BOLD)
+        rowVal.paintFlags = rowVal.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+
+        val outValue = TypedValue()
+        rowVal.context.theme.resolveAttribute(
+          android.R.attr.selectableItemBackground,
+          outValue,
+          true,
+        )
+        rowVal.setBackgroundResource(outValue.resourceId)
+        rowVal.setOnClickListener {
+          rowVal.postDelayed({
+            this.callbacks.onFeedSelected(
+              accountID = newEntry.accountID,
+              title = series.name,
+              uri = seriesLink,
+            )
+          }, 250L)
+        }
       }
       this.metadata.addView(row)
     }

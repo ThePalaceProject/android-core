@@ -359,7 +359,9 @@ class BookSyncTaskTest {
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Failure
 
-    Assertions.assertTrue(fakeAccount.credentialsExpired, "Credentials must have expired.")
+    // A 401 with no problem report is not the specific recoverable credentials-expired case,
+    // so the credentials must not be expired.
+    Assertions.assertFalse(fakeAccount.credentialsExpired, "Credentials must not have expired.")
   }
 
   @Test

@@ -82,13 +82,16 @@ fun FeedEntryBook.toOPDSAcquisitionFeedEntry(): OPDSAcquisitionFeedEntry {
 
   val series = this.series
   if (series != null) {
-    builder.setSeries(
-      OPDSSeries(
-        name = series.name,
-        position = series.position,
-        link = series.link,
-      ),
-    )
+    val seriesLink = series.link
+    if (seriesLink != null) {
+      builder.setSeries(
+        OPDSSeries(
+          name = series.name,
+          position = series.position,
+          link = seriesLink,
+        ),
+      )
+    }
   }
 
   return builder.build()

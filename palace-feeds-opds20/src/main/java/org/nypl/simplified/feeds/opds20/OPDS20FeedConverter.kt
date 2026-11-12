@@ -330,24 +330,22 @@ object OPDS20FeedConverter {
       }
 
     val previewAcquisitions: List<FeedPreviewAcquisition> =
-      previewAcquisitionLinks.map { link ->
-        val rawHref: URI?
+      previewAcquisitionLinks.mapNotNull { link ->
         val hrefValue = linkHrefValue(link)
         if (hrefValue == null) {
-          rawHref = URI("")
+          // a preview acquired from a templated link has no concrete URI and is unusable
+          null
         } else {
-          rawHref = hrefValue
-        }
+          val rawType: MIMEType?
+          val linkType = link.type
+          if (linkType == null) {
+            rawType = parseRaisingException("application/octet-stream")
+          } else {
+            rawType = linkType
+          }
 
-        val rawType: MIMEType?
-        val linkType = link.type
-        if (linkType == null) {
-          rawType = parseRaisingException("application/octet-stream")
-        } else {
-          rawType = linkType
+          FeedPreviewAcquisition(hrefValue, rawType)
         }
-
-        FeedPreviewAcquisition(rawHref, rawType)
       }
 
     val allLinks: List<WPMLink> =
@@ -385,17 +383,12 @@ object OPDS20FeedConverter {
         .filter { REL_COLLECTION in it.relation }
         .mapNotNull { link ->
           val uri = linkHrefValue(link)
-          if (uri == null) {
+          val linkTitle = link.title
+          if (uri == null || linkTitle == null || linkTitle.isEmpty()) {
+            // a group without a name or without a URI is not a valid group
             null
           } else {
-            val linkTitle = link.title
-            val groupName: String
-            if (linkTitle == null) {
-              groupName = ""
-            } else {
-              groupName = linkTitle
-            }
-            FeedEntryGroupRef(name = groupName, uri = uri)
+            FeedEntryGroupRef(name = linkTitle, uri = uri)
           }
         }.toSet()
 
@@ -452,13 +445,7 @@ object OPDS20FeedConverter {
         linkTitle = rawTitle
       }
 
-      val linkURI: URI
-      val hrefValue = linkHrefValue(link)
-      if (hrefValue == null) {
-        linkURI = URI("")
-      } else {
-        linkURI = hrefValue
-      }
+      val linkURI: URI? = linkHrefValue(link)
 
       val isActive: Boolean =
         REL_SELF in link.relation
@@ -504,7 +491,7 @@ object OPDS20FeedConverter {
         FeedSeries(
           name = series.value,
           position = null,
-          link = URI(""),
+          link = null,
         )
       }
 
@@ -517,18 +504,10 @@ object OPDS20FeedConverter {
           seriesPosition = rawPosition.toInt()
         }
 
-        val seriesIdentifier: URI
-        val rawIdentifier = series.identifier
-        if (rawIdentifier == null) {
-          seriesIdentifier = URI("")
-        } else {
-          seriesIdentifier = rawIdentifier
-        }
-
         FeedSeries(
           name = languageMapToString(series.name),
           position = seriesPosition,
-          link = seriesIdentifier,
+          link = series.identifier,
         )
       }
 
@@ -544,14 +523,6 @@ object OPDS20FeedConverter {
   }
 
   private fun convertAcquisitionLink(link: WPMLink): FeedAcquisition {
-    val rawHref: URI?
-    val hrefValue = linkHrefValue(link)
-    if (hrefValue == null) {
-      rawHref = URI("")
-    } else {
-      rawHref = hrefValue
-    }
-
     val rawType: MIMEType?
     val linkType = link.type
     if (linkType == null) {

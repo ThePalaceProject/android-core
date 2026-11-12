@@ -384,10 +384,16 @@ class OPDSClient private constructor(
         val facetPath =
           request.facet.facets.toMutableList()
 
+        val firstFacetURI = facetPath[0].uri
+        if (firstFacetURI == null) {
+          throw IllegalStateException(
+            "The first facet of a composite facet path has no URI.",
+          )
+        }
         var feedNow =
           this.loadSingleFeedWithoutGroups(
             request.accountID,
-            facetPath[0].uri,
+            firstFacetURI,
             request.credentials,
             request.method,
           )
@@ -395,10 +401,16 @@ class OPDSClient private constructor(
         facetPath.removeAt(0)
         for (facet in facetPath) {
           val nextFacet = findEquivalentFacet(facet, feedNow)
+          val nextFacetURI = nextFacet.uri
+          if (nextFacetURI == null) {
+            throw IllegalStateException(
+              "A facet in the composite facet path has no URI.",
+            )
+          }
           feedNow =
             this.loadSingleFeedWithoutGroups(
               request.accountID,
-              nextFacet.uri,
+              nextFacetURI,
               request.credentials,
               request.method,
             )

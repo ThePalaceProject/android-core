@@ -13,7 +13,10 @@ data class FeedFacetData(
   val accountID: AccountID,
   override val title: String,
   override val isActive: Boolean,
-  val uri: URI,
+  /**
+   * The URI of the facet, if any.
+   */
+  val uri: URI?,
   val group: String,
   val groupType: String?,
 ) : FeedFacetSingle {
