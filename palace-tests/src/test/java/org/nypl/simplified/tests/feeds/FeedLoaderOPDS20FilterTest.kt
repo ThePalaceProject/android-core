@@ -87,36 +87,7 @@ class FeedLoaderOPDS20FilterTest {
 
   @Test
   fun testOPDS20IndirectAcquisitionSurvivesFilter() {
-    val json = """
-      {
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "metadata": {
-              "identifier": "urn:test:book1",
-              "title": "Test Book"
-            },
-            "links": [
-              {
-                "href": "https://example.com/acquire/book1",
-                "type": "application/opds-publication+json",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "indirectAcquisition": [
-                    {
-                      "type": "application/epub+zip",
-                      "properties": {}
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """
+    val json = this.resource("opds20-indirect-acquisition-survives-filter.json")
 
     val loader = this.createLoader(json, this.opds20ContentType)
     loader.preferOPDS20 = true
@@ -142,106 +113,7 @@ class FeedLoaderOPDS20FilterTest {
 
   @Test
   fun testOPDS20GroupsSurviveFilter() {
-    val json = """
-      {
-        "metadata": {
-          "title": "Grouped Feed"
-        },
-        "groups": [
-          {
-            "metadata": {
-              "title": "Group A",
-              "identifier": "https://example.com/groupA"
-            },
-            "links": [
-              {
-                "href": "https://example.com/groupA",
-                "rel": "self"
-              }
-            ],
-            "publications": [
-              {
-                "metadata": {
-                  "identifier": "urn:test:bookA1",
-                  "title": "Book A1"
-                },
-                "links": [
-                  {
-                    "href": "https://example.com/acquire/a1",
-                    "type": "application/opds-publication+json",
-                    "rel": "http://opds-spec.org/acquisition/borrow",
-                    "properties": {
-                      "indirectAcquisition": [
-                        {
-                          "type": "application/epub+zip",
-                          "properties": {}
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              {
-                "metadata": {
-                  "identifier": "urn:test:bookA2",
-                  "title": "Book A2"
-                },
-                "links": [
-                  {
-                    "href": "https://example.com/acquire/a2",
-                    "type": "application/opds-publication+json",
-                    "rel": "http://opds-spec.org/acquisition/borrow",
-                    "properties": {
-                      "indirectAcquisition": [
-                        {
-                          "type": "application/epub+zip",
-                          "properties": {}
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "metadata": {
-              "title": "Group B",
-              "identifier": "https://example.com/groupB"
-            },
-            "links": [
-              {
-                "href": "https://example.com/groupB",
-                "rel": "self"
-              }
-            ],
-            "publications": [
-              {
-                "metadata": {
-                  "identifier": "urn:test:bookB1",
-                  "title": "Book B1"
-                },
-                "links": [
-                  {
-                    "href": "https://example.com/acquire/b1",
-                    "type": "application/opds-publication+json",
-                    "rel": "http://opds-spec.org/acquisition/borrow",
-                    "properties": {
-                      "indirectAcquisition": [
-                        {
-                          "type": "application/epub+zip",
-                          "properties": {}
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    """
+    val json = this.resource("opds20-groups-survive-filter.json")
 
     val loader = this.createLoader(json, this.opds20ContentType)
     loader.preferOPDS20 = true
@@ -282,40 +154,7 @@ class FeedLoaderOPDS20FilterTest {
 
   @Test
   fun testOPDS20LCPIndirectAcquisitionSurvivesFilter() {
-    val json = """
-      {
-        "metadata": {
-          "title": "LCP Feed"
-        },
-        "publications": [
-          {
-            "metadata": {
-              "identifier": "urn:test:lcp1",
-              "title": "LCP Book"
-            },
-            "links": [
-              {
-                "href": "https://example.com/acquire/lcp1",
-                "type": "application/opds-publication+json",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "indirectAcquisition": [
-                    {
-                      "type": "application/vnd.readium.lcp.license.v1.0+json",
-                      "child": [
-                        {
-                          "type": "application/epub+zip"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """
+    val json = this.resource("opds20-lcp-indirect-acquisition-survives-filter.json")
 
     val loader = this.createLoader(json, this.opds20ContentType)
     loader.preferOPDS20 = true
@@ -386,36 +225,7 @@ class FeedLoaderOPDS20FilterTest {
 
   @Test
   fun testOPDS20UnsupportedFinalTypeIsFiltered() {
-    val json = """
-      {
-        "metadata": {
-          "title": "PDF Feed"
-        },
-        "publications": [
-          {
-            "metadata": {
-              "identifier": "urn:test:pdf1",
-              "title": "PDF Book"
-            },
-            "links": [
-              {
-                "href": "https://example.com/acquire/pdf1",
-                "type": "application/opds-publication+json",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "indirectAcquisition": [
-                    {
-                      "type": "application/pdf",
-                      "properties": {}
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """
+    val json = this.resource("opds20-unsupported-final-type-is-filtered.json")
 
     val loader = this.createLoader(json, this.opds20ContentType)
     loader.preferOPDS20 = true
@@ -428,5 +238,13 @@ class FeedLoaderOPDS20FilterTest {
     Assertions.assertTrue(result is FeedLoaderResult.FeedLoaderSuccess)
     val feed = (result as FeedLoaderResult.FeedLoaderSuccess).feed
     Assertions.assertEquals(0, (feed as org.nypl.simplified.feeds.api.FeedData).size)
+  }
+
+  private fun resource(
+    name: String
+  ): String {
+    val path = "/org/nypl/simplified/tests/feeds/$name"
+    val stream = FeedLoaderOPDS20FilterTest::class.java.getResourceAsStream(path)
+    return String(stream!!.readAllBytes(), StandardCharsets.UTF_8)
   }
 }

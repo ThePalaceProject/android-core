@@ -44,15 +44,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEmptyFeed() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": []
-      }
-    """.trimIndent()
+    val json = this.resource("empty-feed.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -65,34 +57,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedWithPublication() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:1234567890",
-              "title": "Test Book",
-              "author": [
-                {"name": "Author One"}
-              ],
-              "published": "2024-01-15T00:00:00Z"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/borrow"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("feed-with-publication.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -109,28 +74,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedWithFacets() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [],
-        "facets": [
-          {
-            "metadata": {
-              "title": "Genre"
-            },
-            "links": [
-              {
-                "href": "https://example.com/feed.json?genre=fiction",
-                "rel": "self"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("feed-with-facets.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -145,39 +89,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedWithGroups() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "groups": [
-          {
-            "metadata": {
-              "title": "New Releases",
-              "identifier": "urn:group:new"
-            },
-            "links": [
-              {
-                "href": "https://example.com/group/new",
-                "rel": "self",
-                "type": "application/opds+json"
-              }
-            ],
-            "publications": [
-              {
-                "type": "publication",
-                "metadata": {
-                  "identifier": "urn:isbn:0000000001",
-                  "title": "Grouped Book"
-                },
-                "links": []
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("feed-with-groups.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -192,16 +104,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedMetadata() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed",
-          "modified": "2024-06-15T12:00:00Z"
-        },
-        "publications": []
-      }
-    """.trimIndent()
+    val json = this.resource("feed-metadata.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -213,27 +116,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryWithSubjects() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:1111111111",
-              "title": "Book With Subjects",
-              "subject": [
-                "Fiction"
-              ]
-            },
-            "links": []
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-with-subjects.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -246,29 +129,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryWithMultipleAuthors() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:2222222222",
-              "title": "Multi Author Book",
-              "author": [
-                {"name": "Author One"},
-                {"name": "Author Two"},
-                {"name": "Author Three"}
-              ]
-            },
-            "links": []
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-with-multiple-authors.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -281,30 +142,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryWithLanguageAndPublisher() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:3333333333",
-              "title": "Detailed Book",
-              "languages": ["en"],
-              "publisher": [
-                {"name": "Test Publisher"}
-              ],
-              "description": "A test book description",
-              "duration": 3600.0
-            },
-            "links": []
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-with-language-and-publisher.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -319,21 +157,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedNextLink() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [],
-        "links": [
-          {
-            "href": "https://example.com/feed.json?page=2",
-            "rel": "next"
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("feed-next-link.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -344,40 +168,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testOrderPreserved() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:0000000001",
-              "title": "First Book"
-            },
-            "links": []
-          },
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:0000000002",
-              "title": "Second Book"
-            },
-            "links": []
-          },
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:0000000003",
-              "title": "Third Book"
-            },
-            "links": []
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("order-preserved.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -391,22 +182,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedSearch() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [],
-        "links": [
-          {
-            "href": "https://example.com/search?query={searchTerms}",
-            "rel": "search",
-            "templated": true
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("feed-search.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -417,29 +193,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedTermsOfServiceAndPrivacyPolicyAndAbout() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [],
-        "links": [
-          {
-            "href": "https://example.com/tos",
-            "rel": "terms-of-service"
-          },
-          {
-            "href": "https://example.com/privacy",
-            "rel": "privacy-policy"
-          },
-          {
-            "href": "https://example.com/about",
-            "rel": "about"
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("feed-terms-of-service-and-privacy-policy-and-about.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -452,35 +206,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryPreviewAcquisitions() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:4444444444",
-              "title": "Book With Preview"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/borrow"
-              },
-              {
-                "href": "https://example.com/book-sample.pdf",
-                "type": "application/pdf",
-                "rel": "http://opds-spec.org/acquisition/sample"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-preview-acquisitions.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -495,37 +221,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryAnnotationsAndIssuesAndRelated() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:5555555555",
-              "title": "Book With Links"
-            },
-            "links": [
-              {
-                "href": "https://example.com/annotations",
-                "rel": "http://www.w3.org/ns/oa#annotationService"
-              },
-              {
-                "href": "https://example.com/issues",
-                "rel": "issues"
-              },
-              {
-                "href": "https://example.com/related",
-                "rel": "related"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-annotations-and-issues-and-related.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -540,37 +236,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryAlternateAndAnalyticsAndTimeTracking() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:6666666666",
-              "title": "Book With More Links"
-            },
-            "links": [
-              {
-                "href": "https://example.com/alternate",
-                "rel": "alternate"
-              },
-              {
-                "href": "https://example.com/analytics",
-                "rel": "http://librarysimplified.org/terms/rel/analytics/open-book"
-              },
-              {
-                "href": "https://example.com/time-tracking",
-                "rel": "http://palaceproject.io/terms/timeTracking"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-alternate-and-analytics-and-time-tracking.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -585,35 +251,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryGroups() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:8888888888",
-              "title": "Book In Groups"
-            },
-            "links": [
-              {
-                "href": "https://example.com/group/scifi",
-                "rel": "collection",
-                "title": "Sci-Fi"
-              },
-              {
-                "href": "https://example.com/group/favorites",
-                "rel": "collection",
-                "title": "Favorites"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-groups.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -628,35 +266,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryCoverAndThumbnail() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:9999999999",
-              "title": "Book With Images"
-            },
-            "links": [
-              {
-                "href": "https://example.com/cover.jpg",
-                "type": "image/jpeg",
-                "rel": "http://opds-spec.org/image"
-              },
-              {
-                "href": "https://example.com/thumb.jpg",
-                "type": "image/jpeg",
-                "rel": "http://opds-spec.org/image/thumbnail"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-cover-and-thumbnail.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -670,36 +280,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryNarratorsAndSeries() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:1010101010",
-              "title": "Audiobook",
-              "narrator": [
-                {"name": "Narrator One"}
-              ],
-              "belongsTo": {
-                "series": {
-                  "name": "Dune",
-                  "position": 1.0,
-                  "links": [
-                    {"href": "https://example.com/series/dune", "rel": "self"}
-                  ]
-                }
-              }
-            },
-            "links": []
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-narrators-and-series.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -715,35 +296,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryAvailabilityFromProperties() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:2020202020",
-              "title": "Available Book"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "availability": {
-                    "state": "available"
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-availability-from-properties.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -756,30 +309,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryOpenAccessAvailability() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:3030303030",
-              "title": "Open Access Book"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/open-access"
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-open-access-availability.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -792,21 +322,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testFeedLicenses() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [],
-        "links": [
-          {
-            "href": "https://example.com/licenses",
-            "rel": "license"
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("feed-licenses.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -817,46 +333,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryIndirectAcquisitions() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:4040404040",
-              "title": "Book With DRM"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "availability": {
-                    "state": "available"
-                  },
-                  "indirectAcquisition": [
-                    {
-                      "type": "application/vnd.adobe.adept+xml",
-                      "child": [
-                        {
-                          "type": "application/vnd.readium.lcp.licenser+json",
-                          "child": []
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-indirect-acquisitions.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -879,37 +356,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testEntryDRMLicensor() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:5050505050",
-              "title": "Book With DRM Licensor"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "licensor": {
-                    "vendor": "adobe",
-                    "clientToken": "test-token",
-                    "deviceManager": "https://example.com/devices"
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("entry-drm-licensor.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -925,37 +372,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testAvailabilityReserved() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:6060606060",
-              "title": "Reserved Book"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "availability": {
-                    "state": "reserved",
-                    "since": "2024-01-01T00:00:00Z",
-                    "until": "2024-02-01T00:00:00Z"
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("availability-reserved.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -971,35 +388,7 @@ class OPDS20FeedConverterTest {
 
   @Test
   fun testAvailabilityUnavailable() {
-    val json = """
-      {
-        "type": "feed",
-        "metadata": {
-          "title": "Test Feed"
-        },
-        "publications": [
-          {
-            "type": "publication",
-            "metadata": {
-              "identifier": "urn:isbn:7070707070",
-              "title": "Unavailable Book"
-            },
-            "links": [
-              {
-                "href": "https://example.com/book.epub",
-                "type": "application/epub+zip",
-                "rel": "http://opds-spec.org/acquisition/borrow",
-                "properties": {
-                  "availability": {
-                    "state": "unavailable"
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    """.trimIndent()
+    val json = this.resource("availability-unavailable.json")
 
     val converted = this.parseAndConvert(json)
 
@@ -1008,5 +397,13 @@ class OPDS20FeedConverterTest {
     val entry = feedData.entries[0] as FeedEntryBook
 
     assertTrue(entry.availability is org.nypl.simplified.feeds.api.FeedAvailabilityHoldable)
+  }
+
+  private fun resource(
+    name: String
+  ): String {
+    val path = "/org/nypl/simplified/tests/feeds/opds20/$name"
+    val stream = OPDS20FeedConverterTest::class.java.getResourceAsStream(path)
+    return String(stream!!.readAllBytes(), StandardCharsets.UTF_8)
   }
 }

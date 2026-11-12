@@ -1,0 +1,38 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:4040404040",
+        "title": "Book With DRM"
+      },
+      "links": [
+        {
+          "href": "https://example.com/book.epub",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition/borrow",
+          "properties": {
+            "availability": {
+              "state": "available"
+            },
+            "indirectAcquisition": [
+              {
+                "type": "application/vnd.adobe.adept+xml",
+                "child": [
+                  {
+                    "type": "application/vnd.readium.lcp.licenser+json",
+                    "child": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

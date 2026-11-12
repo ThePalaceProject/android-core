@@ -1,0 +1,14 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [],
+  "links": [
+    {
+      "href": "https://example.com/search?query={searchTerms}",
+      "rel": "search",
+      "templated": true
+    }
+  ]
+}

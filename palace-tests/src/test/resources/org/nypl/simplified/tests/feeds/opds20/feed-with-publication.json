@@ -1,0 +1,26 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:1234567890",
+        "title": "Test Book",
+        "author": [
+          {"name": "Author One"}
+        ],
+        "published": "2024-01-15T00:00:00Z"
+      },
+      "links": [
+        {
+          "href": "https://example.com/book.epub",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition/borrow"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:4444444444",
+        "title": "Book With Preview"
+      },
+      "links": [
+        {
+          "href": "https://example.com/book.epub",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition/borrow"
+        },
+        {
+          "href": "https://example.com/book-sample.pdf",
+          "type": "application/pdf",
+          "rel": "http://opds-spec.org/acquisition/sample"
+        }
+      ]
+    }
+  ]
+}

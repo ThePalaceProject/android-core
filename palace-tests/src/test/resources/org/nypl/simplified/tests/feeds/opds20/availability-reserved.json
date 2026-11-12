@@ -1,0 +1,29 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:6060606060",
+        "title": "Reserved Book"
+      },
+      "links": [
+        {
+          "href": "https://example.com/book.epub",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition/borrow",
+          "properties": {
+            "availability": {
+              "state": "reserved",
+              "since": "2024-01-01T00:00:00Z",
+              "until": "2024-02-01T00:00:00Z"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
