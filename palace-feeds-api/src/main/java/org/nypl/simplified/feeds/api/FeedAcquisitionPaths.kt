@@ -2,6 +2,9 @@ package org.nypl.simplified.feeds.api
 
 /**
  * Functions to transform lists of acquisitions into lists of linearized acquisition paths.
+ *
+ * The linearization rules are specified in the OPDS acquisition spec:
+ * https://github.com/ThePalaceProject/mobile-specs/tree/main/opds-acquisition-spec
  */
 object FeedAcquisitionPaths {
   private fun indirectPathsInner(

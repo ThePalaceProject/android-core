@@ -33,7 +33,6 @@ class BookFormatSupport private constructor(
     types.add(StandardFormatNames.genericEPUBFiles)
     types.add(StandardFormatNames.simplifiedBearerToken)
     types.addAll(StandardFormatNames.allOPDSFeeds)
-    types.add(StandardFormatNames.opds20Publication)
 
     this.collectSupportedAudioBookTypesInto(types)
 

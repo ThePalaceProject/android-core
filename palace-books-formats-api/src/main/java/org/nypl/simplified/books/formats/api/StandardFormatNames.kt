@@ -178,6 +178,21 @@ object StandardFormatNames {
     this.mimeOf("application/atom+xml;relation=entry;profile=opds-catalog")
 
   /**
+   * The MIME type used for OPDS 2.0 feeds.
+   */
+
+  val opds20Feed =
+    this.mimeOf("application/opds+json")
+
+  /**
+   * The MIME type used for OPDS 2.0 publications. This type is also used for
+   * OPDS 2.0 feed entries.
+   */
+
+  val opds20Publication =
+    this.mimeOf("application/opds-publication+json")
+
+  /**
    * The union of all of the known standard format names used for OPDS feeds.
    */
 
@@ -188,13 +203,8 @@ object StandardFormatNames {
       types.add(this.opdsFeedCatalog)
       types.add(this.opdsAcquisitionFeedEntry)
       types.add(this.opdsAcquisitionFeedEntryOld)
+      types.add(this.opds20Feed)
+      types.add(this.opds20Publication)
       types.toSet()
     }
-
-  /**
-   * The MIME type used for OPDS 2.0 publications.
-   */
-
-  val opds20Publication =
-    this.mimeOf("application/opds-publication+json")
 }

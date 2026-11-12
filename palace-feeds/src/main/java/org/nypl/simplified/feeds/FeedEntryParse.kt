@@ -2,6 +2,7 @@ package org.nypl.simplified.feeds
 
 import one.irradia.mime.api.MIMEType
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedEntryParseType
 import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
@@ -32,8 +33,8 @@ class FeedEntryParse(
   ): FeedEntryBook {
     if (contentType != null &&
       (
-        contentType.fullType == CONTENT_TYPE_OPDS_JSON ||
-          contentType.fullType == CONTENT_TYPE_OPDS_PUBLICATION_JSON
+        contentType.fullType == StandardFormatNames.opds20Feed.fullType ||
+          contentType.fullType == StandardFormatNames.opds20Publication.fullType
       )
     ) {
       return this.parseOPDS20(accountID, stream, uri)
@@ -79,9 +80,6 @@ class FeedEntryParse(
   }
 
   companion object {
-    private const val CONTENT_TYPE_OPDS_JSON = "application/opds+json"
-    private const val CONTENT_TYPE_OPDS_PUBLICATION_JSON = "application/opds-publication+json"
-
     /**
      * Create a new [FeedEntryParse] instance.
      */

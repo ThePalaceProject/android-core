@@ -10,6 +10,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP.getAccessToken
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedAcquisitionPath
 import org.nypl.simplified.feeds.api.FeedAcquisitionPaths
@@ -114,7 +115,7 @@ class FeedLoader(
     try {
       val acceptHeader: String?
       if (this.preferOPDS20) {
-        acceptHeader = ACCEPT_OPDS_JSON
+        acceptHeader = StandardFormatNames.opds20Feed.fullType
       } else {
         acceptHeader = null
       }
@@ -124,7 +125,9 @@ class FeedLoader(
       val contentType: MIMEType? = result.contentType
 
       val feed: Feed
-      if (contentType != null && contentType.fullType == CONTENT_TYPE_OPDS_JSON) {
+      if (contentType != null &&
+        contentType.fullType == StandardFormatNames.opds20Feed.fullType
+      ) {
         this.log.debug("parsing feed as OPDS 2.0: {}", uri)
         feed = this.parseOPDS20(accountId, body, uri)
       } else {
@@ -193,8 +196,7 @@ class FeedLoader(
 
   /**
    * Apply the [showOnlySupportedBooks] filter to a feed, removing entries
-   * that have no supported acquisition path. This operates on the
-   * version-neutral [FeedEntryBook] type.
+   * that have no supported acquisition path.
    */
   private fun applyFilter(
     feed: Feed,
@@ -283,9 +285,6 @@ class FeedLoader(
     )
 
   companion object {
-    private const val ACCEPT_OPDS_JSON = "application/opds+json"
-    private const val CONTENT_TYPE_OPDS_JSON = "application/opds+json"
-
     /**
      * Create a new unified feed loader backed by an HTTP client.
      */
