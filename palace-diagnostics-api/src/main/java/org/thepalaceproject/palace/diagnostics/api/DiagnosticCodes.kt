@@ -116,4 +116,19 @@ object DiagnosticCodes {
    */
 
   const val BOOT_FAILED = "BootFailed"
+
+  /**
+   * A value in the managed device (MDM) configuration was present but could not be parsed.
+   * The failing field and its value are carried in the `Field` and `Value` data fields.
+   */
+
+  const val MDM_CONFIGURATION_INVALID_FIELD = "MDMConfigurationInvalidField"
+
+  /**
+   * An account for a library named in the managed device (MDM) configuration could not be
+   * created at start-up. The provider URI is carried in the `Provider` data field; the
+   * exception type is carried in the `ExceptionType` data field.
+   */
+
+  const val MDM_LIBRARY_CREATE_FAILED = "MDMLibraryCreateFailed"
 }

@@ -1,6 +1,7 @@
 package org.nypl.simplified.tests.books.profiles
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.joda.time.DateTimeZone
@@ -60,7 +61,8 @@ class ProfileDescriptionJSONTest {
           audioBookPlaybackSkipIntervalBackwardMs = 30_000L,
           audioBookBatteryDialogAccepted = true,
           showBookCoverDebugLabels = false,
-          preferOPDS20 = false
+          preferOPDS20 = false,
+          enableMDMLibraries = true
         ),
         attributes = ProfileAttributes(
           sortedMapOf(
@@ -80,6 +82,48 @@ class ProfileDescriptionJSONTest {
     assertEquals(description_0, description_1)
   }
 
+  /**
+   * A profile description serialized by an older version of the app (one that predates the
+   * `enableMDMLibraries` field) must deserialize with the field at its default of `false`.
+   */
+
+  @Test
+  fun testEnableMDMLibrariesDefaultsToFalseWhenAbsent() {
+    val mapper = ObjectMapper()
+
+    val description_0 =
+      this.newDescription(enableMDMLibraries = true)
+
+    val node =
+      ProfileDescriptionJSON.serializeToJSON(mapper, description_0)
+    (node.get("preferences") as ObjectNode).remove("enableMDMLibraries")
+
+    val description_1 =
+      ProfileDescriptionJSON.deserializeFromJSON(mapper, node, AccountID.generate())
+
+    assertEquals(false, description_1.preferences.enableMDMLibraries)
+  }
+
+  /**
+   * An explicit `false` value for `enableMDMLibraries` must survive a serialize/deserialize
+   * round-trip.
+   */
+
+  @Test
+  fun testEnableMDMLibrariesFalseRoundTrip() {
+    val mapper = ObjectMapper()
+
+    val description_0 =
+      this.newDescription(enableMDMLibraries = false)
+
+    val node =
+      ProfileDescriptionJSON.serializeToJSON(mapper, description_0)
+    val description_1 =
+      ProfileDescriptionJSON.deserializeFromJSON(mapper, node, AccountID.generate())
+
+    assertEquals(false, description_1.preferences.enableMDMLibraries)
+  }
+
   @Test
   fun testLFA_0() {
     val mapper = ObjectMapper()
@@ -94,6 +138,12 @@ class ProfileDescriptionJSONTest {
     this.logger.debug("{}", ProfileDescriptionJSON.serializeToString(ObjectMapper(), description))
     assertEquals("developer", description.attributes.role)
     assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
+
+    /*
+     * This profile predates the `enableMDMLibraries` field; it must default to `false`.
+     */
+
+    assertEquals(false, description.preferences.enableMDMLibraries)
   }
 
   @Test
@@ -113,6 +163,12 @@ class ProfileDescriptionJSONTest {
     assertEquals("ຊັ້ນ 8", description.attributes.grade)
     assertEquals("ສົ້ນຂົວ", description.attributes.school)
     assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
+
+    /*
+     * This profile predates the `enableMDMLibraries` field; it must default to `false`.
+     */
+
+    assertEquals(false, description.preferences.enableMDMLibraries)
   }
 
   @Test
@@ -128,6 +184,12 @@ class ProfileDescriptionJSONTest {
 
     this.logger.debug("{}", ProfileDescriptionJSON.serializeToString(ObjectMapper(), description))
     assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
+
+    /*
+     * This profile predates the `enableMDMLibraries` field; it must default to `false`.
+     */
+
+    assertEquals(false, description.preferences.enableMDMLibraries)
   }
 
   @Test
@@ -188,6 +250,30 @@ class ProfileDescriptionJSONTest {
     assertEquals(ReaderColorScheme.SCHEME_BLACK_ON_WHITE, description.preferences.readerPreferences.colorScheme())
     assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
   }
+
+  private fun newDescription(enableMDMLibraries: Boolean): ProfileDescription =
+    ProfileDescription(
+      preferences =
+        ProfilePreferences(
+          dateOfBirth = null,
+          showTestingLibraries = false,
+          hasSeenLibrarySelectionScreen = false,
+          hasSeenNotificationScreen = false,
+          readerPreferences = ReaderPreferences.builder().build(),
+          mostRecentAccount = AccountID.generate(),
+          playbackRates = hashMapOf(),
+          showDebugSettings = false,
+          downloadOnlyOnWIFI = false,
+          isLCPManualPassphraseEnabled = false,
+          audioBookPlaybackSkipIntervalForwardMs = 30_000L,
+          audioBookPlaybackSkipIntervalBackwardMs = 30_000L,
+          audioBookBatteryDialogAccepted = false,
+          showBookCoverDebugLabels = false,
+          preferOPDS20 = false,
+          enableMDMLibraries = enableMDMLibraries,
+        ),
+      attributes = ProfileAttributes(sortedMapOf()),
+    )
 
   private fun ofResource(name: String): String {
     val bytes =

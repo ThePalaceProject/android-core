@@ -38,6 +38,7 @@ class SettingsDebugMenuStartupFragment :
   private lateinit var hasSeenLibrarySelector: SwitchCompat
   private lateinit var hasSeenNotifications: SwitchCompat
   private lateinit var failNextBoot: SwitchCompat
+  private lateinit var enableMDMLibraries: SwitchCompat
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
@@ -81,6 +82,14 @@ class SettingsDebugMenuStartupFragment :
       SettingsDebugModel.hasSeenLibrarySelection()
     this.hasSeenAudiobookBatteryDialog.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(audioBookBatteryDialogAccepted = checked) }
+    }
+
+    this.enableMDMLibraries =
+      view.findViewById(R.id.debugStartupEnableMDMLibraries)
+    this.enableMDMLibraries.isChecked =
+      SettingsDebugModel.enableMDMLibraries()
+    this.enableMDMLibraries.setOnCheckedChangeListener { _, checked ->
+      SettingsDebugModel.setEnableMDMLibraries(checked)
     }
   }
 }

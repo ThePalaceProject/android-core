@@ -231,6 +231,9 @@ object ProfileDescriptionJSON {
     val preferOPDS20 =
       JSONParserUtilities.getBooleanDefault(objectNode, "preferOPDS20", false)
 
+    val enableMDMLibraries =
+      JSONParserUtilities.getBooleanDefault(objectNode, "enableMDMLibraries", false)
+
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI,
@@ -247,6 +250,7 @@ object ProfileDescriptionJSON {
       audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
       showBookCoverDebugLabels = showBookCoverDebugLabels,
       preferOPDS20 = preferOPDS20,
+      enableMDMLibraries = enableMDMLibraries,
     )
   }
 
@@ -309,6 +313,9 @@ object ProfileDescriptionJSON {
     val preferOPDS20 =
       JSONParserUtilities.getBooleanDefault(objectNode, "preferOPDS20", false)
 
+    val enableMDMLibraries =
+      JSONParserUtilities.getBooleanDefault(objectNode, "enableMDMLibraries", false)
+
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI,
@@ -325,6 +332,7 @@ object ProfileDescriptionJSON {
       audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
       showBookCoverDebugLabels = showBookCoverDebugLabels,
       preferOPDS20 = preferOPDS20,
+      enableMDMLibraries = enableMDMLibraries,
     )
   }
 
@@ -413,6 +421,7 @@ object ProfileDescriptionJSON {
         audioBookBatteryDialogAccepted = audioBookBatteryDialogAccepted,
         showBookCoverDebugLabels = false,
         preferOPDS20 = false,
+        enableMDMLibraries = false,
       )
 
     val attributeMap = mutableMapOf<String, String>()
@@ -555,6 +564,7 @@ object ProfileDescriptionJSON {
     output.put("audioBookBatteryDialogAccepted", preferences.audioBookBatteryDialogAccepted)
     output.put("showBookCoverDebugLabels", preferences.showBookCoverDebugLabels)
     output.put("preferOPDS20", preferences.preferOPDS20)
+    output.put("enableMDMLibraries", preferences.enableMDMLibraries)
 
     output.set<ObjectNode>(
       "playbackRates",

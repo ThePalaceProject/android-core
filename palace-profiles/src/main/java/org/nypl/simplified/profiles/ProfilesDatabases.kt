@@ -424,6 +424,7 @@ object ProfilesDatabases {
                 audioBookBatteryDialogAccepted = false,
                 showBookCoverDebugLabels = false,
                 preferOPDS20 = false,
+                enableMDMLibraries = false,
               ),
             attributes = ProfileAttributes(sortedMapOf()),
           )

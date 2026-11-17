@@ -115,7 +115,8 @@ import org.slf4j.LoggerFactory
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
-import org.thepalaceproject.mdm.MDMConfiguration
+import org.thepalaceproject.mdm.MDMConfigurationReader
+import org.thepalaceproject.mdm.MDMLibraryApplier
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
 import org.thepalaceproject.palace.battery.BatteryModel
@@ -989,7 +990,12 @@ internal object MainServices {
     )
 
     val profile = bookController.profileCurrent() as ProfileType
-    MDMConfiguration.setup(MainApplication.application, profile)
+    MDMLibraryApplier(
+      profiles = profilesControllerTypeService,
+      diagnostics = DiagnosticsService.create(),
+    ).apply(
+      MDMConfigurationReader(context).readConfiguration(),
+    )
 
     val subscription =
       profilesControllerTypeService

@@ -1,25 +1,19 @@
 package org.thepalaceproject.mdm
 
-import android.app.Application
-import android.content.RestrictionsManager
-import org.nypl.simplified.profiles.api.ProfileType
-import org.slf4j.LoggerFactory
+import java.net.URI
 
-object MDMConfiguration {
-  private val logger =
-    LoggerFactory.getLogger(MDMConfiguration::class.java)
-
-  fun setup(
-    application: Application,
-    profile: ProfileType,
-  ) {
-    this.logger.debug("Configuring...")
-
-    val restrictionsManager =
-      application.getSystemService(RestrictionsManager::class.java)
-    val data =
-      restrictionsManager.applicationRestrictions
-
-    this.logger.debug("Data: {}", data)
-  }
-}
+/**
+ * A parsed managed device (MDM) configuration.
+ *
+ * The configuration is set by a device management system (e.g. Google Admin
+ * Console) and names the libraries that the application must present to the
+ * user.
+ */
+data class MDMConfiguration(
+  /**
+   * @return The registry UUIDs of the configured libraries, in the order in
+   * which they appear in the configuration. Each value is a `urn:uuid:`
+   * provider URI, in the form used by the library registry.
+   */
+  val libraryURIs: List<URI>,
+)
