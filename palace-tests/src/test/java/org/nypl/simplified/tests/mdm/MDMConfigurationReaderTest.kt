@@ -3,32 +3,19 @@ package org.nypl.simplified.tests.mdm
 import android.content.Context
 import android.content.RestrictionsManager
 import android.os.Bundle
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
-import org.robolectric.annotation.Config
-import org.robolectric.annotation.ConscryptMode
-import org.robolectric.shadow.api.Shadow
-import org.robolectric.shadows.ShadowRestrictionsManager
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 import org.thepalaceproject.mdm.MDMConfiguration
 import org.thepalaceproject.mdm.MDMConfigurationReader
 import java.net.URI
 
 /**
- * Tests for [MDMConfigurationReader], which reads the managed device
- * configuration from the system [RestrictionsManager].
- *
- * These tests require a live [RestrictionsManager] service, and are therefore
- * run with [RobolectricTestRunner]. As with the other Robolectric tests in
- * this project, they use JUnit 4.
+ * Tests for [MDMConfigurationReader]. The [Context], [RestrictionsManager],
+ * and [Bundle] collaborators are mocked, so no Android runtime is required.
  */
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
-@ConscryptMode(ConscryptMode.Mode.OFF)
 class MDMConfigurationReaderTest {
 
   private val libraryA =
@@ -36,9 +23,17 @@ class MDMConfigurationReaderTest {
   private val libraryB =
     URI.create("urn:uuid:00000000-0000-4000-8000-000000000001")
 
-  @Before
+  private val context =
+    Mockito.mock(Context::class.java)
+  private val manager =
+    Mockito.mock(RestrictionsManager::class.java)
+  private val bundle =
+    Mockito.mock(Bundle::class.java)
+
+  @BeforeEach
   fun before() {
-    this.setRestrictions(null)
+    Mockito.`when`(this.context.getSystemService(RestrictionsManager::class.java))
+      .thenReturn(this.manager)
   }
 
   /**
@@ -49,8 +44,11 @@ class MDMConfigurationReaderTest {
 
   @Test
   fun unmanagedDeviceYieldsEmptyConfiguration() {
+    // `manager.applicationRestrictions` is left unstubbed: an unstubbed mock
+    // returns null, as the real manager does when the device is not managed.
+
     val result =
-      MDMConfigurationReader(this.context()).readConfiguration()
+      MDMConfigurationReader(this.context).readConfiguration()
 
     assertTrue(result.configuration.libraryURIs.isEmpty())
     assertTrue(result.invalidFields.isEmpty())
@@ -63,13 +61,15 @@ class MDMConfigurationReaderTest {
 
   @Test
   fun managedDeviceParsesConfiguredLibraries() {
-    val bundle = Bundle()
-    bundle.putString("Library-0", "urn:uuid:00000000-0000-4000-8000-000000000000")
-    bundle.putString("Library-2", "urn:uuid:00000000-0000-4000-8000-000000000001")
-    this.setRestrictions(bundle)
+    this.mockBundle(
+      mapOf(
+        "Library-0" to "urn:uuid:00000000-0000-4000-8000-000000000000",
+        "Library-2" to "urn:uuid:00000000-0000-4000-8000-000000000001",
+      )
+    )
 
     val result =
-      MDMConfigurationReader(this.context()).readConfiguration()
+      MDMConfigurationReader(this.context).readConfiguration()
 
     assertEquals(MDMConfiguration(listOf(this.libraryA, this.libraryB)), result.configuration)
     assertTrue(result.invalidFields.isEmpty())
@@ -82,13 +82,15 @@ class MDMConfigurationReaderTest {
 
   @Test
   fun managedDeviceReportsInvalidFields() {
-    val bundle = Bundle()
-    bundle.putString("Library-0", "urn:uuid:00000000-0000-4000-8000-000000000000")
-    bundle.putString("Library-1", "https://not-a-library.example.com")
-    this.setRestrictions(bundle)
+    this.mockBundle(
+      mapOf(
+        "Library-0" to "urn:uuid:00000000-0000-4000-8000-000000000000",
+        "Library-1" to "https://not-a-library.example.com",
+      )
+    )
 
     val result =
-      MDMConfigurationReader(this.context()).readConfiguration()
+      MDMConfigurationReader(this.context).readConfiguration()
 
     assertEquals(MDMConfiguration(listOf(this.libraryA)), result.configuration)
     assertEquals(1, result.invalidFields.size)
@@ -103,14 +105,16 @@ class MDMConfigurationReaderTest {
 
   @Test
   fun managedDeviceSkipsBlankValues() {
-    val bundle = Bundle()
-    bundle.putString("Library-0", "urn:uuid:00000000-0000-4000-8000-000000000000")
-    bundle.putString("Library-1", "   ")
-    bundle.putString("Library-2", "urn:uuid:00000000-0000-4000-8000-000000000001")
-    this.setRestrictions(bundle)
+    this.mockBundle(
+      mapOf(
+        "Library-0" to "urn:uuid:00000000-0000-4000-8000-000000000000",
+        "Library-1" to "   ",
+        "Library-2" to "urn:uuid:00000000-0000-4000-8000-000000000001",
+      )
+    )
 
     val result =
-      MDMConfigurationReader(this.context()).readConfiguration()
+      MDMConfigurationReader(this.context).readConfiguration()
 
     assertEquals(MDMConfiguration(listOf(this.libraryA, this.libraryB)), result.configuration)
     assertTrue(result.invalidFields.isEmpty())
@@ -122,43 +126,43 @@ class MDMConfigurationReaderTest {
 
   @Test
   fun managedDeviceIgnoresNonLibraryKeys() {
-    val bundle = Bundle()
-    bundle.putString("some-other-policy", "urn:uuid:00000000-0000-4000-8000-000000000000")
-    this.setRestrictions(bundle)
+    this.mockBundle(
+      mapOf(
+        "some-other-policy" to "urn:uuid:00000000-0000-4000-8000-000000000000",
+      )
+    )
 
     val result =
-      MDMConfigurationReader(this.context()).readConfiguration()
+      MDMConfigurationReader(this.context).readConfiguration()
 
     assertTrue(result.configuration.libraryURIs.isEmpty())
     assertTrue(result.invalidFields.isEmpty())
   }
 
   /**
-   * A value that is not a plain string is ignored rather than reported as
-   * invalid.
+   * A key whose value is not a string is skipped rather than reported as
+   * invalid, as the real [Bundle.getString] returns `null` for such values.
    */
 
   @Test
-  fun managedDeviceIgnoresNonStringValues() {
-    val bundle = Bundle()
-    bundle.putStringArray("Library-0", arrayOf("urn:uuid:00000000-0000-4000-8000-000000000000"))
-    this.setRestrictions(bundle)
+  fun managedDeviceSkipsKeysWithNoStringValue() {
+    Mockito.`when`(this.manager.applicationRestrictions).thenReturn(this.bundle)
+    Mockito.`when`(this.bundle.keySet()).thenReturn(setOf("Library-0"))
+    // `bundle.getString("Library-0")` is left unstubbed: it returns null,
+    // matching the real Bundle for values that are not strings.
 
     val result =
-      MDMConfigurationReader(this.context()).readConfiguration()
+      MDMConfigurationReader(this.context).readConfiguration()
 
     assertTrue(result.configuration.libraryURIs.isEmpty())
     assertTrue(result.invalidFields.isEmpty())
   }
 
-  private fun context(): Context =
-    RuntimeEnvironment.getApplication()
-
-  private fun setRestrictions(bundle: Bundle?) {
-    val manager =
-      this.context().getSystemService(RestrictionsManager::class.java)
-    val shadow: ShadowRestrictionsManager =
-      Shadow.extract(manager)
-    shadow.setApplicationRestrictions(bundle)
+  private fun mockBundle(values: Map<String, String>) {
+    Mockito.`when`(this.manager.applicationRestrictions).thenReturn(this.bundle)
+    Mockito.`when`(this.bundle.keySet()).thenReturn(values.keys)
+    for ((key, value) in values) {
+      Mockito.`when`(this.bundle.getString(key)).thenReturn(value)
+    }
   }
 }
