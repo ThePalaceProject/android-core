@@ -18,7 +18,7 @@ class AccountProviderDescriptionCollectionSerializer internal constructor(
   private val uri: URI,
   private val stream: OutputStream,
   private val document: AccountProviderDescriptionCollection,
-  private val serializers: AccountProviderDescriptionSerializersType
+  private val serializers: AccountProviderDescriptionSerializersType,
 ) : AccountProviderDescriptionCollectionSerializerType {
   private val mapper = ObjectMapper()
 

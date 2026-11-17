@@ -11,5 +11,5 @@ data class BuildConfigurationAccountsRegistryURIs(
    * The URI for the production Library Registry.
    */
 
-  val registryBaseURI: URI
+  val registryBaseURI: URI,
 )

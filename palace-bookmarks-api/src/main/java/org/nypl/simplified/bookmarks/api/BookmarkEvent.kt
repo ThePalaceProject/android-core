@@ -13,7 +13,7 @@ sealed class BookmarkEvent {
    */
 
   data class BookmarkSyncStarted(
-    val accountID: AccountID
+    val accountID: AccountID,
   ) : BookmarkEvent()
 
   /**
@@ -21,7 +21,7 @@ sealed class BookmarkEvent {
    */
 
   data class BookmarkSyncFinished(
-    val accountID: AccountID
+    val accountID: AccountID,
   ) : BookmarkEvent()
 
   /**
@@ -30,6 +30,6 @@ sealed class BookmarkEvent {
 
   data class BookmarkSaved(
     val accountID: AccountID,
-    val bookmark: SerializedBookmark
+    val bookmark: SerializedBookmark,
   ) : BookmarkEvent()
 }

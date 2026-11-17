@@ -19,14 +19,18 @@ import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.books.borrowing.internal.BorrowAudiobookAuthorizationHandler
 import org.nypl.simplified.content.api.ContentResolverType
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.FeedEntryParse
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryParseType
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
+import org.nypl.simplified.tests.MutableServiceDirectory
 import org.nypl.simplified.tests.TestDirectories
 import org.readium.r2.lcp.LcpService
 import org.slf4j.Logger
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.io.IOException
 import java.util.UUID
@@ -58,15 +62,25 @@ class MockBorrowContext(
   }
 
   override lateinit var audioBookManifestStrategies: AudioBookManifestStrategiesType
-  override lateinit var services: ServiceDirectoryType
+
+  /*
+   * The diagnostics service is always present in the real application; the mock reflects this
+   * with a no-op default that tests may replace.
+   */
+
+  override var services: ServiceDirectoryType =
+    MutableServiceDirectory().apply {
+      this.putService(DiagnosticsServiceType::class.java, NoopDiagnosticsService())
+      this.putService(FeedEntryParseType::class.java, FeedEntryParse.create())
+    }
 
   override var adobeExecutorTimeout: BorrowTimeoutConfiguration =
     BorrowTimeoutConfiguration(2L, TimeUnit.SECONDS)
 
   override var adobeExecutor: AdobeAdeptExecutorType? = null
   override var boundlessService: MockBoundless? = MockBoundless()
-  override lateinit var currentAcquisitionPathElement: OPDSAcquisitionPathElement
-  override lateinit var opdsAcquisitionPath: OPDSAcquisitionPath
+  override lateinit var currentAcquisitionPathElement: FeedAcquisitionPathElement
+  override lateinit var opdsAcquisitionPath: FeedAcquisitionPath
   override var bookCurrent: Book = bookInitial
 
   override fun bookPublishStatus(status: BookStatus) {
@@ -128,7 +142,7 @@ class MockBorrowContext(
   }
 
   override fun chooseNewAcquisitionPath(
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook
   ): Link {
     TODO("Not yet implemented")
   }
@@ -184,7 +198,7 @@ class MockBorrowContext(
     )
   }
 
-  var currentRemainingOPDSPathElements: List<OPDSAcquisitionPathElement> =
+  var currentRemainingOPDSPathElements: List<FeedAcquisitionPathElement> =
     listOf()
 
   var currentURIField: Link? =
@@ -231,7 +245,17 @@ class MockBorrowContext(
     throw IOException("Could not create a temporary file within 100 attempts!")
   }
 
-  override fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement> {
+  override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> {
     return this.currentRemainingOPDSPathElements
+  }
+}
+
+/**
+ * A diagnostics service that does nothing.
+ */
+
+private class NoopDiagnosticsService : DiagnosticsServiceType {
+  override fun report(code: String, data: Map<String, String>, throwable: Throwable?) {
+    // No-op.
   }
 }

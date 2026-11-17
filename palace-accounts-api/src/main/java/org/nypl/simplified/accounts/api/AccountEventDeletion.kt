@@ -16,7 +16,7 @@ sealed class AccountEventDeletion :
    */
 
   data class AccountEventDeletionInProgress(
-    override val message: String
+    override val message: String,
   ) : AccountEventDeletion()
 
   /**
@@ -25,7 +25,7 @@ sealed class AccountEventDeletion :
 
   data class AccountEventDeletionSucceeded(
     override val message: String,
-    val id: AccountID
+    val id: AccountID,
   ) : AccountEventDeletion()
 
   /**
@@ -33,7 +33,7 @@ sealed class AccountEventDeletion :
    */
 
   data class AccountEventDeletionFailed(
-    val taskResult: TaskResult.Failure<*>
+    val taskResult: TaskResult.Failure<*>,
   ) : AccountEventDeletion(),
     PresentableErrorType {
     override val message: String

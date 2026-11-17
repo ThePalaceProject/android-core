@@ -1,0 +1,31 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "groups": [
+    {
+      "metadata": {
+        "title": "New Releases",
+        "identifier": "urn:group:new"
+      },
+      "links": [
+        {
+          "href": "https://example.com/group/new",
+          "rel": "self",
+          "type": "application/opds+json"
+        }
+      ],
+      "publications": [
+        {
+          "type": "publication",
+          "metadata": {
+            "identifier": "urn:isbn:0000000001",
+            "title": "Grouped Book"
+          },
+          "links": []
+        }
+      ]
+    }
+  ]
+}

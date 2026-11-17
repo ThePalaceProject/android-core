@@ -21,7 +21,7 @@ class OPDSSearchParser private constructor() : OPDSSearchParserType {
   @Throws(OPDSParseException::class)
   override fun parse(
     uri: URI,
-    s: InputStream
+    s: InputStream,
   ): OPDSOpenSearch1_1 {
     val timePreParse = System.nanoTime()
     var timePostParse = timePreParse
@@ -35,12 +35,16 @@ class OPDSSearchParser private constructor() : OPDSSearchParserType {
       val root = d.firstChild
       val eSearch =
         nodeAsElementWithName(
-          root, OPEN_SEARCH_URI, "OpenSearchDescription"
+          root,
+          OPEN_SEARCH_URI,
+          "OpenSearchDescription",
         )
 
       val eURL =
         getFirstChildElementWithName(
-          eSearch, OPEN_SEARCH_URI, "Url"
+          eSearch,
+          OPEN_SEARCH_URI,
+          "Url",
         )
 
       return OPDSOpenSearch1_1(eURL.getAttribute("template"))
@@ -61,15 +65,18 @@ class OPDSSearchParser private constructor() : OPDSSearchParserType {
       LOG.debug(
         "parsing completed ({}ms - parse: {}ms, interp: {}ms): {}",
         TimeUnit.MILLISECONDS.convert(
-          timeParse + timeInterp, TimeUnit.NANOSECONDS
+          timeParse + timeInterp,
+          TimeUnit.NANOSECONDS,
         ),
         TimeUnit.MILLISECONDS.convert(
-          timeParse, TimeUnit.NANOSECONDS
+          timeParse,
+          TimeUnit.NANOSECONDS,
         ),
         TimeUnit.MILLISECONDS.convert(
-          timeInterp, TimeUnit.NANOSECONDS
+          timeInterp,
+          TimeUnit.NANOSECONDS,
         ),
-        uri
+        uri,
       )
     }
   }

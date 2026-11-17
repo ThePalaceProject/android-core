@@ -27,14 +27,14 @@ import java.net.URI
 
 class BHTTPCalls(
   private val objectMapper: ObjectMapper,
-  private val http: LSHTTPClientType
+  private val http: LSHTTPClientType,
 ) : BookmarkHTTPCallsType {
   private val logger = LoggerFactory.getLogger(BHTTPCalls::class.java)
 
   override fun bookmarksGet(
     account: AccountType,
     annotationsURI: URI,
-    credentials: AccountAuthenticationCredentials
+    credentials: AccountAuthenticationCredentials,
   ): List<BookmarkAnnotation> {
     val auth =
       AccountAuthenticatedHTTP.createAuthorization(credentials)
@@ -66,7 +66,7 @@ class BHTTPCalls(
   override fun bookmarkDelete(
     account: AccountType,
     bookmarkURI: URI,
-    credentials: AccountAuthenticationCredentials
+    credentials: AccountAuthenticationCredentials,
   ): Boolean {
     val auth =
       AccountAuthenticatedHTTP.createAuthorization(credentials)
@@ -102,7 +102,7 @@ class BHTTPCalls(
     account: AccountType,
     annotationsURI: URI,
     credentials: AccountAuthenticationCredentials,
-    bookmark: BookmarkAnnotation
+    bookmark: BookmarkAnnotation,
   ): URI? {
     val data =
       BookmarkAnnotationsJSON.serializeBookmarkAnnotationToBytes(this.objectMapper, bookmark)
@@ -145,7 +145,7 @@ class BHTTPCalls(
 
   private fun <T> logAndFail(
     uri: URI,
-    error: LSHTTPResponseStatus.Responded.Error
+    error: LSHTTPResponseStatus.Responded.Error,
   ): T {
     val problemReport = error.properties.problemReport
     if (problemReport != null) {
@@ -163,7 +163,7 @@ class BHTTPCalls(
     val response =
       BookmarkAnnotationsJSON.deserializeBookmarkAnnotationResponseFromJSON(
         objectMapper = this.objectMapper,
-        node = node
+        node = node,
       )
     return response.first.items
   }

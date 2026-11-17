@@ -12,6 +12,6 @@ interface AccountProviderDescriptionCollectionParsersType : ParserProviderType<A
   override fun createParser(
     uri: URI,
     stream: InputStream,
-    warningsAsErrors: Boolean
+    warningsAsErrors: Boolean,
   ): AccountProviderDescriptionCollectionParserType
 }

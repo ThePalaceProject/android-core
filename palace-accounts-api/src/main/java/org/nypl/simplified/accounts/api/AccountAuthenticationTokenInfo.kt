@@ -4,7 +4,7 @@ import java.net.URI
 
 data class AccountAuthenticationTokenInfo(
   val accessToken: String,
-  val authURI: URI
+  val authURI: URI,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

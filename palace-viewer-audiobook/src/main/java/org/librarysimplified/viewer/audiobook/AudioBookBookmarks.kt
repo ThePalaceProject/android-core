@@ -14,7 +14,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorAudioBookTime2
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20210317
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 
 /**
  * Functions to convert between SimplyE and SR2 bookmarks.
@@ -26,9 +26,9 @@ object AudioBookBookmarks {
    */
 
   fun fromPlayerBookmark(
-    feedEntry: OPDSAcquisitionFeedEntry,
+    feedEntry: FeedEntryBook,
     deviceId: String,
-    source: PlayerBookmark
+    source: PlayerBookmark,
   ): SerializedBookmark {
     val kind =
       when (source.kind) {
@@ -48,9 +48,9 @@ object AudioBookBookmarks {
       location =
         SerializedLocatorAudioBookTime2(
           readingOrderItem = source.readingOrderID.text,
-          readingOrderItemOffsetMilliseconds = source.offsetMilliseconds.value
+          readingOrderItemOffsetMilliseconds = source.offsetMilliseconds.value,
         ),
-      uri = null
+      uri = null,
     )
   }
 
@@ -86,14 +86,15 @@ object AudioBookBookmarks {
               chapterTitle = source.bookChapterTitle,
               totalRemainingBookTime = Duration.ZERO,
               chapterProgressEstimate = source.bookChapterProgress,
-              bookProgressEstimate = source.bookProgress
-            )
+              bookProgressEstimate = source.bookProgress,
+            ),
         )
       }
 
       is SerializedLocatorLegacyCFI,
       is SerializedLocatorPage1,
-      is SerializedLocatorHrefProgression20210317 -> {
+      is SerializedLocatorHrefProgression20210317,
+      -> {
         // None of these locator formats are suitable for audio books.
         null
       }

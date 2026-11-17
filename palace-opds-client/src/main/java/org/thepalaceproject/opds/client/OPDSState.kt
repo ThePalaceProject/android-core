@@ -16,7 +16,7 @@ sealed class OPDSState {
    */
 
   data class Loading(
-    val request: OPDSClientRequest
+    val request: OPDSClientRequest,
   ) : OPDSState()
 
   /**
@@ -25,21 +25,21 @@ sealed class OPDSState {
 
   data class Error(
     val message: PresentableErrorType,
-    val request: OPDSClientRequest
+    val request: OPDSClientRequest,
   ) : OPDSState()
 
   data class LoadedFeedWithGroups(
     val request: OPDSClientRequest,
-    val handle: OPDSFeedHandleWithGroupsType
+    val handle: OPDSFeedHandleWithGroupsType,
   ) : OPDSStateHistoryParticipant()
 
   data class LoadedFeedWithoutGroups(
     val request: OPDSClientRequest,
-    val handle: OPDSFeedHandleWithoutGroupsType
+    val handle: OPDSFeedHandleWithoutGroupsType,
   ) : OPDSStateHistoryParticipant()
 
   data class LoadedFeedEntry(
     val request: OPDSClientRequest.ExistingEntry,
-    val handle: OPDSFeedHandleSingleEntryType
+    val handle: OPDSFeedHandleSingleEntryType,
   ) : OPDSStateHistoryParticipant()
 }

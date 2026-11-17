@@ -39,17 +39,17 @@ import java.io.IOException
 class PdfServer private constructor(
   val port: Int,
   private val context: Application,
-  private val publication: Publication
+  private val publication: Publication,
 ) : RouterNanoHTTPD("127.0.0.1", port) {
   companion object {
     private val pdf: Format =
       Format(
         specification =
           FormatSpecification(
-            specifications = setOf(Specification.Pdf)
+            specifications = setOf(Specification.Pdf),
           ),
         mediaType = MediaType.PDF,
-        fileExtension = FileExtension("pdf")
+        fileExtension = FileExtension("pdf"),
       )
 
     private val lcpPDF: Format =
@@ -60,10 +60,11 @@ class PdfServer private constructor(
               setOf(
                 Specification.Rpf,
                 Specification.Zip,
-                Specification.Lcp)
+                Specification.Lcp,
+              ),
           ),
         mediaType = MediaType.LCP_PROTECTED_PDF,
-        fileExtension = FileExtension("pdf")
+        fileExtension = FileExtension("pdf"),
       )
 
     suspend fun create(
@@ -71,7 +72,7 @@ class PdfServer private constructor(
       context: Application,
       drmInfo: BookDRMInformation,
       pdfFile: File,
-      port: Int
+      port: Int,
     ): PdfServer {
       val httpClient =
         DefaultHttpClient()
@@ -121,7 +122,7 @@ class PdfServer private constructor(
           return PdfServer(
             port = port,
             context = context,
-            publication = publication
+            publication = publication,
           )
         }
       }
@@ -132,8 +133,9 @@ class PdfServer private constructor(
 
   init {
     if (publication.isRestricted) {
-      throw IOException("Failed to unlock PDF",
-        publication.protectionError?.let { ErrorException(it) }
+      throw IOException(
+        "Failed to unlock PDF",
+        publication.protectionError?.let { ErrorException(it) },
       )
     }
 
@@ -162,12 +164,12 @@ class PdfServer private constructor(
       resource: UriResource,
       uri: Uri,
       parameters: Map<String, String>?,
-      session: IHTTPSession
+      session: IHTTPSession,
     ): Response =
       Response.newFixedLengthResponse(
         Status.NOT_FOUND,
         MIME_PLAINTEXT,
-        "Not found"
+        "Not found",
       )
   }
 
@@ -205,7 +207,7 @@ class PdfServer private constructor(
       resource: UriResource,
       uri: Uri,
       parameters: Map<String, String>?,
-      session: IHTTPSession
+      session: IHTTPSession,
     ): Response {
       val filename =
         uri.pathSegments.drop(1).joinToString("/")
@@ -219,7 +221,7 @@ class PdfServer private constructor(
       return Response.newChunkedResponse(
         Status.OK,
         mediaType.toString(),
-        assetStream
+        assetStream,
       )
     }
   }
@@ -231,7 +233,7 @@ class PdfServer private constructor(
       resource: UriResource,
       uri: Uri,
       parameters: Map<String, String>?,
-      session: IHTTPSession
+      session: IHTTPSession,
     ): Response {
       val pdfResource = resource.initParameter(Resource::class.java)
 
@@ -259,7 +261,7 @@ class PdfServer private constructor(
           "application/pdf",
           // This initial response will be discarded by the PDF viewer once it sees that range
           // requests are supported, so we can just return some dummy data.
-          ByteArrayInputStream(ByteArray(8))
+          ByteArrayInputStream(ByteArray(8)),
         ).apply {
           addHeader("Accept-Ranges", "bytes")
           addHeader("Cache-Control", "no-store")
@@ -269,7 +271,7 @@ class PdfServer private constructor(
     private fun handlePartial(
       pdfResource: Resource,
       length: Long,
-      range: String
+      range: String,
     ): Response {
       val longRange = parseRange(range)
 
@@ -285,7 +287,7 @@ class PdfServer private constructor(
         .newFixedLengthResponse(
           Status.PARTIAL_CONTENT,
           "application/pdf",
-          data
+          data,
         ).apply {
           addHeader("Accept-Ranges", "bytes")
           addHeader("Cache-Control", "no-store")
@@ -320,10 +322,14 @@ class PdfServer private constructor(
     override fun get(
       uriResource: UriResource?,
       urlParams: Map<String, String>?,
-      session: IHTTPSession?
+      session: IHTTPSession?,
     ): Response {
-      uriResource ?: return notFoundResponse
-      session ?: return notFoundResponse
+      if (uriResource == null) {
+        return notFoundResponse
+      }
+      if (session == null) {
+        return notFoundResponse
+      }
 
       log.debug("{} {}", session.method, session.uri)
 
@@ -334,7 +340,7 @@ class PdfServer private constructor(
           resource = uriResource,
           uri = uri,
           parameters = urlParams,
-          session = session
+          session = session,
         )
       } catch (e: FileNotFoundException) {
         log.debug("File not found in pdf server handler: {}", e.toString())
@@ -351,7 +357,7 @@ class PdfServer private constructor(
       resource: UriResource,
       uri: Uri,
       parameters: Map<String, String>?,
-      session: IHTTPSession
+      session: IHTTPSession,
     ): Response
   }
 }

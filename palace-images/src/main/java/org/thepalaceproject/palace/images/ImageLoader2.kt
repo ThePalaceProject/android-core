@@ -3,9 +3,11 @@ package org.thepalaceproject.palace.images
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
-import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -16,8 +18,10 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import org.librarysimplified.palace.images.R
 import org.nypl.simplified.accounts.api.AccountProviderDescription
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,7 +33,8 @@ class ImageLoader2 private constructor(
   private val appContext: Context,
   private val bookRegistry: BookRegistryReadableType,
   private val coverGenerator: BookCoverGeneratorType,
-  private val badgeLookup: BookCoverBadgeLookupType
+  private val badgeLookup: BookCoverBadgeLookupType,
+  private val debugLabelsLookup: BookCoverDebugLabelsLookupType,
 ) : ImageLoader2Type {
   private val logger =
     LoggerFactory.getLogger(ImageLoader2::class.java)
@@ -42,14 +47,15 @@ class ImageLoader2 private constructor(
 
     private fun safeSubstring(
       source: String,
-      length: Int
+      length: Int,
     ): String = source.substring(0, Math.min(source.length, length) - 1)
 
     fun create(
       context: Application,
       bookRegistry: BookRegistryReadableType,
       coverGenerator: BookCoverGeneratorType,
-      badgeLookup: BookCoverBadgeLookupType
+      badgeLookup: BookCoverBadgeLookupType,
+      debugLabelsLookup: BookCoverDebugLabelsLookupType,
     ): ImageLoader2Type {
       this.logger.debug("Configuring Glide")
 
@@ -59,52 +65,61 @@ class ImageLoader2 private constructor(
       registry.prepend(
         URI::class.java,
         Bitmap::class.java,
-        GeneratedCoverModelLoader.Factory(coverGenerator)
+        GeneratedCoverModelLoader.Factory(coverGenerator),
       )
 
       registry.prepend(
         URI::class.java,
         Bitmap::class.java,
-        DataURIModelLoader.Factory()
+        DataURIModelLoader.Factory(),
       )
 
       registry.prepend(
         URI::class.java,
         InputStream::class.java,
-        SimplifiedAssetModelLoader.Factory(context)
+        SimplifiedAssetModelLoader.Factory(context),
       )
 
       registry.prepend(
         URI::class.java,
         InputStream::class.java,
-        HttpURIModelLoader.Factory()
+        HttpURIModelLoader.Factory(),
       )
 
       return ImageLoader2(
         context.applicationContext,
         bookRegistry,
         coverGenerator,
-        badgeLookup
+        badgeLookup,
+        debugLabelsLookup,
       )
     }
   }
 
-  private fun generateCoverURI(entry: FeedEntry.FeedEntryOPDS): URI {
-    val feedEntry = entry.feedEntry
+  private fun generateCoverURI(entry: FeedEntryBook): URI {
+    val feedEntry = entry
     val title = feedEntry.title
     val authors = feedEntry.authors
     val author = authors.firstOrNull() ?: ""
     return this.coverGenerator.generateURIForTitleAuthor(title, author)
   }
 
-  private fun coverURIOf(entry: FeedEntry.FeedEntryOPDS): URI? {
-    val bookWithStatus = this.bookRegistry.bookOrNull(entry.bookID)
-    return bookWithStatus?.book?.cover?.toURI() ?: entry.feedEntry.cover
+  private fun coverURIOf(entry: FeedEntryBook): URI? {
+    val bookWithStatus = this.bookRegistry.bookOrNull(FeedBookIDConversions.toBookID(entry.bookID))
+    val bookCoverURI = bookWithStatus?.book?.cover?.toURI()
+    if (bookCoverURI != null) {
+      return bookCoverURI
+    }
+    return entry.cover
   }
 
-  private fun thumbnailURIOf(entry: FeedEntry.FeedEntryOPDS): URI? {
-    val bookWithStatus = this.bookRegistry.bookOrNull(entry.bookID)
-    return bookWithStatus?.book?.thumbnail?.toURI() ?: entry.feedEntry.thumbnail
+  private fun thumbnailURIOf(entry: FeedEntryBook): URI? {
+    val bookWithStatus = this.bookRegistry.bookOrNull(FeedBookIDConversions.toBookID(entry.bookID))
+    val bookThumbnailURI = bookWithStatus?.book?.thumbnail?.toURI()
+    if (bookThumbnailURI != null) {
+      return bookThumbnailURI
+    }
+    return entry.thumbnail
   }
 
   private abstract class BaseListener<T>(
@@ -132,18 +147,19 @@ class ImageLoader2 private constructor(
     source: String,
     private val future: CompletableFuture<Unit>,
     private val handler: Handler,
-    private val onFallback: (() -> Unit)? = null
+    private val onFallback: (() -> Unit)? = null,
+    private val onColorLoaded: ((Int) -> Unit)? = null,
   ) : BaseListener<Drawable?>(
       logger = logger,
       op = op,
       type = "Drawable",
-      source = safeSubstring(source, 64)
+      source = safeSubstring(source, 64),
     ) {
     override fun onLoadFailed(
       e: GlideException?,
       model: Any?,
       target: Target<Drawable?>?,
-      isFirstResource: Boolean
+      isFirstResource: Boolean,
     ): Boolean {
       this.onLogLoadFailed(e)
       this.onFallback?.let {
@@ -159,10 +175,15 @@ class ImageLoader2 private constructor(
       model: Any?,
       target: Target<Drawable?>?,
       dataSource: DataSource?,
-      isFirstResource: Boolean
+      isFirstResource: Boolean,
     ): Boolean {
       this.onLogResourceReady()
       this.future.complete(Unit)
+      this.onColorLoaded?.let { callback ->
+        (resource as? BitmapDrawable)?.bitmap?.let { bmp ->
+          this.handler.post { callback(averageRow0Color(bmp)) }
+        }
+      }
       return false
     }
   }
@@ -173,18 +194,18 @@ class ImageLoader2 private constructor(
     source: String,
     private val future: CompletableFuture<Unit>,
     private val handler: Handler,
-    private val onFallback: (() -> Unit)? = null
+    private val onFallback: (() -> Unit)? = null,
   ) : BaseListener<Bitmap?>(
       logger = logger,
       op = op,
       type = "Bitmap",
-      source = safeSubstring(source, 64)
+      source = safeSubstring(source, 64),
     ) {
     override fun onLoadFailed(
       e: GlideException?,
       model: Any?,
       target: Target<Bitmap?>?,
-      isFirstResource: Boolean
+      isFirstResource: Boolean,
     ): Boolean {
       this.onLogLoadFailed(e)
       this.onFallback?.let {
@@ -200,7 +221,7 @@ class ImageLoader2 private constructor(
       model: Any?,
       target: Target<Bitmap?>?,
       dataSource: DataSource?,
-      isFirstResource: Boolean
+      isFirstResource: Boolean,
     ): Boolean {
       this.onLogResourceReady()
       this.future.complete(Unit)
@@ -212,7 +233,7 @@ class ImageLoader2 private constructor(
     context: Context,
     account: AccountProviderDescription,
     defaultIcon: Int,
-    iconView: ImageView
+    iconView: ImageView,
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val logo = account.logoURI
@@ -229,7 +250,7 @@ class ImageLoader2 private constructor(
         op = "LoadAccountLogoIntoView",
         source = source,
         future = future,
-        handler = this.mainHandler
+        handler = this.mainHandler,
       )
 
     val requestManager = Glide.with(context)
@@ -251,10 +272,10 @@ class ImageLoader2 private constructor(
   }
 
   override fun loadThumbnailInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
-    height: Int
+    height: Int,
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val primaryUri = this.thumbnailURIOf(entry)
@@ -267,19 +288,19 @@ class ImageLoader2 private constructor(
       height = height,
       future = future,
       uri = primaryUri ?: generatedUri,
-      fallbackUri = if (primaryUri != null) generatedUri else null
+      fallbackUri = if (primaryUri != null) generatedUri else null,
     )
     return future
   }
 
   private fun loadThumbnailIntoInternal(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
     height: Int,
     future: CompletableFuture<Unit>,
     uri: URI,
-    fallbackUri: URI?
+    fallbackUri: URI?,
   ) {
     val onFallback: (() -> Unit)? =
       fallbackUri?.let {
@@ -291,7 +312,7 @@ class ImageLoader2 private constructor(
             height = height,
             future = future,
             uri = it,
-            fallbackUri = null
+            fallbackUri = null,
           )
         }
       }
@@ -303,7 +324,7 @@ class ImageLoader2 private constructor(
         source = uri.toString(),
         future = future,
         handler = this.mainHandler,
-        onFallback = onFallback
+        onFallback = onFallback,
       )
 
     val glide = Glide.with(this.appContext)
@@ -316,17 +337,21 @@ class ImageLoader2 private constructor(
       request = request.override(width, height)
     }
     val badge = this.badgeLookup.badgeForEntry(entry)
-    request = request.transform(BookCoverBadgeTransform(badge))
+    request =
+      request.transform(
+        BookCoverBadgeTransform(badge),
+        BookCoverDebugLabelsTransform(this.debugLabelsLookup.labelsForEntry(entry)),
+      )
     request = request.listener(listener)
     request.into(imageView)
   }
 
   override fun loadCoverInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     hasBadge: Boolean,
     width: Int,
-    height: Int
+    height: Int,
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val primaryUri = this.coverURIOf(entry)
@@ -340,20 +365,20 @@ class ImageLoader2 private constructor(
       height = height,
       future = future,
       uri = primaryUri ?: generatedUri,
-      fallbackUri = if (primaryUri != null) generatedUri else null
+      fallbackUri = if (primaryUri != null) generatedUri else null,
     )
     return future
   }
 
   private fun loadCoverIntoInternal(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     hasBadge: Boolean,
     width: Int,
     height: Int,
     future: CompletableFuture<Unit>,
     uri: URI,
-    fallbackUri: URI?
+    fallbackUri: URI?,
   ) {
     val onFallback: (() -> Unit)? =
       fallbackUri?.let {
@@ -366,7 +391,7 @@ class ImageLoader2 private constructor(
             height = height,
             future = future,
             uri = it,
-            fallbackUri = null
+            fallbackUri = null,
           )
         }
       }
@@ -378,7 +403,7 @@ class ImageLoader2 private constructor(
         source = uri.toString(),
         future = future,
         handler = this.mainHandler,
-        onFallback = onFallback
+        onFallback = onFallback,
       )
 
     val glide = Glide.with(this.appContext)
@@ -392,16 +417,95 @@ class ImageLoader2 private constructor(
     }
     if (hasBadge) {
       val badge = this.badgeLookup.badgeForEntry(entry)
-      request = request.transform(BookCoverBadgeTransform(badge))
+      request =
+        request.transform(
+          BookCoverBadgeTransform(badge),
+          BookCoverDebugLabelsTransform(this.debugLabelsLookup.labelsForEntry(entry)),
+        )
     }
     request = request.listener(listener)
     request.into(imageView)
   }
 
+  override fun loadCoverBackgroundInto(
+    entry: FeedEntryBook,
+    imageView: ImageView,
+    width: Int,
+    height: Int,
+    onColorLoaded: (Int) -> Unit,
+  ): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    val primaryUri = this.coverURIOf(entry)
+    val generatedUri = this.generateCoverURI(entry)
+
+    this.loadCoverBackgroundIntoInternal(
+      entry = entry,
+      imageView = imageView,
+      width = width,
+      height = height,
+      onColorLoaded = onColorLoaded,
+      future = future,
+      uri = primaryUri ?: generatedUri,
+      fallbackUri = if (primaryUri != null) generatedUri else null,
+    )
+    return future
+  }
+
+  private fun loadCoverBackgroundIntoInternal(
+    entry: FeedEntryBook,
+    imageView: ImageView,
+    width: Int,
+    height: Int,
+    onColorLoaded: (Int) -> Unit,
+    future: CompletableFuture<Unit>,
+    uri: URI,
+    fallbackUri: URI?,
+  ) {
+    val onFallback: (() -> Unit)? =
+      fallbackUri?.let {
+        {
+          this.loadCoverBackgroundIntoInternal(
+            entry = entry,
+            imageView = imageView,
+            width = width,
+            height = height,
+            onColorLoaded = onColorLoaded,
+            future = future,
+            uri = it,
+            fallbackUri = null,
+          )
+        }
+      }
+
+    val listener =
+      ImageRequestListenerDrawable(
+        logger = this.logger,
+        op = "LoadCoverBackgroundInto",
+        source = uri.toString(),
+        future = future,
+        handler = this.mainHandler,
+        onFallback = onFallback,
+        onColorLoaded = onColorLoaded,
+      )
+
+    val glide = Glide.with(this.appContext)
+    var request =
+      glide
+        .load(uri)
+        .error(R.drawable.cover_error)
+        .placeholder(R.drawable.cover_loading)
+    if (width > 0 || height > 0) {
+      request = request.override(width, height)
+    }
+    request = request.transform(BookCoverBackgroundTransform())
+    request = request.listener(listener)
+    request.into(imageView)
+  }
+
   override fun loadCoverAsBitmap(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     onBitmapLoaded: (Bitmap) -> Unit,
-    defaultResource: Int
+    defaultResource: Int,
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     val primaryUri = this.coverURIOf(entry)
@@ -411,7 +515,7 @@ class ImageLoader2 private constructor(
       onBitmapLoaded = onBitmapLoaded,
       defaultResource = defaultResource,
       future = future,
-      fallbackUri = if (primaryUri != null) generatedUri else null
+      fallbackUri = if (primaryUri != null) generatedUri else null,
     )
     return future
   }
@@ -419,14 +523,14 @@ class ImageLoader2 private constructor(
   override fun loadCoverAsBitmap(
     source: URI,
     onBitmapLoaded: (Bitmap) -> Unit,
-    defaultResource: Int
+    defaultResource: Int,
   ): CompletableFuture<Unit> {
     val future = CompletableFuture<Unit>()
     this.loadCoverAsBitmapInternal(
       uri = source,
       onBitmapLoaded = onBitmapLoaded,
       defaultResource = defaultResource,
-      future = future
+      future = future,
     )
     return future
   }
@@ -436,7 +540,7 @@ class ImageLoader2 private constructor(
     onBitmapLoaded: (Bitmap) -> Unit,
     defaultResource: Int,
     future: CompletableFuture<Unit>,
-    fallbackUri: URI? = null
+    fallbackUri: URI? = null,
   ) {
     val onFallback: (() -> Unit)? =
       fallbackUri?.let {
@@ -446,7 +550,7 @@ class ImageLoader2 private constructor(
             onBitmapLoaded = onBitmapLoaded,
             defaultResource = defaultResource,
             future = future,
-            fallbackUri = null
+            fallbackUri = null,
           )
         }
       }
@@ -458,7 +562,7 @@ class ImageLoader2 private constructor(
         source = uri.toString(),
         future = future,
         handler = this.mainHandler,
-        onFallback = onFallback
+        onFallback = onFallback,
       )
 
     Glide
@@ -471,15 +575,32 @@ class ImageLoader2 private constructor(
   }
 
   private class BitmapTarget(
-    private val onBitmapLoaded: (Bitmap) -> Unit
+    private val onBitmapLoaded: (Bitmap) -> Unit,
   ) : CustomTarget<Bitmap>() {
     override fun onResourceReady(
       resource: Bitmap,
-      transition: Transition<in Bitmap>?
+      transition: Transition<in Bitmap>?,
     ) {
       this.onBitmapLoaded(resource)
     }
 
     override fun onLoadCleared(placeholder: Drawable?) {}
   }
+}
+
+private fun averageRow0Color(bmp: Bitmap): Int {
+  var r = 0
+  var g = 0
+  var b = 0
+  val width = bmp.width
+  for (x in 0 until width) {
+    val c = bmp.getPixel(x, 0)
+    r += Color.red(c)
+    g += Color.green(c)
+    b += Color.blue(c)
+  }
+  r /= width
+  g /= width
+  b /= width
+  return Color.argb(255, r, g, b)
 }

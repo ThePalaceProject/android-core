@@ -26,7 +26,7 @@ sealed class AccountLoginState {
    */
 
   data class AccountNotLoggedIn(
-    override val previousCredentials: AccountAuthenticationCredentials?
+    override val previousCredentials: AccountAuthenticationCredentials?,
   ) : AccountLoginState() {
     override val credentials: AccountAuthenticationCredentials?
       get() = this.previousCredentials
@@ -56,7 +56,7 @@ sealed class AccountLoginState {
      * `true` if the login operation can be cancelled.
      */
 
-    val cancellable: Boolean
+    val cancellable: Boolean,
   ) : AccountLoginState() {
     override val credentials: AccountAuthenticationCredentials?
       get() = this.previousCredentials
@@ -89,7 +89,7 @@ sealed class AccountLoginState {
      * authentication description.
      */
 
-    val externalURI: URI
+    val externalURI: URI,
   ) : AccountLoginState() {
     override val credentials: AccountAuthenticationCredentials?
       get() = this.previousCredentials
@@ -105,7 +105,7 @@ sealed class AccountLoginState {
      */
 
     override val previousCredentials: AccountAuthenticationCredentials?,
-    val taskResult: TaskResult.Failure<*>
+    val taskResult: TaskResult.Failure<*>,
   ) : AccountLoginState(),
     PresentableErrorType {
     override val message: String =
@@ -124,7 +124,7 @@ sealed class AccountLoginState {
    */
 
   data class AccountLoggedIn(
-    override val credentials: AccountAuthenticationCredentials
+    override val credentials: AccountAuthenticationCredentials,
   ) : AccountLoginState() {
     override val previousCredentials: AccountAuthenticationCredentials =
       this.credentials
@@ -136,7 +136,7 @@ sealed class AccountLoginState {
    */
 
   data class AccountLoggedInStaleCredentials(
-    override val credentials: AccountAuthenticationCredentials
+    override val credentials: AccountAuthenticationCredentials,
   ) : AccountLoginState() {
     override val previousCredentials: AccountAuthenticationCredentials =
       this.credentials
@@ -154,7 +154,7 @@ sealed class AccountLoginState {
      * @see AccountLogoutStringResourcesType
      */
 
-    val status: String
+    val status: String,
   ) : AccountLoginState() {
     override val previousCredentials: AccountAuthenticationCredentials =
       this.credentials
@@ -166,7 +166,7 @@ sealed class AccountLoginState {
 
   data class AccountLogoutFailed(
     val taskResult: TaskResult.Failure<*>,
-    override val credentials: AccountAuthenticationCredentials
+    override val credentials: AccountAuthenticationCredentials,
   ) : AccountLoginState(),
     PresentableErrorType {
     override val previousCredentials: AccountAuthenticationCredentials =

@@ -1,0 +1,307 @@
+{
+  "metadata": {
+    "title": "Active loans and holds",
+    "modified": "2026-11-12T18:22:57Z"
+  },
+  "links": [
+    {
+      "href": "https://gorgon.staging.palaceproject.io/a1qa-test/loans/",
+      "rel": "self",
+      "type": "application/opds+json"
+    },
+    {
+      "href": "https://gorgon.staging.palaceproject.io/a1qa-test/loans/",
+      "rel": "http://opds-spec.org/shelf",
+      "type": "application/opds+json"
+    },
+    {
+      "href": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/",
+      "rel": "http://www.w3.org/ns/oa#annotationService",
+      "type": "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
+    },
+    {
+      "href": "https://thepalaceproject.org/code-of-conduct",
+      "rel": "terms-of-service",
+      "type": "text/html"
+    },
+    {
+      "href": "https://thepalaceproject.org/about",
+      "rel": "copyright",
+      "type": "text/html"
+    },
+    {
+      "href": "https://thepalaceproject.org/about",
+      "rel": "about",
+      "type": "text/html"
+    },
+    {
+      "href": "https://thepalaceproject.org/about",
+      "rel": "license",
+      "type": "text/html"
+    },
+    {
+      "href": "mailto:dalessandro@lyrasis.org",
+      "rel": "help",
+      "type": "application/opds+json"
+    },
+    {
+      "href": "https://gorgon.staging.palaceproject.io/a1qa-test/patrons/me/",
+      "rel": "profile",
+      "type": "application/opds+json"
+    }
+  ],
+  "publications": [
+    {
+      "metadata": {
+        "title": "Funamental Accessibility Tests: Non-Visual Reading",
+        "@type": "http://schema.org/Book",
+        "sortAs": "Funamental Accessibility Tests: Non-Visual Reading",
+        "identifier": "urn:uuid:66a9cf92-a05c-448c-9205-8f3875caca7b",
+        "modified": "2026-06-22T13:15:47Z",
+        "published": "2024-07-26T00:00:00Z",
+        "language": "en",
+        "author": {
+          "name": "The DAISY Consortium",
+          "links": [
+            {
+              "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/contributor/The%20DAISY%20Consortium/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult",
+              "rel": "contributor",
+              "type": "application/opds+json"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "name": "Adult",
+            "sortAs": "Adult",
+            "code": "Adult",
+            "scheme": "http://schema.org/audience"
+          }
+        ]
+      },
+      "images": [
+        {
+          "href": "https://storage.googleapis.com/palace_sample_feeds/accessible_epubs/66a9cf92-a05c-448c-9205-8f3875caca7b.png",
+          "rel": "http://opds-spec.org/image",
+          "type": "image/png"
+        },
+        {
+          "href": "https://storage.googleapis.com/palace_sample_feeds/accessible_epubs/66a9cf92-a05c-448c-9205-8f3875caca7b.png",
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "type": "image/png"
+        }
+      ],
+      "links": [
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:66a9cf92-a05c-448c-9205-8f3875caca7b",
+          "rel": "alternate",
+          "type": "application/opds-publication+json"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:66a9cf92-a05c-448c-9205-8f3875caca7b",
+          "rel": "self",
+          "type": "application/opds-publication+json"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:66a9cf92-a05c-448c-9205-8f3875caca7b/related_books",
+          "rel": "related",
+          "type": "application/opds+json",
+          "title": "Recommended Works"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/URI/urn:uuid:66a9cf92-a05c-448c-9205-8f3875caca7b",
+          "rel": "http://www.w3.org/ns/oa#annotationService",
+          "type": "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/analytics/URI/urn:uuid:66a9cf92-a05c-448c-9205-8f3875caca7b/open_book",
+          "rel": "http://librarysimplified.org/terms/rel/analytics/open-book",
+          "type": "text/html"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/498740/fulfill/5",
+          "rel": "http://opds-spec.org/acquisition",
+          "type": "application/epub+zip",
+          "properties": {
+            "availability": {
+              "state": "ready",
+              "since": "2026-11-12T17:46:56Z"
+            }
+          }
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/loans/498740/revoke",
+          "rel": "http://librarysimplified.org/terms/rel/revoke"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "title": "Advanced Accessibility Tests: Media Overlays",
+        "@type": "http://schema.org/Book",
+        "sortAs": "Advanced Accessibility Tests: Media Overlays",
+        "identifier": "urn:uuid:6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b",
+        "modified": "2026-06-22T13:15:47Z",
+        "published": "2024-07-26T00:00:00Z",
+        "language": "en",
+        "author": {
+          "name": "The DAISY Consortium",
+          "links": [
+            {
+              "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/contributor/The%20DAISY%20Consortium/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult",
+              "rel": "contributor",
+              "type": "application/opds+json"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "name": "Adult",
+            "sortAs": "Adult",
+            "code": "Adult",
+            "scheme": "http://schema.org/audience"
+          }
+        ]
+      },
+      "images": [
+        {
+          "href": "https://storage.googleapis.com/palace_sample_feeds/accessible_epubs/6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b.png",
+          "rel": "http://opds-spec.org/image",
+          "type": "image/png"
+        },
+        {
+          "href": "https://storage.googleapis.com/palace_sample_feeds/accessible_epubs/6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b.png",
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "type": "image/png"
+        }
+      ],
+      "links": [
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b",
+          "rel": "alternate",
+          "type": "application/opds-publication+json"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b",
+          "rel": "self",
+          "type": "application/opds-publication+json"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b/related_books",
+          "rel": "related",
+          "type": "application/opds+json",
+          "title": "Recommended Works"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/URI/urn:uuid:6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b",
+          "rel": "http://www.w3.org/ns/oa#annotationService",
+          "type": "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/analytics/URI/urn:uuid:6b870f80-5ac9-4f97-a4d9-2c62a3a5cf8b/open_book",
+          "rel": "http://librarysimplified.org/terms/rel/analytics/open-book",
+          "type": "text/html"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/498743/fulfill/5",
+          "rel": "http://opds-spec.org/acquisition",
+          "type": "application/epub+zip",
+          "properties": {
+            "availability": {
+              "state": "ready",
+              "since": "2026-11-12T18:05:30Z"
+            }
+          }
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/loans/498743/revoke",
+          "rel": "http://librarysimplified.org/terms/rel/revoke"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "title": "Fundamental Accessibility Tests: Basic Functionality",
+        "@type": "http://schema.org/Book",
+        "sortAs": "Fundamental Accessibility Tests: Basic Functionality",
+        "identifier": "urn:uuid:656de7cb-dfad-4438-891b-6f2cfe78b8d6",
+        "modified": "2026-06-22T13:15:46Z",
+        "published": "2024-07-26T00:00:00Z",
+        "language": "en",
+        "author": {
+          "name": "The DAISY Consortium",
+          "links": [
+            {
+              "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/contributor/The%20DAISY%20Consortium/eng/Adult,Adults+Only,All+Ages,Children,Young+Adult",
+              "rel": "contributor",
+              "type": "application/opds+json"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "name": "Adult",
+            "sortAs": "Adult",
+            "code": "Adult",
+            "scheme": "http://schema.org/audience"
+          }
+        ]
+      },
+      "images": [
+        {
+          "href": "https://storage.googleapis.com/palace_sample_feeds/accessible_epubs/656de7cb-dfad-4438-891b-6f2cfe78b8d6.png",
+          "rel": "http://opds-spec.org/image",
+          "type": "image/png"
+        },
+        {
+          "href": "https://storage.googleapis.com/palace_sample_feeds/accessible_epubs/656de7cb-dfad-4438-891b-6f2cfe78b8d6.png",
+          "rel": "http://opds-spec.org/image/thumbnail",
+          "type": "image/png"
+        }
+      ],
+      "links": [
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:656de7cb-dfad-4438-891b-6f2cfe78b8d6",
+          "rel": "alternate",
+          "type": "application/opds-publication+json"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:656de7cb-dfad-4438-891b-6f2cfe78b8d6",
+          "rel": "self",
+          "type": "application/opds-publication+json"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/URI/urn:uuid:656de7cb-dfad-4438-891b-6f2cfe78b8d6/related_books",
+          "rel": "related",
+          "type": "application/opds+json",
+          "title": "Recommended Works"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/annotations/URI/urn:uuid:656de7cb-dfad-4438-891b-6f2cfe78b8d6",
+          "rel": "http://www.w3.org/ns/oa#annotationService",
+          "type": "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\""
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/analytics/URI/urn:uuid:656de7cb-dfad-4438-891b-6f2cfe78b8d6/open_book",
+          "rel": "http://librarysimplified.org/terms/rel/analytics/open-book",
+          "type": "text/html"
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/works/498739/fulfill/5",
+          "rel": "http://opds-spec.org/acquisition",
+          "type": "application/epub+zip",
+          "properties": {
+            "availability": {
+              "state": "ready",
+              "since": "2026-11-12T16:47:38Z"
+            }
+          }
+        },
+        {
+          "href": "https://gorgon.staging.palaceproject.io/a1qa-test/loans/498739/revoke",
+          "rel": "http://librarysimplified.org/terms/rel/revoke"
+        }
+      ]
+    }
+  ]
+}

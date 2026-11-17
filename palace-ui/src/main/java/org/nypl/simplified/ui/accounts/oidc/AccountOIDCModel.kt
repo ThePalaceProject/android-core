@@ -28,7 +28,7 @@ object AccountOIDCModel {
   fun start(
     activity: Activity,
     accountEvents: AccountEvents,
-    account: AccountType
+    account: AccountType,
   ) {
     this.logger.debug("OIDC: Starting: {}", account.id)
     this.subscriptions?.close()
@@ -40,7 +40,7 @@ object AccountOIDCModel {
           this.onAccountEvent(
             activity = activity,
             account = account,
-            event = event
+            event = event,
           )
         } catch (e: Throwable) {
           this.logger.error("Error handling event: ", e)
@@ -52,7 +52,7 @@ object AccountOIDCModel {
   private fun onAccountEvent(
     activity: Activity,
     account: AccountType,
-    event: AccountEvent
+    event: AccountEvent,
   ) {
     if (event !is AccountEventLoginStateChanged) {
       return
@@ -77,7 +77,8 @@ object AccountOIDCModel {
       is AccountLoggingOut,
       is AccountLoginFailed,
       is AccountLogoutFailed,
-      is AccountNotLoggedIn -> {
+      is AccountNotLoggedIn,
+      -> {
         this.logger.debug("OIDC: Unsubscribing from account events: {}", account.id)
         this.subscriptions?.close()
       }

@@ -19,6 +19,7 @@ import org.joda.time.format.DateTimeFormat
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadExternalAuthenticationInProgress
 import org.nypl.simplified.books.book_registry.BookStatus.DownloadWaitingForExternalAuthentication
@@ -41,6 +42,8 @@ import org.nypl.simplified.books.book_registry.BookStatus.Revoked
 import org.nypl.simplified.books.book_registry.BookStatusEvent.BookStatusEventChanged
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.views.Views
@@ -59,12 +62,12 @@ class CatalogFeedPagingDataAdapter(
       object : DiffUtil.ItemCallback<FeedEntry>() {
         override fun areContentsTheSame(
           oldItem: FeedEntry,
-          newItem: FeedEntry
+          newItem: FeedEntry,
         ): Boolean = oldItem == newItem
 
         override fun areItemsTheSame(
           oldItem: FeedEntry,
-          newItem: FeedEntry
+          newItem: FeedEntry,
         ): Boolean = oldItem.bookID == newItem.bookID
       }
   }
@@ -157,18 +160,20 @@ class CatalogFeedPagingDataAdapter(
       val targetWidth = 0
 
       when (item) {
-        is FeedEntry.FeedEntryCorrupt -> {
+        is FeedEntryCorrupt -> {
           this.view.setOnClickListener {
             // Nothing!
           }
         }
 
-        is FeedEntry.FeedEntryOPDS -> {
+        is FeedEntryBook -> {
+          val bookID = FeedBookIDConversions.toBookID(item.bookID)
+
           this.subscription =
             this@CatalogFeedPagingDataAdapter
               .registryEvents.events
               .ofType(BookStatusEventChanged::class.java)
-              .filter { event -> event.bookId == item.bookID }
+              .filter { event -> event.bookId == bookID }
               .subscribe { event -> this.onStatusChangedForFeedEntry(item) }
 
           for (v in listOf(this.view, this.idle, this.error, this.corrupt, this.progress)) {
@@ -178,9 +183,9 @@ class CatalogFeedPagingDataAdapter(
           Views.setVisible(this.idleCover, false)
           Views.setVisible(this.idleCoverProgress, true)
 
-          this.errorTitle.text = item.feedEntry.title
-          this.idleTitle.text = item.feedEntry.title
-          this.idleAuthor.text = item.feedEntry.authorsCommaSeparated
+          this.errorTitle.text = item.title
+          this.idleTitle.text = item.title
+          this.idleAuthor.text = item.authorsCommaSeparated
           this.idleTime.text = ""
           this.idleTimeDays.text = ""
 
@@ -189,7 +194,7 @@ class CatalogFeedPagingDataAdapter(
               entry = item,
               imageView = this.idleCover,
               width = targetWidth,
-              height = targetHeight
+              height = targetHeight,
             )
 
           f.thenAccept {
@@ -208,11 +213,11 @@ class CatalogFeedPagingDataAdapter(
       }
     }
 
-    private fun onStatusChangedForFeedEntry(item: FeedEntry.FeedEntryOPDS) {
+    private fun onStatusChangedForFeedEntry(item: FeedEntryBook) {
       val status =
         CatalogBookStatus.create(
           this@CatalogFeedPagingDataAdapter.registryEvents.registry,
-          item
+          item,
         )
 
       this.onStatusChanged(BookWithStatus(status.book, status.status))
@@ -323,7 +328,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusDownloading(
       book: Book,
-      status: Downloading
+      status: Downloading,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -343,7 +348,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusFailedDownload(
       book: Book,
-      status: FailedDownload
+      status: FailedDownload,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, true)
@@ -364,7 +369,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusFailedDownloadBadCredentials(
       book: Book,
-      status: FailedDownloadBadCredentials
+      status: FailedDownloadBadCredentials,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, true)
@@ -389,14 +394,14 @@ class CatalogFeedPagingDataAdapter(
           accountID = book.account,
           bookID = book.id,
           entry = book.entry,
-          samlDownloadContext = null
-        )
+          samlDownloadContext = null,
+        ),
       )
     }
 
     private fun onBookStatusFailedLoan(
       book: Book,
-      status: FailedLoan
+      status: FailedLoan,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, true)
@@ -418,7 +423,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusFailedLoanBadCredentials(
       book: Book,
-      status: FailedLoanBadCredentials
+      status: FailedLoanBadCredentials,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, true)
@@ -440,7 +445,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusFailedRevoke(
       book: Book,
-      status: FailedRevoke
+      status: FailedRevoke,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, true)
@@ -462,7 +467,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusFailedRevokeBadCredentials(
       book: Book,
-      status: FailedRevokeBadCredentials
+      status: FailedRevokeBadCredentials,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, true)
@@ -484,7 +489,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusHeldInQueue(
       book: Book,
-      status: Held.HeldInQueue
+      status: Held.HeldInQueue,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -498,7 +503,7 @@ class CatalogFeedPagingDataAdapter(
           onClick = {
             this.callbacks.onBookRequestRevoke(book)
           },
-          title = book.entry.title
+          title = book.entry.title,
         )
         Views.setVisible(this.idleButtonPositive, true)
       } else {
@@ -511,7 +516,7 @@ class CatalogFeedPagingDataAdapter(
         this.idleTime.text =
           this.idleTime.resources.getString(
             R.string.catalogBookAvailabilityHeldQueue,
-            position
+            position,
           )
         this.idleTimeDays.text = ""
         Views.setVisible(this.idleTime, true)
@@ -520,7 +525,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusHeldReady(
       book: Book,
-      status: Held.HeldReady
+      status: Held.HeldReady,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -533,7 +538,7 @@ class CatalogFeedPagingDataAdapter(
         onClick = {
           this.onBookBorrow(book)
         },
-        title = book.entry.title
+        title = book.entry.title,
       )
       Views.setVisible(this.idleButtonPositive, true)
 
@@ -543,7 +548,7 @@ class CatalogFeedPagingDataAdapter(
           onClick = {
             this.callbacks.onBookRequestRevoke(book)
           },
-          title = book.entry.title
+          title = book.entry.title,
         )
         Views.setVisible(this.idleButtonNegative0, true)
       } else {
@@ -553,7 +558,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusHoldable(
       book: Book,
-      status: Holdable
+      status: Holdable,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -566,7 +571,7 @@ class CatalogFeedPagingDataAdapter(
         onClick = {
           this.onBookBorrow(book)
         },
-        title = book.entry.title
+        title = book.entry.title,
       )
       Views.setVisible(this.idleButtonPositive, true)
       Views.setVisible(this.idleButtonNegative0, false)
@@ -574,7 +579,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusLoanable(
       book: Book,
-      status: Loanable
+      status: Loanable,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -587,7 +592,7 @@ class CatalogFeedPagingDataAdapter(
         onClick = {
           this.onBookBorrow(book)
         },
-        title = book.entry.title
+        title = book.entry.title,
       )
       Views.setVisible(this.idleButtonPositive, true)
       Views.setVisible(this.idleButtonNegative0, false)
@@ -595,7 +600,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusLoanedDownloaded(
       book: Book,
-      status: Loaned.LoanedDownloaded
+      status: Loaned.LoanedDownloaded,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -605,13 +610,14 @@ class CatalogFeedPagingDataAdapter(
 
       when (val format = book.findPreferredFormat()) {
         is BookFormat.BookFormatPDF,
-        is BookFormat.BookFormatEPUB -> {
+        is BookFormat.BookFormatEPUB,
+        -> {
           this.buttonCreator.setAsReadButton(
             this.idleButtonPositive,
             onClick = {
               this.callbacks.onBookRequestViewerOpen(book, format)
             },
-            title = book.entry.title
+            title = book.entry.title,
           )
         }
 
@@ -621,7 +627,7 @@ class CatalogFeedPagingDataAdapter(
             onClick = {
               this.callbacks.onBookRequestViewerOpen(book, format)
             },
-            title = book.entry.title
+            title = book.entry.title,
           )
         }
 
@@ -631,7 +637,7 @@ class CatalogFeedPagingDataAdapter(
             onClick = {
               // XXX: Can this even happen?
             },
-            title = book.entry.title
+            title = book.entry.title,
           )
         }
       }
@@ -643,7 +649,7 @@ class CatalogFeedPagingDataAdapter(
           onClick = {
             this.callbacks.onBookRequestRevoke(book)
           },
-          title = book.entry.title
+          title = book.entry.title,
         )
         Views.setVisible(this.idleButtonNegative0, true)
       } else if (this.callbacks.onIsBookDeletable(book)) {
@@ -652,7 +658,7 @@ class CatalogFeedPagingDataAdapter(
           onClick = {
             this.callbacks.onBookRequestDelete(book)
           },
-          title = book.entry.title
+          title = book.entry.title,
         )
         Views.setVisible(this.idleButtonNegative0, true)
       } else {
@@ -668,12 +674,12 @@ class CatalogFeedPagingDataAdapter(
         this.idleTime.text =
           this.idleTime.resources.getString(
             R.string.catalogBookCellBorrowingUntil,
-            loanEndFormatter.print(loanDuration)
+            loanEndFormatter.print(loanDuration),
           )
         this.idleTimeDays.text =
           this.idleTime.resources.getString(
             R.string.catalogBookCellBorrowingDays,
-            days.days
+            days.days,
           )
 
         Views.setVisible(this.idleTime, true)
@@ -692,7 +698,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusLoanedNotDownloaded(
       book: Book,
-      status: Loaned.LoanedNotDownloaded
+      status: Loaned.LoanedNotDownloaded,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -705,7 +711,7 @@ class CatalogFeedPagingDataAdapter(
         onClick = {
           this.onBookBorrow(book)
         },
-        title = book.entry.title
+        title = book.entry.title,
       )
       Views.setVisible(this.idleButtonPositive, true)
 
@@ -715,7 +721,7 @@ class CatalogFeedPagingDataAdapter(
           onClick = {
             this.callbacks.onBookRequestRevoke(book)
           },
-          title = book.entry.title
+          title = book.entry.title,
         )
         Views.setVisible(this.idleButtonNegative0, true)
       } else if (this.callbacks.onIsBookDeletable(book)) {
@@ -724,7 +730,7 @@ class CatalogFeedPagingDataAdapter(
           onClick = {
             this.callbacks.onBookRequestDelete(book)
           },
-          title = book.entry.title
+          title = book.entry.title,
         )
         Views.setVisible(this.idleButtonNegative0, true)
       } else {
@@ -734,7 +740,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusReachedLoanLimit(
       book: Book,
-      status: ReachedLoanLimit
+      status: ReachedLoanLimit,
     ) {
       MaterialAlertDialogBuilder(this.view.context)
         .setTitle(R.string.bookReachedLoanLimitDialogTitle)
@@ -746,7 +752,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusRequestingDownload(
       book: Book,
-      status: RequestingDownload
+      status: RequestingDownload,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -759,7 +765,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusRequestingRevoke(
       book: Book,
-      status: RequestingRevoke
+      status: RequestingRevoke,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -772,7 +778,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusRequestingLoan(
       book: Book,
-      status: RequestingLoan
+      status: RequestingLoan,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -785,7 +791,7 @@ class CatalogFeedPagingDataAdapter(
 
     private fun onBookStatusRevoked(
       book: Book,
-      status: Revoked
+      status: Revoked,
     ) {
       Views.setVisible(this.corrupt, false)
       Views.setVisible(this.error, false)
@@ -811,7 +817,7 @@ class CatalogFeedPagingDataAdapter(
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): ViewHolder {
     val view =
       LayoutInflater
@@ -831,7 +837,7 @@ class CatalogFeedPagingDataAdapter(
 
   override fun onBindViewHolder(
     holder: ViewHolder,
-    position: Int
+    position: Int,
   ) {
     val item = this.getItem(position)
     if (item != null) {

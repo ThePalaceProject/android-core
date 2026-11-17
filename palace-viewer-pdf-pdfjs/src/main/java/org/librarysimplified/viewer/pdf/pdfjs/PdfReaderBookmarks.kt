@@ -14,6 +14,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 
 internal object PdfReaderBookmarks {
   /**
@@ -23,7 +24,7 @@ internal object PdfReaderBookmarks {
   fun loadBookmarks(
     bookmarkService: BookmarkServiceUsableType,
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): List<PdfBookmark> {
     val allBookmarks: Map<AccountID, Map<BookID, BookmarksForBook>> =
       bookmarkService.bookmarks.get()
@@ -52,7 +53,8 @@ internal object PdfReaderBookmarks {
       is SerializedLocatorAudioBookTime1,
       is SerializedLocatorAudioBookTime2,
       is SerializedLocatorLegacyCFI,
-      is SerializedLocatorHrefProgression20210317 -> {
+      is SerializedLocatorHrefProgression20210317,
+      -> {
         // None of these locator formats are suitable for PDFs
         null
       }
@@ -65,7 +67,7 @@ internal object PdfReaderBookmarks {
               BookmarkLastReadLocation -> PdfBookmarkKind.LAST_READ
             },
           pageNumber = location.page,
-          time = source.time
+          time = source.time,
         )
       }
     }
@@ -75,15 +77,15 @@ internal object PdfReaderBookmarks {
    */
 
   fun fromPdfBookmark(
-    bookEntry: FeedEntry.FeedEntryOPDS,
+    bookEntry: FeedEntryBook,
     deviceId: String,
-    source: PdfBookmark
+    source: PdfBookmark,
   ): SerializedBookmark =
     SerializedBookmarks.createWithCurrentFormat(
       bookChapterProgress = 0.0,
       bookChapterTitle = "",
       bookProgress = 0.0,
-      bookTitle = bookEntry.feedEntry.title,
+      bookTitle = bookEntry.title,
       deviceID = deviceId,
       kind =
         when (source.kind) {
@@ -91,7 +93,7 @@ internal object PdfReaderBookmarks {
           PdfBookmarkKind.LAST_READ -> BookmarkLastReadLocation
         },
       location = SerializedLocatorPage1(source.pageNumber),
-      opdsId = bookEntry.feedEntry.id,
+      opdsId = bookEntry.id,
       time = source.time,
       uri = null,
     )

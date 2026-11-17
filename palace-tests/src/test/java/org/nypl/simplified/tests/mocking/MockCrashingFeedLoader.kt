@@ -13,6 +13,9 @@ class MockCrashingFeedLoader : FeedLoaderType {
   override var showOnlySupportedBooks: Boolean =
     false
 
+  override var preferOPDS20: Boolean =
+    false
+
   override fun fetchURI(
     accountID: AccountID,
     uri: URI,

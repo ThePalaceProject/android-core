@@ -78,7 +78,7 @@ data class OPDSAcquisitionFeed(
    * @return The link to the authentication document, if any
    */
   val authDocument: URI?,
-  val annotations: URI?
+  val annotations: URI?,
 ) : Serializable {
   /**
    * Create a builder initialized from this feed.
@@ -89,7 +89,7 @@ data class OPDSAcquisitionFeed(
         inUri = this.feedURI,
         inTitle = this.feedTitle,
         inId = this.feedID,
-        inUpdated = this.feedUpdated
+        inUpdated = this.feedUpdated,
       )
 
     for (entry in this.feedEntries) {
@@ -116,7 +116,7 @@ data class OPDSAcquisitionFeed(
     inUri: URI,
     inTitle: String,
     inId: String,
-    inUpdated: DateTime
+    inUpdated: DateTime,
   ) : OPDSAcquisitionFeedBuilderType {
     private val entries = mutableListOf<OPDSAcquisitionFeedEntry>()
 
@@ -240,7 +240,7 @@ data class OPDSAcquisitionFeed(
           OPDSGroup(
             title = name,
             uri = requireNotNull(this.groupUris[name]),
-            entries = entries
+            entries = entries,
           )
       }
 
@@ -263,7 +263,7 @@ data class OPDSAcquisitionFeed(
         licensor = this.licensor,
         errors = this.errors.toList(),
         authDocument = this.authDocument,
-        annotations = this.annotations
+        annotations = this.annotations,
       )
     }
   }
@@ -285,13 +285,13 @@ data class OPDSAcquisitionFeed(
       inUri: URI,
       inId: String,
       inUpdated: DateTime,
-      inTitle: String
+      inTitle: String,
     ): OPDSAcquisitionFeedBuilderType =
       Builder(
         inUri = inUri,
         inTitle = inTitle,
         inId = inId,
-        inUpdated = inUpdated
+        inUpdated = inUpdated,
       )
 
     /**

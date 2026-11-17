@@ -17,7 +17,7 @@ object BookmarkAnnotationsJSON {
   @Throws(JSONParseException::class)
   fun deserializeSelectorNodeFromJSON(
     objectMapper: ObjectMapper,
-    node: ObjectNode
+    node: ObjectNode,
   ): BookmarkAnnotationSelectorNode {
     val type =
       JSONParserUtilities.getString(node, "type")
@@ -38,7 +38,8 @@ object BookmarkAnnotationsJSON {
 
     when (type) {
       "FragmentSelector",
-      "oa:FragmentSelector" -> {
+      "oa:FragmentSelector",
+      -> {
         Unit
       }
 
@@ -49,13 +50,13 @@ object BookmarkAnnotationsJSON {
 
     return BookmarkAnnotationSelectorNode(
       type = type,
-      value = value
+      value = value,
     )
   }
 
   fun serializeSelectorNodeToJSON(
     objectMapper: ObjectMapper,
-    selector: BookmarkAnnotationSelectorNode
+    selector: BookmarkAnnotationSelectorNode,
   ): ObjectNode {
     val node = objectMapper.createObjectNode()
     node.put("type", selector.type)
@@ -65,13 +66,13 @@ object BookmarkAnnotationsJSON {
 
   fun serializeTargetNodeToJSON(
     objectMapper: ObjectMapper,
-    target: BookmarkAnnotationTargetNode
+    target: BookmarkAnnotationTargetNode,
   ): ObjectNode {
     val node = objectMapper.createObjectNode()
     node.put("source", target.source)
     node.set<ObjectNode>(
       "selector",
-      serializeSelectorNodeToJSON(objectMapper, target.selector)
+      serializeSelectorNodeToJSON(objectMapper, target.selector),
     )
     return node
   }
@@ -79,20 +80,20 @@ object BookmarkAnnotationsJSON {
   @Throws(JSONParseException::class)
   fun deserializeTargetNodeFromJSON(
     objectMapper: ObjectMapper,
-    node: ObjectNode
+    node: ObjectNode,
   ): BookmarkAnnotationTargetNode =
     BookmarkAnnotationTargetNode(
       source = JSONParserUtilities.getString(node, "source"),
       selector =
         deserializeSelectorNodeFromJSON(
           objectMapper,
-          JSONParserUtilities.getObject(node, "selector")
-        )
+          JSONParserUtilities.getObject(node, "selector"),
+        ),
     )
 
   fun serializeBodyNodeToJSON(
     mapper: ObjectMapper,
-    target: BookmarkAnnotationBodyNode
+    target: BookmarkAnnotationBodyNode,
   ): ObjectNode {
     val node = mapper.createObjectNode()
     node.put("http://librarysimplified.org/terms/time", target.timestamp)
@@ -117,20 +118,20 @@ object BookmarkAnnotationsJSON {
         JSONParserUtilities.getStringDefault(
           node,
           "http://librarysimplified.org/terms/chapter",
-          ""
+          "",
         ),
       bookProgress =
         JSONParserUtilities
           .getDoubleDefault(
             node,
             "http://librarysimplified.org/terms/progressWithinBook",
-            0.0
-          ).toFloat()
+            0.0,
+          ).toFloat(),
     )
 
   fun serializeBookmarkAnnotationToJSON(
     mapper: ObjectMapper,
-    annotation: BookmarkAnnotation
+    annotation: BookmarkAnnotation,
   ): ObjectNode {
     val node = mapper.createObjectNode()
     if (annotation.context != null) {
@@ -148,22 +149,22 @@ object BookmarkAnnotationsJSON {
 
   fun serializeBookmarkAnnotationToBytes(
     objectMapper: ObjectMapper,
-    annotation: BookmarkAnnotation
+    annotation: BookmarkAnnotation,
   ): ByteArray {
     objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false)
     objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
     return objectMapper.writeValueAsBytes(
       serializeBookmarkAnnotationToJSON(
         objectMapper,
-        annotation
-      )
+        annotation,
+      ),
     )
   }
 
   @Throws(JSONParseException::class)
   fun deserializeBookmarkAnnotationFromJSON(
     objectMapper: ObjectMapper,
-    node: ObjectNode
+    node: ObjectNode,
   ): BookmarkAnnotation =
     BookmarkAnnotation(
       context = JSONParserUtilities.getStringOrNull(node, "@context"),
@@ -174,21 +175,21 @@ object BookmarkAnnotationsJSON {
       target =
         deserializeTargetNodeFromJSON(
           objectMapper,
-          JSONParserUtilities.getObject(node, "target")
-        )
+          JSONParserUtilities.getObject(node, "target"),
+        ),
     )
 
   fun serializeBookmarkAnnotationFirstNodeToJSON(
     objectMapper: ObjectMapper,
-    annotation: BookmarkAnnotationFirstNode
+    annotation: BookmarkAnnotationFirstNode,
   ): ObjectNode {
     val nodes = objectMapper.createArrayNode()
     annotation.items.forEach { mark ->
       nodes.add(
         serializeBookmarkAnnotationToJSON(
           objectMapper,
-          mark
-        )
+          mark,
+        ),
       )
     }
 
@@ -202,7 +203,7 @@ object BookmarkAnnotationsJSON {
   @Throws(JSONParseException::class)
   fun deserializeBookmarkAnnotationFirstNodeFromJSON(
     objectMapper: ObjectMapper,
-    node: ObjectNode
+    node: ObjectNode,
   ): BookmarkAnnotationFirstNode {
     val bookmarkAnnotations = arrayListOf<BookmarkAnnotation>()
     JSONParserUtilities.getArray(node, "items").map { item ->
@@ -210,7 +211,7 @@ object BookmarkAnnotationsJSON {
         val bookmarkAnnotation =
           deserializeBookmarkAnnotationFromJSON(
             objectMapper = objectMapper,
-            node = JSONParserUtilities.checkObject(null, item)
+            node = JSONParserUtilities.checkObject(null, item),
           )
         bookmarkAnnotations.add(bookmarkAnnotation)
       } catch (exception: JSONParseException) {
@@ -221,13 +222,13 @@ object BookmarkAnnotationsJSON {
     return BookmarkAnnotationFirstNode(
       type = JSONParserUtilities.getString(node, "type"),
       id = JSONParserUtilities.getString(node, "id"),
-      items = bookmarkAnnotations
+      items = bookmarkAnnotations,
     )
   }
 
   fun serializeBookmarkAnnotationResponseToJSON(
     mapper: ObjectMapper,
-    annotation: BookmarkAnnotationResponse
+    annotation: BookmarkAnnotationResponse,
   ): ObjectNode {
     val node = mapper.createObjectNode()
     node.put("total", annotation.total)
@@ -236,14 +237,14 @@ object BookmarkAnnotationsJSON {
     node.set<ArrayNode>("type", serializeStringArray(mapper, annotation.type))
     node.set<ObjectNode>(
       "first",
-      serializeBookmarkAnnotationFirstNodeToJSON(mapper, annotation.first)
+      serializeBookmarkAnnotationFirstNodeToJSON(mapper, annotation.first),
     )
     return node
   }
 
   private fun serializeStringArray(
     objectMapper: ObjectMapper,
-    context: List<String>
+    context: List<String>,
   ): ArrayNode {
     val array = objectMapper.createArrayNode()
     context.forEach { text -> array.add(text) }
@@ -253,7 +254,7 @@ object BookmarkAnnotationsJSON {
   @Throws(JSONParseException::class)
   fun deserializeBookmarkAnnotationResponseFromJSON(
     objectMapper: ObjectMapper,
-    node: ObjectNode
+    node: ObjectNode,
   ): BookmarkAnnotationResponse =
     BookmarkAnnotationResponse(
       context =
@@ -271,14 +272,14 @@ object BookmarkAnnotationsJSON {
       first =
         deserializeBookmarkAnnotationFirstNodeFromJSON(
           objectMapper = objectMapper,
-          node = JSONParserUtilities.getObject(node, "first")
-        )
+          node = JSONParserUtilities.getObject(node, "first"),
+        ),
     )
 
   @Throws(JSONParseException::class)
   fun deserializeBookmarkAnnotationResponseFromJSON(
     objectMapper: ObjectMapper,
-    node: JsonNode
+    node: JsonNode,
   ): BookmarkAnnotationResponse =
     deserializeBookmarkAnnotationResponseFromJSON(
       objectMapper = objectMapper,

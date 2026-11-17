@@ -40,7 +40,8 @@ interface ContentResolverType {
    */
 
   @Throws(FileNotFoundException::class)
-  fun openInputStreamOrThrow(uri: URI): InputStream = this.openInputStream(uri) ?: throw FileNotFoundException(uri.toString())
+  fun openInputStreamOrThrow(uri: URI): InputStream =
+    this.openInputStream(uri) ?: throw FileNotFoundException(uri.toString())
 
   /**
    * Open an input stream for the given `content://` URI.

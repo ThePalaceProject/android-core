@@ -18,5 +18,5 @@ data class OPDSPreviewAcquisition(
    * The MIME type of immediately retrievable content, if any.
    */
 
-  val type: MIMEType
+  val type: MIMEType,
 ) : Serializable

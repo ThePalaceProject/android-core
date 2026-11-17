@@ -1,10 +1,12 @@
 package org.nypl.simplified.ui.catalog
 
 import org.nypl.simplified.books.api.Book
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookPreviewStatus
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 
 data class CatalogBookStatus<S : BookStatus>(
   val book: Book,
@@ -16,7 +18,7 @@ data class CatalogBookStatus<S : BookStatus>(
       accountID = this.book.account,
       bookID = this.book.id,
       entry = this.book.entry,
-      samlDownloadContext = null
+      samlDownloadContext = null,
     )
 
   companion object {
@@ -28,21 +30,22 @@ data class CatalogBookStatus<S : BookStatus>(
 
     fun create(
       registry: BookRegistryReadableType,
-      feedEntry: FeedEntry.FeedEntryOPDS
+      feedEntry: FeedEntryBook,
     ): CatalogBookStatus<BookStatus> {
+      val bookID = FeedBookIDConversions.toBookID(feedEntry.bookID)
       val registryStatus =
-        registry.bookStatusOrNull(feedEntry.bookID)
+        registry.bookStatusOrNull(bookID)
 
-      var book = registry.bookOrNull(feedEntry.bookID)?.book
+      var book = registry.bookOrNull(bookID)?.book
       if (book == null) {
         book =
           Book(
-            id = feedEntry.bookID,
+            id = bookID,
             account = feedEntry.accountID,
             cover = null,
             thumbnail = null,
-            entry = feedEntry.feedEntry,
-            formats = listOf()
+            entry = feedEntry,
+            formats = listOf(),
           )
       }
 
@@ -50,22 +53,23 @@ data class CatalogBookStatus<S : BookStatus>(
         return CatalogBookStatus(
           book,
           registryStatus,
-          bookPreviewStatusOf(feedEntry)
+          bookPreviewStatusOf(feedEntry),
         )
       } else {
         return CatalogBookStatus(
           book,
           BookStatus.fromBook(book),
-          bookPreviewStatusOf(feedEntry)
+          bookPreviewStatusOf(feedEntry),
         )
       }
     }
 
-    private fun bookPreviewStatusOf(entry: FeedEntry.FeedEntryOPDS): BookPreviewStatus =
-      if (!entry.feedEntry.previewAcquisitions.isNullOrEmpty()) {
-        BookPreviewStatus.HasPreview()
+    private fun bookPreviewStatusOf(entry: FeedEntryBook): BookPreviewStatus {
+      if (!entry.previewAcquisitions.isNullOrEmpty()) {
+        return BookPreviewStatus.HasPreview()
       } else {
-        BookPreviewStatus.None
+        return BookPreviewStatus.None
       }
+    }
   }
 }

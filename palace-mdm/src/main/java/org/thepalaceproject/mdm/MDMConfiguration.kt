@@ -11,7 +11,7 @@ object MDMConfiguration {
 
   fun setup(
     application: Application,
-    profile: ProfileType
+    profile: ProfileType,
   ) {
     this.logger.debug("Configuring...")
 

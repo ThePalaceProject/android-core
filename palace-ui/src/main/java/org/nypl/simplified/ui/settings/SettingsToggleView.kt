@@ -16,7 +16,7 @@ class SettingsToggleView
   constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
   ) : FrameLayout(context, attrs, defStyleAttr) {
     private val icon: ImageView
     val toggle: CheckBox
@@ -43,7 +43,10 @@ class SettingsToggleView
 
       val a =
         context.theme.obtainStyledAttributes(
-          attrs, R.styleable.SettingsToggleView, defStyleAttr, 0
+          attrs,
+          R.styleable.SettingsToggleView,
+          defStyleAttr,
+          0,
         )
 
       try {

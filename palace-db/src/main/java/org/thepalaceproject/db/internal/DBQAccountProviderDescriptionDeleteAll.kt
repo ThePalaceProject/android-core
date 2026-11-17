@@ -11,7 +11,7 @@ internal object DBQAccountProviderDescriptionDeleteAll : DBQAccountProviderDescr
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: Unit
+    parameters: Unit,
   ) {
     transaction.connection.connection.prepareStatement(this.queryText).use { statement ->
       statement.executeUpdate()

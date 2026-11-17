@@ -33,7 +33,7 @@ internal class BServiceOpSyncOneAccount(
     this.logger.debug(
       "[{}]: syncing account {}",
       this.profile.id.uuid,
-      this.accountID
+      this.accountID,
     )
 
     val syncable =
@@ -57,7 +57,7 @@ internal class BServiceOpSyncOneAccount(
 
   private fun sendBookmarksToServer(
     syncable: BSyncableAccount,
-    received: List<SerializedBookmark>
+    received: List<SerializedBookmark>,
   ) {
     val localExtras =
       this.determineExtraLocalBookmarks(received, syncable)
@@ -65,7 +65,7 @@ internal class BServiceOpSyncOneAccount(
     this.logger.debug(
       "[{}]: We have {} bookmarks the server did not have",
       this.accountID.uuid,
-      localExtras.size
+      localExtras.size,
     )
 
     for (bookmark in localExtras) {
@@ -73,7 +73,7 @@ internal class BServiceOpSyncOneAccount(
         this.logger.debug(
           "[{}]: Sending bookmark {}",
           this.accountID.uuid,
-          bookmark.bookmarkId.value
+          bookmark.bookmarkId.value,
         )
 
         val bookmarkAnnotation =
@@ -83,7 +83,7 @@ internal class BServiceOpSyncOneAccount(
           account = syncable.account,
           annotationsURI = syncable.annotationsURI,
           credentials = syncable.credentials,
-          bookmark = bookmarkAnnotation
+          bookmark = bookmarkAnnotation,
         )
       } catch (e: Exception) {
         this.logger.error("[{}]: Error sending bookmark: ", this.accountID.uuid, e)
@@ -98,7 +98,7 @@ internal class BServiceOpSyncOneAccount(
 
   private fun determineExtraLocalBookmarks(
     received: List<SerializedBookmark>,
-    syncable: BSyncableAccount
+    syncable: BSyncableAccount,
   ): Set<SerializedBookmark> =
     syncable.account.bookDatabase
       .books()
@@ -117,14 +117,14 @@ internal class BServiceOpSyncOneAccount(
         this.httpCalls.bookmarksGet(
           account = syncable.account,
           annotationsURI = syncable.annotationsURI,
-          credentials = syncable.credentials
+          credentials = syncable.credentials,
         )
       } catch (e: Exception) {
         this.logger.error(
           "[{}]: Could not receive bookmarks for account {}: ",
           this.profile.id.uuid,
           syncable.account.id,
-          e
+          e,
         )
         listOf()
       }
@@ -132,7 +132,7 @@ internal class BServiceOpSyncOneAccount(
     this.logger.debug(
       "[{}]: Received {} bookmarks",
       this.profile.id.uuid,
-      bookmarkAnnotations.size
+      bookmarkAnnotations.size,
     )
 
     val results = arrayListOf<SerializedBookmark>()
@@ -144,7 +144,8 @@ internal class BServiceOpSyncOneAccount(
 
         if (!syncable.account.bookDatabase
             .books()
-            .contains(bookmark.book)) {
+            .contains(bookmark.book)
+        ) {
           continue
         }
 
@@ -164,14 +165,14 @@ internal class BServiceOpSyncOneAccount(
             BookmarkAttributes.addBookmark(
               this.bookmarksSource.get(),
               syncable.account.id,
-              bookmark
-            )
+              bookmark,
+            ),
           )
           this.bookmarkEventsOut.onNext(
             BookmarkEvent.BookmarkSaved(
               syncable.account.id,
-              bookmark
-            )
+              bookmark,
+            ),
           )
         }
 
@@ -181,7 +182,7 @@ internal class BServiceOpSyncOneAccount(
           "[{}]: could not store bookmark for account {}: ",
           this.profile.id.uuid,
           syncable.account.id,
-          e
+          e,
         )
       }
     }

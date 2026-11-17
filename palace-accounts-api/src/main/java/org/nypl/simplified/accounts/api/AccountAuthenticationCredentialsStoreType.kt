@@ -17,7 +17,7 @@ interface AccountAuthenticationCredentialsStoreType {
 
   fun put(
     account: AccountID,
-    credentials: AccountAuthenticationCredentials
+    credentials: AccountAuthenticationCredentials,
   )
 
   /**

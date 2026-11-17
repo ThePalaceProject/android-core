@@ -27,7 +27,7 @@ internal object DBQAccountProviderPut : DBQAccountProviderPutType {
 
   override fun execute(
     transaction: DBTransactionType,
-    baseDescription: AccountProvider
+    baseDescription: AccountProvider,
   ) {
     val timestamp =
       baseDescription.updated

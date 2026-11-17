@@ -2,7 +2,6 @@ package org.nypl.simplified.viewer.api
 
 import android.app.Activity
 import org.joda.time.LocalDateTime
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
@@ -12,7 +11,8 @@ import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.util.ServiceLoader
 
 /**
@@ -59,15 +59,8 @@ object Viewers {
     context: Activity,
     preferences: ViewerParameters,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
   ) {
-    MDC.put(MDCKeys.BOOK_DRM, format.drmInformation.kind.name)
-    MDC.put(MDCKeys.BOOK_FORMAT, format.contentType.toString())
-    MDC.put(MDCKeys.BOOK_INTERNAL_ID, book.id.value())
-    MDC.put(MDCKeys.BOOK_ID, book.entry.id)
-    MDC.put(MDCKeys.BOOK_TITLE, book.entry.title)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, book.entry.publisher)
-
     this.logger.debug("Open: {} ({})", book.id, book.entry.title)
     val providers =
       ServiceLoader
@@ -95,7 +88,9 @@ object Viewers {
       val supported = viewerProvider.canSupport(preferences, book, format)
       if (supported) {
         this.logger.debug(
-          "[{}] Viewer provider {} supports the book, using it!", index, viewerProvider.name
+          "[{}] Viewer provider {} supports the book, using it!",
+          index,
+          viewerProvider.name,
         )
 
         val profile = this.profilesController.profileCurrent()
@@ -112,8 +107,8 @@ object Viewers {
             targetURI = book.entry.analytics,
             onAccessTokenUpdated = { accessToken ->
               account.updateBasicTokenCredentials(accessToken)
-            }
-          )
+            },
+          ),
         )
 
         viewerProvider.open(
@@ -121,15 +116,32 @@ object Viewers {
           parameters = newPreferences,
           book = book,
           format = format,
-          accountProviderId = account.provider.id
+          accountProviderId = account.provider.id,
         )
         return
       } else {
         this.logger.debug(
-          "[{}] Viewer provider {} does not support the book", index, viewerProvider.name
+          "[{}] Viewer provider {} does not support the book",
+          index,
+          viewerProvider.name,
         )
       }
     }
     this.logger.error("No viewer providers can handle the given book")
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.NO_VIEWER_FOR_BOOK,
+      data =
+        mapOf(
+          Pair("AccountInternalID", book.account.uuid.toString()),
+          Pair("BookID", book.entry.id),
+          Pair("BookInternalID", book.id.value()),
+          Pair("BookTitle", book.entry.title),
+          Pair("BookPublisher", book.entry.publisher.orEmpty()),
+          Pair("BookFormat", format::class.simpleName.orEmpty()),
+        ),
+    )
   }
 }

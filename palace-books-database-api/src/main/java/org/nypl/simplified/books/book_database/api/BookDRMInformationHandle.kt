@@ -68,7 +68,7 @@ sealed class BookDRMInformationHandle {
     @Throws(IOException::class)
     abstract fun setInfo(
       passphrase: String,
-      licenseBytes: ByteArray
+      licenseBytes: ByteArray,
     ): BookDRMInformation.LCP
   }
 

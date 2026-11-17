@@ -4,10 +4,11 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import org.librarysimplified.ui.R
+import org.nypl.simplified.books.book_database.api.BookFormats
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_AUDIO
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_EPUB
 import org.nypl.simplified.books.book_database.api.BookFormats.BookFormatDefinition.BOOK_FORMAT_PDF
-import org.nypl.simplified.feeds.api.FeedEntry.FeedEntryOPDS
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.palace.images.BookCoverBadge
 import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
@@ -18,10 +19,10 @@ import org.thepalaceproject.palace.images.BookCoverBadgeLookupType
 
 class CatalogCoverBadgeImages private constructor(
   private val screenSize: ScreenSizeInformationType,
-  private val audioBookIcon: Bitmap
+  private val audioBookIcon: Bitmap,
 ) : BookCoverBadgeLookupType {
-  override fun badgeForEntry(entry: FeedEntryOPDS): BookCoverBadge? =
-    when (entry.probableFormat) {
+  override fun badgeForEntry(entry: FeedEntryBook): BookCoverBadge? {
+    return when (BookFormats.inferFormat(entry)) {
       BOOK_FORMAT_EPUB -> {
         null
       }
@@ -42,6 +43,7 @@ class CatalogCoverBadgeImages private constructor(
         null
       }
     }
+  }
 
   companion object {
     /**
@@ -50,12 +52,12 @@ class CatalogCoverBadgeImages private constructor(
 
     fun create(
       resources: Resources,
-      screenSize: ScreenSizeInformationType
+      screenSize: ScreenSizeInformationType,
     ): BookCoverBadgeLookupType {
       val audioBookIcon = BitmapFactory.decodeResource(resources, R.drawable.audiobook_icon)
       return CatalogCoverBadgeImages(
         audioBookIcon = audioBookIcon,
-        screenSize = screenSize
+        screenSize = screenSize,
       )
     }
   }

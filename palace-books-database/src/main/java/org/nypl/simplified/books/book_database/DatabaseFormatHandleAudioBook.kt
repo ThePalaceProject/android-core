@@ -40,7 +40,7 @@ import java.net.URI
  */
 
 internal class DatabaseFormatHandleAudioBook internal constructor(
-  private val parameters: DatabaseFormatHandleParameters
+  private val parameters: DatabaseFormatHandleParameters,
 ) : BookDatabaseEntryFormatHandleAudioBook() {
   private val log =
     LoggerFactory.getLogger(DatabaseFormatHandleAudioBook::class.java)
@@ -73,7 +73,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         directory = this.parameters.directory,
         format = this.formatDefinition,
         bookFormats = this.parameters.bookFormatSupport,
-        onUpdate = this::onDRMUpdated
+        onUpdate = this::onDRMUpdated,
       )
 
     if (drmHandleInitial == null) {
@@ -88,7 +88,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
           directory = this.parameters.directory,
           format = this.formatDefinition,
           bookFormats = this.parameters.bookFormatSupport,
-          onUpdate = this::onDRMUpdated
+          onUpdate = this::onDRMUpdated,
         ) ?: throw IllegalStateException("Still could not open a DRM handle!")
 
       this.drmHandleRef = drmHandleNext
@@ -113,8 +113,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
           SerializedBookmarkFallbackValues(
             kind = BookmarkKind.BookmarkExplicit,
             bookOPDSId = this.parameters.entry.book.entry.id,
-            bookTitle = this.parameters.entry.book.entry.title
-          )
+            bookTitle = this.parameters.entry.book.entry.title,
+          ),
       )
     }
 
@@ -142,7 +142,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
           directory = this.parameters.directory,
           format = this.formatDefinition,
           drmKind = kind,
-          onUpdate = this::onDRMUpdated
+          onUpdate = this::onDRMUpdated,
         )
       oldRef.close()
       this.onDRMUpdated()
@@ -174,8 +174,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
             input =
               ManifestUnparsed(
                 palaceId = PlayerPalaceID(this.parameters.entry.book.entry.id),
-                data = stream.readBytes()
-              )
+                data = stream.readBytes(),
+              ),
           )
 
         when (manifestResult) {
@@ -186,7 +186,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
                 briefID,
                 error.line,
                 error.column,
-                error.message
+                error.message,
               )
             }
             throw IOException("One or more manifest parse errors occurred")
@@ -206,7 +206,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
                   filter = { true },
                   httpClient = this.parameters.httpClient,
                   manifest = manifestResult.result,
-                )
+                ),
             )
 
             this.log.debug("[{}]: deleted audio book data", briefID)
@@ -230,11 +230,11 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
         formatRef =
           formatRef.copy(
             file = null,
-            lastReadLocation = null
+            lastReadLocation = null,
           )
 
         formatRef
-      }
+      },
     )
   }
 
@@ -250,8 +250,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
           this.fileBookmarks,
           this.fileBookmarksTmp,
           JSONSerializerUtilities.serializeToString(
-            serialized.map { x -> x.toJSON(this.parameters.objectMapper) }
-          )
+            serialized.map { x -> x.toJSON(this.parameters.objectMapper) },
+          ),
         )
         this.formatRef = this.formatRef.copy(bookmarks = serialized)
         this.formatRef
@@ -262,7 +262,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
   override fun copyInManifestAndURI(
     data: ByteArray,
-    manifestURI: URI?
+    manifestURI: URI?,
   ) {
     val newFormat =
       synchronized(this.dataLock) {
@@ -270,7 +270,9 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
         if (manifestURI != null) {
           FileUtilities.fileWriteUTF8Atomically(
-            this.fileManifestURI, this.fileManifestURITmp, manifestURI.toString()
+            this.fileManifestURI,
+            this.fileManifestURITmp,
+            manifestURI.toString(),
           )
         } else {
           FileUtilities.fileDelete(this.fileManifestURI)
@@ -281,8 +283,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
             manifest =
               BookFormat.AudioBookManifestReference(
                 manifestURI = manifestURI,
-                manifestFile = this.fileManifest
-              )
+                manifestFile = this.fileManifest,
+              ),
           )
         this.formatRef
       }
@@ -294,7 +296,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     if (bookmark != null) {
       Preconditions.checkArgument(
         bookmark.kind == BookmarkKind.BookmarkLastReadLocation,
-        "Must use a last-read location bookmark"
+        "Must use a last-read location bookmark",
       )
     }
 
@@ -304,7 +306,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
           FileUtilities.fileWriteUTF8Atomically(
             this.filePosition,
             this.filePositionTmp,
-            JSONSerializerUtilities.serializeToString(bookmark.toJSON(this.parameters.objectMapper))
+            JSONSerializerUtilities.serializeToString(bookmark.toJSON(this.parameters.objectMapper)),
           )
         } else {
           FileUtilities.fileDelete(this.filePosition)
@@ -320,7 +322,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
   override fun addBookmark(bookmark: SerializedBookmark) {
     Preconditions.checkArgument(
       bookmark.kind == BookmarkKind.BookmarkExplicit,
-      "Must use an explicit bookmark"
+      "Must use an explicit bookmark",
     )
 
     val newFormat =
@@ -335,8 +337,8 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
           this.fileBookmarks,
           this.fileBookmarksTmp,
           JSONSerializerUtilities.serializeToString(
-            newBookmarks.map { x -> x.toJSON(this.parameters.objectMapper) }
-          )
+            newBookmarks.map { x -> x.toJSON(this.parameters.objectMapper) },
+          ),
         )
         this.formatRef = this.formatRef.copy(bookmarks = newBookmarks)
         this.formatRef
@@ -358,7 +360,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
       filePosition: File,
       contentType: MIMEType,
       drmInfo: BookDRMInformation,
-      bookmarkFallbackValues: SerializedBookmarkFallbackValues
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues,
     ): BookFormat.BookFormatAudioBook =
       BookFormat.BookFormatAudioBook(
         file = if (fileBook.exists()) fileBook else null,
@@ -373,13 +375,13 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     private fun loadBookmarksIfPresent(
       objectMapper: ObjectMapper,
       fileBookmarks: File,
-      bookmarkFallbackValues: SerializedBookmarkFallbackValues
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues,
     ): List<SerializedBookmark> =
       if (fileBookmarks.isFile) {
         this.loadBookmarks(
           objectMapper = objectMapper,
           fileBookmarks = fileBookmarks,
-          bookmarkFallbackValues = bookmarkFallbackValues
+          bookmarkFallbackValues = bookmarkFallbackValues,
         )
       } else {
         listOf()
@@ -388,7 +390,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     private fun loadBookmarks(
       objectMapper: ObjectMapper,
       fileBookmarks: File,
-      bookmarkFallbackValues: SerializedBookmarkFallbackValues
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues,
     ): List<SerializedBookmark> {
       val tree =
         objectMapper.readTree(fileBookmarks)
@@ -412,7 +414,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     @Throws(IOException::class)
     private fun loadLastReadLocationIfPresent(
       fileLastRead: File,
-      bookmarkFallbackValues: SerializedBookmarkFallbackValues
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues,
     ): SerializedBookmark? =
       if (fileLastRead.isFile) {
         try {
@@ -428,7 +430,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
     @Throws(IOException::class)
     private fun loadLastReadLocation(
       fileLastRead: File,
-      bookmarkFallbackValues: SerializedBookmarkFallbackValues
+      bookmarkFallbackValues: SerializedBookmarkFallbackValues,
     ): SerializedBookmark {
       val fallbackValues =
         bookmarkFallbackValues.copy(kind = BookmarkKind.BookmarkLastReadLocation)
@@ -440,7 +442,7 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
     private fun loadManifestIfNecessary(
       fileManifest: File,
-      fileManifestURI: File
+      fileManifestURI: File,
     ): BookFormat.AudioBookManifestReference? =
       if (fileManifest.isFile) {
         this.loadManifest(fileManifest, fileManifestURI)
@@ -450,11 +452,11 @@ internal class DatabaseFormatHandleAudioBook internal constructor(
 
     private fun loadManifest(
       fileManifest: File,
-      fileManifestURI: File
+      fileManifestURI: File,
     ): BookFormat.AudioBookManifestReference =
       BookFormat.AudioBookManifestReference(
         manifestFile = fileManifest,
-        manifestURI = URI.create(FileUtilities.fileReadUTF8(fileManifestURI))
+        manifestURI = URI.create(FileUtilities.fileReadUTF8(fileManifestURI)),
       )
   }
 }

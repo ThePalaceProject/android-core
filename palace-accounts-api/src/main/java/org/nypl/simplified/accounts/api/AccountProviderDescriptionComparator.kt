@@ -10,7 +10,7 @@ import java.net.URI
  */
 
 class AccountProviderDescriptionComparator(
-  val buildConfig: BuildConfigurationServiceType
+  val buildConfig: BuildConfigurationServiceType,
 ) : Comparator<AccountProviderDescription> {
   private val featuredIds =
     try {
@@ -23,7 +23,7 @@ class AccountProviderDescriptionComparator(
 
   override fun compare(
     o1: AccountProviderDescription,
-    o2: AccountProviderDescription
+    o2: AccountProviderDescription,
   ): Int =
     if (this.isFeatured(o1)) {
       if (this.isFeatured(o2)) {

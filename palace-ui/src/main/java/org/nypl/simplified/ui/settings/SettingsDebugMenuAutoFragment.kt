@@ -27,7 +27,8 @@ class SettingsDebugMenuAutoFragment :
       override fun fragment(): SettingsDebugMenuAutoFragment = SettingsDebugMenuAutoFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuAutoFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuAutoFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -40,7 +41,7 @@ class SettingsDebugMenuAutoFragment :
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -67,11 +68,11 @@ class SettingsDebugMenuAutoFragment :
     val appInfo =
       context.packageManager.getApplicationInfo(
         context.packageName,
-        PackageManager.GET_META_DATA
+        PackageManager.GET_META_DATA,
       )
 
     return appInfo.metaData?.containsKey(
-      "com.google.android.gms.car.application"
+      "com.google.android.gms.car.application",
     ) == true
   }
 }

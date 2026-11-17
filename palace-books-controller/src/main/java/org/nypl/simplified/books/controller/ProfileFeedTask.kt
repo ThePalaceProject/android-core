@@ -9,12 +9,13 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.feeds.api.Feed
 import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_HOLDS
 import org.nypl.simplified.feeds.api.FeedBooksSelection.BOOKS_FEED_LOANED
-import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.FilteringForAccount
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo.Sorting.SortBy
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedFacetPseudoFiltering
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting.SortBy
+import org.nypl.simplified.feeds.api.FeedFacetSingle
 import org.nypl.simplified.feeds.api.FeedSearch
+import org.nypl.simplified.feeds.api.FeedSearchLocal
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
@@ -26,12 +27,12 @@ internal class ProfileFeedTask(
   private val bookFormatSupport: BookFormatSupportType,
   private val bookRegistry: BookRegistryReadableType,
   private val profiles: ProfilesControllerType,
-  private val request: ProfileFeedRequest
-) : Callable<Feed.FeedWithoutGroups> {
+  private val request: ProfileFeedRequest,
+) : Callable<FeedData> {
   private val logger =
     LoggerFactory.getLogger(ProfileFeedTask::class.java)
 
-  override fun call(): Feed.FeedWithoutGroups {
+  override fun call(): FeedData {
     this.logger.debug("generating local feed")
 
     /*
@@ -40,16 +41,6 @@ internal class ProfileFeedTask(
 
     val facetGroups = this.makeFacets()
     val facets = facetGroups.values.flatten()
-
-    val feed =
-      Feed.empty(
-        feedURI = this.request.uri,
-        feedID = this.request.id,
-        feedSearch = FeedSearch.FeedSearchLocal,
-        feedTitle = createTitle(),
-        feedFacets = facets,
-        feedFacetGroups = facetGroups
-      )
 
     try {
       this.logger.debug("book registry contains {} books", this.bookRegistry.books().size)
@@ -64,18 +55,22 @@ internal class ProfileFeedTask(
       this.sortBooks(this.request.sortBy, books)
       this.logger.debug("after sorting, {} candidate books remain", books.size)
 
-      for (book in books) {
-        feed.entriesInOrder.add(
-          FeedEntry.FeedEntryOPDS(
-            accountID = book.book.account,
-            feedEntry = book.book.entry
-          )
-        )
-      }
+      val entries =
+        books.map { book ->
+          book.book.entry
+        }
 
-      return feed
+      return FeedData
+        .empty(
+          feedID = this.request.id,
+          feedSearch = FeedSearchLocal,
+          feedTitle = createTitle(),
+          feedURI = this.request.uri,
+          feedFacets = facets,
+          feedFacetGroups = facetGroups,
+        ).copy(entries = entries)
     } finally {
-      this.logger.debug("generated a local feed with {} entries", feed.size)
+      this.logger.debug("generated a local feed")
     }
   }
 
@@ -113,15 +108,15 @@ internal class ProfileFeedTask(
     for (account in accounts) {
       val active = account.id == this.request.filterByAccountID
       val title = account.provider.displayName
-      facets.add(FilteringForAccount(title, active, account.id))
+      facets.add(FeedFacetPseudoFiltering(title, active, account.id))
     }
 
     facets.add(
-      FilteringForAccount(
+      FeedFacetPseudoFiltering(
         title = this.request.facetTitleProvider.libraryAll,
         isActive = this.request.filterByAccountID == null,
-        account = null
-      )
+        account = null,
+      ),
     )
     return Pair(this.request.facetTitleProvider.library, facets)
   }
@@ -136,7 +131,7 @@ internal class ProfileFeedTask(
           SortBy.SORT_BY_AUTHOR -> this.request.facetTitleProvider.sortByAuthor
           SortBy.SORT_BY_TITLE -> this.request.facetTitleProvider.sortByTitle
         }
-      facets.add(Sorting(title, active, sortingFacet))
+      facets.add(FeedFacetPseudoSorting(title, active, sortingFacet))
     }
     return Pair(this.request.facetTitleProvider.sortBy, facets)
   }
@@ -147,7 +142,7 @@ internal class ProfileFeedTask(
 
   private fun searchBooks(
     search: String?,
-    books: ArrayList<BookWithStatus>
+    books: ArrayList<BookWithStatus>,
   ) {
     if (search == null) {
       return
@@ -182,7 +177,7 @@ internal class ProfileFeedTask(
 
   private fun sortBooks(
     sortBy: SortBy,
-    books: ArrayList<BookWithStatus>
+    books: ArrayList<BookWithStatus>,
   ) {
     when (sortBy) {
       SortBy.SORT_BY_AUTHOR -> this.sortBooksByAuthor(books)
@@ -226,7 +221,7 @@ internal class ProfileFeedTask(
 
   private fun filterBooks(
     filter: (BookStatus) -> Boolean,
-    books: ArrayList<BookWithStatus>
+    books: ArrayList<BookWithStatus>,
   ) {
     val iter = books.iterator()
     while (iter.hasNext()) {
@@ -284,7 +279,8 @@ internal class ProfileFeedTask(
       is BookStatus.Held,
       is BookStatus.Holdable,
       is BookStatus.Loanable,
-      is BookStatus.Revoked -> {
+      is BookStatus.Revoked,
+      -> {
         false
       }
 
@@ -301,7 +297,8 @@ internal class ProfileFeedTask(
       is BookStatus.ReachedLoanLimit,
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
-      is BookStatus.RequestingRevoke -> {
+      is BookStatus.RequestingRevoke,
+      -> {
         true
       }
     }
@@ -316,9 +313,9 @@ internal class ProfileFeedTask(
       is BookStatus.DownloadWaitingForExternalAuthentication,
       is BookStatus.Downloading,
       is BookStatus.FailedDownload,
+      is BookStatus.FailedDownloadBadCredentials,
       is BookStatus.FailedLoan,
       is BookStatus.FailedLoanBadCredentials,
-      is BookStatus.FailedDownloadBadCredentials,
       is BookStatus.FailedRevoke,
       is BookStatus.FailedRevokeBadCredentials,
       is BookStatus.Holdable,
@@ -328,7 +325,8 @@ internal class ProfileFeedTask(
       is BookStatus.RequestingDownload,
       is BookStatus.RequestingLoan,
       is BookStatus.RequestingRevoke,
-      is BookStatus.Revoked -> {
+      is BookStatus.Revoked,
+      -> {
         false
       }
     }
@@ -340,7 +338,7 @@ internal class ProfileFeedTask(
 
   private fun searchMatches(
     termsUpper: List<String>,
-    book: BookWithStatus
+    book: BookWithStatus,
   ): Boolean {
     if (termsUpper.isEmpty()) {
       return true

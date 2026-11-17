@@ -9,7 +9,6 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.AllowRedirects.DISALLOW_REDIRECTS
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Post
 import org.librarysimplified.http.api.LSHTTPResponseStatus
-import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
@@ -43,7 +42,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URLEncoder
@@ -60,12 +58,12 @@ class ProfileAccountLoginTask(
   private val notificationTokenHttpCalls: NotificationTokenHTTPCallsType,
   private val patronParsers: PatronUserProfileParsersType,
   private val profile: ProfileReadableType,
-  private val request: ProfileAccountLoginRequest
+  private val request: ProfileAccountLoginRequest,
 ) : Callable<TaskResult<Unit>> {
   init {
     Preconditions.checkState(
       this.profile.accounts().containsKey(this.account.id),
-      "Profile must contain the given account"
+      "Profile must contain the given account",
     )
   }
 
@@ -82,37 +80,28 @@ class ProfileAccountLoginTask(
 
   private fun debug(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.debug("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   private fun error(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   private fun run(): TaskResult<Unit> {
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID,
-      this.account.id.uuid
-        .toString()
-    )
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, this.account.provider.displayName)
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
-      this.account.provider.id
-        .toString()
-    )
-
     return try {
       if (!this.updateLoggingInState(
-          this.steps.beginNewStep(this.loginStrings.loginCheckAuthRequired)
+          this.steps.beginNewStep(this.loginStrings.loginCheckAuthRequired),
         )
       ) {
         return this.steps.finishSuccess(Unit)
       }
 
       this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
-      this.steps.addAttribute("AccountProviderID",
+      this.steps.addAttribute(
+        "AccountProviderID",
         this.account.provider.id
-          .toString()
+          .toString(),
       )
 
       if (!this.validateRequest()) {
@@ -120,13 +109,13 @@ class ProfileAccountLoginTask(
         this.steps.currentStepFailed(
           message = this.loginStrings.loginAuthNotRequired,
           errorCode = "loginAuthNotRequired",
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         this.account.setLoginState(
           AccountLoginFailed(
             previousCredentials = this.account.loginState.credentials,
-            taskResult = this.steps.finishFailure<Unit>()
-          )
+            taskResult = this.steps.finishFailure<Unit>(),
+          ),
         )
         return this.steps.finishFailure()
       }
@@ -172,14 +161,14 @@ class ProfileAccountLoginTask(
         message = this.loginStrings.loginUnexpectedException,
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       val failure = this.steps.finishFailure<Unit>()
       this.account.setLoginState(
         AccountLoginFailed(
           previousCredentials = this.account.loginState.credentials,
-          taskResult = failure
-        )
+          taskResult = failure,
+        ),
       )
       failure
     }
@@ -187,13 +176,13 @@ class ProfileAccountLoginTask(
 
   private fun handleProfileAccountLoginError(
     uri: URI,
-    result: LSHTTPResponseStatus.Responded.Error
+    result: LSHTTPResponseStatus.Responded.Error,
   ) {
     this.logger.error(
       "received http error: {}: {}: {}",
       uri,
       result.properties.message,
-      result.properties.status
+      result.properties.status,
     )
 
     val exception = Exception()
@@ -207,7 +196,7 @@ class ProfileAccountLoginTask(
           message = "Invalid credentials!",
           errorCode = "invalidCredentials",
           exception = exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw exception
       }
@@ -217,7 +206,7 @@ class ProfileAccountLoginTask(
           message = "Server error: ${result.properties.status} ${result.properties.message}",
           errorCode = "httpError ${result.properties.status} $uri",
           exception = exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw exception
       }
@@ -228,7 +217,8 @@ class ProfileAccountLoginTask(
     this.steps.beginNewStep("Cancelling login...")
     return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
-      is AccountLoggingInWaitingForExternalAuthentication -> {
+      is AccountLoggingInWaitingForExternalAuthentication,
+      -> {
         val previous = loginState.previousCredentials
         if (previous != null) {
           this.account.setLoginState(AccountLoggedInStaleCredentials(credentials = previous))
@@ -243,9 +233,10 @@ class ProfileAccountLoginTask(
       is AccountLoggedIn,
       is AccountLoggedInStaleCredentials,
       is AccountLoggingOut,
-      is AccountLogoutFailed -> {
+      is AccountLogoutFailed,
+      -> {
         this.steps.currentStepSucceeded(
-          "Ignored the cancellation attempt because the account wasn't waiting for authentication."
+          "Ignored the cancellation attempt because the account wasn't waiting for authentication.",
         )
         this.steps.finishSuccess(Unit)
       }
@@ -257,7 +248,8 @@ class ProfileAccountLoginTask(
     return when (val loginState = this.account.loginState) {
       is AccountLoggedInStaleCredentials,
       is AccountLoggingIn,
-      is AccountLoggingInWaitingForExternalAuthentication -> {
+      is AccountLoggingInWaitingForExternalAuthentication,
+      -> {
         this.credentials =
           AccountAuthenticationCredentials.SAML2_0(
             accessToken = request.accessToken,
@@ -267,7 +259,7 @@ class ProfileAccountLoginTask(
             cookies = request.cookies,
             annotationsURI = loginState.credentials?.annotationsURI,
             deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI,
-            patronAuthorization = null
+            patronAuthorization = null,
           )
 
         this.handlePatronUserProfile()
@@ -280,9 +272,10 @@ class ProfileAccountLoginTask(
       is AccountLoggingOut,
       is AccountLoginFailed,
       is AccountNotLoggedIn,
-      is AccountLogoutFailed -> {
+      is AccountLogoutFailed,
+      -> {
         this.steps.currentStepSucceeded(
-          "Ignored the authentication token because the account wasn't waiting for one."
+          "Ignored the authentication token because the account wasn't waiting for one.",
         )
         this.steps.finishSuccess(Unit)
       }
@@ -295,8 +288,8 @@ class ProfileAccountLoginTask(
         previousCredentials = this.account.loginState.credentials,
         description = request.description,
         status = "Waiting for authentication...",
-        externalURI = request.description.authenticate
-      )
+        externalURI = request.description.authenticate,
+      ),
     )
     return this.steps.finishSuccess(Unit)
   }
@@ -305,7 +298,8 @@ class ProfileAccountLoginTask(
     this.steps.beginNewStep("Cancelling login...")
     return when (val loginState = this.account.loginState) {
       is AccountLoggingIn,
-      is AccountLoggingInWaitingForExternalAuthentication -> {
+      is AccountLoggingInWaitingForExternalAuthentication,
+      -> {
         val previous = loginState.previousCredentials
         if (previous != null) {
           this.account.setLoginState(AccountLoggedInStaleCredentials(credentials = previous))
@@ -320,9 +314,10 @@ class ProfileAccountLoginTask(
       is AccountLoggedIn,
       is AccountLoggedInStaleCredentials,
       is AccountLoggingOut,
-      is AccountLogoutFailed -> {
+      is AccountLogoutFailed,
+      -> {
         this.steps.currentStepSucceeded(
-          "Ignored the cancellation attempt because the account wasn't waiting for authentication."
+          "Ignored the cancellation attempt because the account wasn't waiting for authentication.",
         )
         this.steps.finishSuccess(Unit)
       }
@@ -334,7 +329,8 @@ class ProfileAccountLoginTask(
     return when (val loginState = this.account.loginState) {
       is AccountLoggedInStaleCredentials,
       is AccountLoggingIn,
-      is AccountLoggingInWaitingForExternalAuthentication -> {
+      is AccountLoggingInWaitingForExternalAuthentication,
+      -> {
         this.credentials =
           AccountAuthenticationCredentials.OpenIDConnect(
             accessToken = request.accessToken,
@@ -342,7 +338,7 @@ class ProfileAccountLoginTask(
             authenticationDescription = this.findCurrentDescription().description,
             annotationsURI = loginState.credentials?.annotationsURI,
             deviceRegistrationURI = loginState.credentials?.deviceRegistrationURI,
-            patronAuthorization = null
+            patronAuthorization = null,
           )
 
         this.handlePatronUserProfile()
@@ -355,9 +351,10 @@ class ProfileAccountLoginTask(
       is AccountLoggingOut,
       is AccountLoginFailed,
       is AccountNotLoggedIn,
-      is AccountLogoutFailed -> {
+      is AccountLogoutFailed,
+      -> {
         this.steps.currentStepSucceeded(
-          "Ignored the authentication token because the account wasn't waiting for one."
+          "Ignored the authentication token because the account wasn't waiting for one.",
         )
         this.steps.finishSuccess(Unit)
       }
@@ -392,7 +389,7 @@ class ProfileAccountLoginTask(
           message = "Connection failed when starting authentication.",
           errorCode = "connectionFailed",
           exception = status.exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw status.exception
       }
@@ -410,7 +407,7 @@ class ProfileAccountLoginTask(
             message = "The server did not provide a Location header for redirecting.",
             errorCode = "locationHeaderMissing",
             exception = null,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           return this.steps.finishFailure()
         }
@@ -421,8 +418,8 @@ class ProfileAccountLoginTask(
             previousCredentials = this.account.loginState.credentials,
             description = request.description,
             status = "Waiting for authentication...",
-            externalURI = locationTarget
-          )
+            externalURI = locationTarget,
+          ),
         )
         return this.steps.finishSuccess(Unit)
       }
@@ -433,8 +430,8 @@ class ProfileAccountLoginTask(
             previousCredentials = this.account.loginState.credentials,
             description = request.description,
             status = "Waiting for authentication...",
-            externalURI = request.description.authenticate
-          )
+            externalURI = request.description.authenticate,
+          ),
         )
         return this.steps.finishSuccess(Unit)
       }
@@ -455,7 +452,7 @@ class ProfileAccountLoginTask(
         adobeCredentials = existingCredentials?.adobeCredentials,
         annotationsURI = existingCredentials?.annotationsURI,
         deviceRegistrationURI = existingCredentials?.deviceRegistrationURI,
-        patronAuthorization = null
+        patronAuthorization = null,
       )
 
     this.handlePatronUserProfile()
@@ -474,8 +471,8 @@ class ProfileAccountLoginTask(
         .setAuthorization(
           LSHTTPAuthorizationBasic.ofUsernamePassword(
             request.username.value,
-            request.password.value
-          )
+            request.password.value,
+          ),
         ).setMethod(Post(ByteArray(0), MIMECompatibility.applicationOctetStream))
         .build()
 
@@ -490,15 +487,15 @@ class ProfileAccountLoginTask(
                 AccountAuthenticationTokenInfo(
                   accessToken =
                     this.getAccessTokenFromBasicTokenResponse(
-                      node = ObjectMapper().readTree(status.bodyStream)
+                      node = ObjectMapper().readTree(status.bodyStream),
                     ),
-                  authURI = authenticationURI
+                  authURI = authenticationURI,
                 ),
               adobeCredentials = null,
               authenticationDescription = request.description.description,
               annotationsURI = null,
               deviceRegistrationURI = null,
-              patronAuthorization = null
+              patronAuthorization = null,
             )
 
           this.handlePatronUserProfile()
@@ -517,7 +514,7 @@ class ProfileAccountLoginTask(
             message = "Connection failed when fetching authentication token.",
             errorCode = "connectionFailed",
             exception = status.exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw status.exception
         }
@@ -545,7 +542,7 @@ class ProfileAccountLoginTask(
         patronParsers = this.patronParsers,
         credentials = this.credentials,
         http = this.http,
-        account = this.account
+        account = this.account,
       )
 
     /*
@@ -558,7 +555,7 @@ class ProfileAccountLoginTask(
           currentCredentials.copy(
             annotationsURI = patronProfile.annotationsURI,
             deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-            patronAuthorization = patronProfile.authorization
+            patronAuthorization = patronProfile.authorization,
           )
         }
 
@@ -566,7 +563,7 @@ class ProfileAccountLoginTask(
           currentCredentials.copy(
             annotationsURI = patronProfile.annotationsURI,
             deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-            patronAuthorization = patronProfile.authorization
+            patronAuthorization = patronProfile.authorization,
           )
         }
 
@@ -574,7 +571,7 @@ class ProfileAccountLoginTask(
           currentCredentials.copy(
             annotationsURI = patronProfile.annotationsURI,
             deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-            patronAuthorization = patronProfile.authorization
+            patronAuthorization = patronProfile.authorization,
           )
         }
 
@@ -582,7 +579,7 @@ class ProfileAccountLoginTask(
           currentCredentials.copy(
             annotationsURI = patronProfile.annotationsURI,
             deviceRegistrationURI = patronProfile.deviceRegistrationURI,
-            patronAuthorization = patronProfile.authorization
+            patronAuthorization = patronProfile.authorization,
           )
         }
       }
@@ -594,45 +591,60 @@ class ProfileAccountLoginTask(
     return when (this.request) {
       is Basic -> {
         (this.account.provider.authentication == this.request.description) ||
-          (this.account.provider.authenticationAlternatives
-            .any { it == this.request.description })
+          (
+            this.account.provider.authenticationAlternatives
+              .any { it == this.request.description }
+          )
       }
 
       is BasicToken -> {
         (this.account.provider.authentication == this.request.description) ||
-          (this.account.provider.authenticationAlternatives
-            .any { it == this.request.description })
+          (
+            this.account.provider.authenticationAlternatives
+              .any { it == this.request.description }
+          )
       }
 
       is SAML20Initiate -> {
         (this.account.provider.authentication == this.request.description) ||
-          (this.account.provider.authenticationAlternatives
-            .any { it == this.request.description })
+          (
+            this.account.provider.authenticationAlternatives
+              .any { it == this.request.description }
+          )
       }
 
       is SAML20Cancel,
-      is SAML20Complete -> {
+      is SAML20Complete,
+      -> {
         this.account.provider.authentication is SAML2_0 ||
-          (this.account.provider.authenticationAlternatives
-            .any { it is SAML2_0 })
+          (
+            this.account.provider.authenticationAlternatives
+              .any { it is SAML2_0 }
+          )
       }
 
       is OIDCCancel -> {
         this.account.provider.authentication is OpenIDConnect ||
-          (this.account.provider.authenticationAlternatives
-            .any { it is OpenIDConnect })
+          (
+            this.account.provider.authenticationAlternatives
+              .any { it is OpenIDConnect }
+          )
       }
 
       is OIDCComplete -> {
         this.account.provider.authentication is OpenIDConnect ||
-          (this.account.provider.authenticationAlternatives
-            .any { it is OpenIDConnect })
+          (
+            this.account.provider.authenticationAlternatives
+              .any { it is OpenIDConnect }
+          )
       }
 
       is OIDCInitiate -> {
         this.account.provider.authentication is OpenIDConnect ||
-          (this.account.provider.authenticationAlternatives
-            .any { it is OpenIDConnect })
+          (
+            this.account.provider.authenticationAlternatives
+              .any { it is OpenIDConnect }
+          )
       }
     }
   }
@@ -644,14 +656,15 @@ class ProfileAccountLoginTask(
       is Basic,
       is BasicToken,
       is OIDCInitiate,
-      is SAML20Initiate -> {
+      is SAML20Initiate,
+      -> {
         this.account.setLoginState(
           AccountLoggingIn(
             status = step.description,
             description = this.findCurrentDescription(),
             cancellable = false,
-            previousCredentials = loginStatePrevious.credentials
-          )
+            previousCredentials = loginStatePrevious.credentials,
+          ),
         )
         true
       }
@@ -659,7 +672,8 @@ class ProfileAccountLoginTask(
       is OIDCCancel,
       is OIDCComplete,
       is SAML20Cancel,
-      is SAML20Complete -> {
+      is SAML20Complete,
+      -> {
         when (this.account.loginState) {
           is AccountLoggingInWaitingForExternalAuthentication -> {
             this.account.setLoginState(
@@ -667,8 +681,8 @@ class ProfileAccountLoginTask(
                 status = step.description,
                 description = this.findCurrentDescription(),
                 cancellable = false,
-                previousCredentials = loginStatePrevious.credentials
-              )
+                previousCredentials = loginStatePrevious.credentials,
+              ),
             )
             true
           }
@@ -679,7 +693,8 @@ class ProfileAccountLoginTask(
           is AccountLoggedIn,
           is AccountLoggedInStaleCredentials,
           is AccountLoggingOut,
-          is AccountLogoutFailed -> {
+          is AccountLogoutFailed,
+          -> {
             this.steps.currentStepSucceeded("Ignored an unexpected completion/cancellation attempt.")
             false
           }
@@ -723,7 +738,8 @@ class ProfileAccountLoginTask(
           is AccountLoggingOut,
           is AccountLoginFailed,
           is AccountNotLoggedIn,
-          is AccountLogoutFailed -> {
+          is AccountLogoutFailed,
+          -> {
             throw NoCurrentDescription()
           }
         }
@@ -748,7 +764,8 @@ class ProfileAccountLoginTask(
           is AccountLoggingOut,
           is AccountLoginFailed,
           is AccountNotLoggedIn,
-          is AccountLogoutFailed -> {
+          is AccountLogoutFailed,
+          -> {
             throw NoCurrentDescription()
           }
         }

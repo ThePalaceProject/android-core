@@ -42,7 +42,7 @@ sealed class AccountAuthenticationViewBindings {
   abstract fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,
     isVisible: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
   )
 
   /**

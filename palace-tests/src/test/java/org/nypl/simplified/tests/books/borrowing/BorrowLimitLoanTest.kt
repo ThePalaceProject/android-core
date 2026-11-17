@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.MockResponse
@@ -38,7 +41,7 @@ import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFile
 import org.nypl.simplified.books.formats.api.StandardFormatNames.opdsAcquisitionFeedEntry
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileType
@@ -140,12 +143,12 @@ class BorrowLimitLoanTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = OPDSAcquisitionFeedEntry.newBuilder(
+        entry = OPDS12FeedConverter.convertEntry(this.accountId, OPDSAcquisitionFeedEntry.newBuilder(
           "x",
           "Title",
           DateTime.now(),
           OPDSAvailabilityLoanable.get()
-        ).build(),
+        ).build()),
         formats = listOf()
       )
 
@@ -171,7 +174,7 @@ class BorrowLimitLoanTest {
       )
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
 
     this.webServer = MockWebServer()
     this.webServer.start(20000)
@@ -202,9 +205,9 @@ class BorrowLimitLoanTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
+      FeedAcquisitionPathElement(opdsAcquisitionFeedEntry, null, emptyMap())
     this.context.currentRemainingOPDSPathElements =
-      listOf(OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
+      listOf(FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap()))
 
     val response =
       MockResponse()

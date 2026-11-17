@@ -20,7 +20,7 @@ class AudioBookLoadingFragment2 : Fragment(R.layout.audio_book_player_loading) {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? {
     val layout =
       inflater.inflate(R.layout.audio_book_player_loading, container, false)

@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.http.refresh_token.revoke
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.content.Context
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
@@ -38,8 +41,7 @@ import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.BookRevokeTask
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
-import org.nypl.simplified.feeds.api.FeedHTTPTransport
-import org.nypl.simplified.feeds.api.FeedLoader
+import org.nypl.simplified.feeds.FeedLoader
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.opds.core.OPDSAcquisition
@@ -191,7 +193,7 @@ class RevokeBookRefreshTokenTest {
         account = this.accountID,
         cover = null,
         thumbnail = null,
-        entry = opdsEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountID, opdsEntry),
         formats = listOf()
       )
     Mockito.`when`(profilesDatabase.currentProfile())
@@ -274,17 +276,11 @@ class RevokeBookRefreshTokenTest {
       OPDSFeedParser.newParser(entryParser)
     val searchParser =
       OPDSSearchParser.newParser()
-    val transport =
-      FeedHTTPTransport(this.httpClient)
-
     val feedLoader =
       FeedLoader.create(
         bookFormatSupport = this.bookFormatSupport,
-        contentResolver = this.contentResolver,
         exec = executorFeeds,
-        parser = parser,
-        searchParser = searchParser,
-        transport = transport
+        http = this.httpClient,
       )
 
     feedLoader.showOnlySupportedBooks = false

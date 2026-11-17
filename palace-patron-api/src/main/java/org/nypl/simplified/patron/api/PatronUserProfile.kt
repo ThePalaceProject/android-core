@@ -13,7 +13,7 @@ data class PatronUserProfile(
   val settings: PatronSettings,
   val links: List<Link>,
   val drm: List<PatronDRM>,
-  val authorization: PatronAuthorization?
+  val authorization: PatronAuthorization?,
 ) {
   /**
    * The annotations link, if one was present.

@@ -11,7 +11,7 @@ interface AccountLogoutStringResourcesType {
 
   fun logoutDeactivatingDeviceAdobeFailed(
     errorCode: String,
-    e: Throwable
+    e: Throwable,
   ): String
 
   /**

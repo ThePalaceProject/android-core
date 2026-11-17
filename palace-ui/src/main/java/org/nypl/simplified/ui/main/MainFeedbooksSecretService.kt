@@ -10,7 +10,7 @@ import java.io.InputStream
 import java.util.Properties
 
 class MainFeedbooksSecretService private constructor(
-  override val configuration: FeedbooksPlayerExtensionConfiguration
+  override val configuration: FeedbooksPlayerExtensionConfiguration,
 ) : AudioBookFeedbooksSecretServiceType {
   companion object {
     private val logger =
@@ -43,8 +43,8 @@ class MainFeedbooksSecretService private constructor(
       return MainFeedbooksSecretService(
         FeedbooksPlayerExtensionConfiguration(
           bearerTokenSecret = decodedSecret,
-          issuerURL = issuerURI
-        )
+          issuerURL = issuerURI,
+        ),
       )
     }
   }

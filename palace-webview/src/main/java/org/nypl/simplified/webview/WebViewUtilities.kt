@@ -31,7 +31,7 @@ object WebViewUtilities {
 
   fun dumpCookiesAsAccountCookies(
     cookieManager: CookieManager,
-    dataDir: File
+    dataDir: File,
   ): List<AccountCookie> {
     cookieManager.flush()
 
@@ -40,7 +40,7 @@ object WebViewUtilities {
         it.getAll().map { webViewCookie ->
           AccountCookie(
             url = webViewCookie.sourceURL,
-            value = webViewCookie.toSetCookieString()
+            value = webViewCookie.toSetCookieString(),
           )
         }
       }
@@ -64,16 +64,22 @@ object WebViewUtilities {
 
   fun formatWebKitTimestampForHTTP(timestamp: Long): String =
     httpDateFormatter.format(
-      webkitTimeToUnixTime(timestamp)
+      webkitTimeToUnixTime(timestamp),
     )
 
   fun setForcedDark(
     settings: WebSettings,
-    configuration: Configuration
+    configuration: Configuration,
   ) {
     if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
       val forceDarkMode =
-        if (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) FORCE_DARK_ON else FORCE_DARK_OFF
+        if (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+          Configuration.UI_MODE_NIGHT_YES
+        ) {
+          FORCE_DARK_ON
+        } else {
+          FORCE_DARK_OFF
+        }
       WebSettingsCompat.setForceDark(settings, forceDarkMode)
     }
   }

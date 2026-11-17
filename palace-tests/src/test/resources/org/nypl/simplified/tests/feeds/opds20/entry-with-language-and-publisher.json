@@ -1,0 +1,22 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:3333333333",
+        "title": "Detailed Book",
+        "languages": ["en"],
+        "publisher": [
+          {"name": "Test Publisher"}
+        ],
+        "description": "A test book description",
+        "duration": 3600.0
+      },
+      "links": []
+    }
+  ]
+}

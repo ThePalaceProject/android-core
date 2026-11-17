@@ -31,14 +31,14 @@ class PalaceBottomSheet :
   private var isOpen = false
 
   constructor(
-    context: Context
+    context: Context,
   ) : super(context) {
     this.initializeLayout(context)
   }
 
   constructor(
     context: Context,
-    attrs: AttributeSet?
+    attrs: AttributeSet?,
   ) : super(context, attrs) {
     this.initializeLayout(context)
   }
@@ -46,7 +46,7 @@ class PalaceBottomSheet :
   constructor(
     context: Context,
     attrs: AttributeSet?,
-    @AttrRes defStyleAttr: Int
+    @AttrRes defStyleAttr: Int,
   ) : super(context, attrs, defStyleAttr) {
     this.initializeLayout(context)
   }
@@ -61,7 +61,7 @@ class PalaceBottomSheet :
    */
 
   private class SwipeGestureListener(
-    private val parent: PalaceBottomSheet
+    private val parent: PalaceBottomSheet,
   ) : SimpleOnGestureListener() {
     private val swipeThreshold = 100
     private val swipeVelocityThreshold = 100
@@ -70,7 +70,7 @@ class PalaceBottomSheet :
       e1: MotionEvent?,
       e2: MotionEvent,
       velocityX: Float,
-      velocityY: Float
+      velocityY: Float,
     ): Boolean {
       if (e1 == null) {
         return false
@@ -98,7 +98,7 @@ class PalaceBottomSheet :
   override fun addView(
     child: View?,
     index: Int,
-    params: ViewGroup.LayoutParams?
+    params: ViewGroup.LayoutParams?,
   ) {
     if (child == null) {
       return
@@ -143,7 +143,7 @@ class PalaceBottomSheet :
 
   override fun drawerSetHandleAccessibilityStrings(
     openHandle: Int,
-    closeHandle: Int
+    closeHandle: Int,
   ) {
     this.handleOpenString =
       this.context.getString(openHandle)
@@ -192,7 +192,7 @@ class PalaceBottomSheet :
     left: Int,
     top: Int,
     right: Int,
-    bottom: Int
+    bottom: Int,
   ) {
     super.onLayout(changed, left, top, right, bottom)
 

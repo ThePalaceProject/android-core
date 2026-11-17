@@ -49,7 +49,8 @@ class SettingsDebugMenuRegistryFragment :
       override fun fragment(): SettingsDebugMenuRegistryFragment = SettingsDebugMenuRegistryFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuRegistryFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuRegistryFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -77,7 +78,7 @@ class SettingsDebugMenuRegistryFragment :
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -138,7 +139,7 @@ class SettingsDebugMenuRegistryFragment :
             // Don't care.
           }
         }
-      }
+      },
     )
 
     this.registryRefreshFull.setOnClickListener {
@@ -146,14 +147,14 @@ class SettingsDebugMenuRegistryFragment :
         AccountProviderRegistryRefresh.Full(
           clearBeforeRefresh = true,
           includeTestingLibraries = SettingsDebugModel.showTestingLibraries(),
-        )
+        ),
       )
     }
     this.registryRefreshIncremental.setOnClickListener {
       registry.refreshAsync(
         AccountProviderRegistryRefresh.Incremental(
           includeTestingLibraries = SettingsDebugModel.showTestingLibraries(),
-        )
+        ),
       )
     }
     this.debugRegistryQALibraries.setOnCheckedChangeListener { _, checked ->
@@ -162,7 +163,7 @@ class SettingsDebugMenuRegistryFragment :
         AccountProviderRegistryRefresh.Full(
           clearBeforeRefresh = true,
           includeTestingLibraries = checked,
-        )
+        ),
       )
     }
 
@@ -181,7 +182,7 @@ class SettingsDebugMenuRegistryFragment :
           s: CharSequence?,
           start: Int,
           count: Int,
-          after: Int
+          after: Int,
         ) {
           // Nothing required.
         }
@@ -190,7 +191,7 @@ class SettingsDebugMenuRegistryFragment :
           s: CharSequence?,
           start: Int,
           before: Int,
-          count: Int
+          count: Int,
         ) {
           this@SettingsDebugMenuRegistryFragment.update { over ->
             if (over != null) {
@@ -200,7 +201,7 @@ class SettingsDebugMenuRegistryFragment :
             }
           }
         }
-      }
+      },
     )
 
     this.libraryRegistryOverridePath.addTextChangedListener(
@@ -213,7 +214,7 @@ class SettingsDebugMenuRegistryFragment :
           s: CharSequence?,
           start: Int,
           count: Int,
-          after: Int
+          after: Int,
         ) {
           // Nothing required.
         }
@@ -222,7 +223,7 @@ class SettingsDebugMenuRegistryFragment :
           s: CharSequence?,
           start: Int,
           before: Int,
-          count: Int
+          count: Int,
         ) {
           this@SettingsDebugMenuRegistryFragment.update { over ->
             if (over != null) {
@@ -232,7 +233,7 @@ class SettingsDebugMenuRegistryFragment :
             }
           }
         }
-      }
+      },
     )
 
     this.libraryRegistryOverrideParameters.addTextChangedListener(
@@ -245,7 +246,7 @@ class SettingsDebugMenuRegistryFragment :
           s: CharSequence?,
           start: Int,
           count: Int,
-          after: Int
+          after: Int,
         ) {
           // Nothing required.
         }
@@ -254,17 +255,22 @@ class SettingsDebugMenuRegistryFragment :
           s: CharSequence?,
           start: Int,
           before: Int,
-          count: Int
+          count: Int,
         ) {
           this@SettingsDebugMenuRegistryFragment.update { over ->
             if (over != null) {
-              over.copy(queryParameters = this@SettingsDebugMenuRegistryFragment.libraryRegistryOverrideParameters.text.toString())
+              over.copy(
+                queryParameters =
+                  this@SettingsDebugMenuRegistryFragment
+                    .libraryRegistryOverrideParameters.text
+                    .toString(),
+              )
             } else {
               AccountProviderRegistryOverride("", "", "")
             }
           }
         }
-      }
+      },
     )
 
     this.libraryRegistryClear.setOnClickListener {
@@ -311,7 +317,7 @@ class SettingsDebugMenuRegistryFragment :
   @UiThread
   private fun updateRegistryStatus(
     status: AccountProviderRegistryStatus,
-    registry: AccountProviderRegistryType
+    registry: AccountProviderRegistryType,
   ) {
     val descriptions =
       registry.accountProviderDescriptions()
@@ -380,8 +386,8 @@ class SettingsDebugMenuRegistryFragment :
           body = result.message,
           subject = "[palace-error-report] $appVersion",
           attributes = result.attributes.toSortedMap(),
-          taskSteps = result.steps
-        )
+          taskSteps = result.steps,
+        ),
     )
   }
 

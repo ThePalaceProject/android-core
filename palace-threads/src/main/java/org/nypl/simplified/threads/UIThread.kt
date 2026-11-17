@@ -54,7 +54,8 @@ object UIThread : Executor {
             caller.className,
             caller.methodName,
             caller.lineNumber,
-            e)
+            e,
+          )
         }
       }
 

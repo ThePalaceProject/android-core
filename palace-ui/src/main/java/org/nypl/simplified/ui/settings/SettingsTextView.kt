@@ -15,7 +15,7 @@ class SettingsTextView
   constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
   ) : FrameLayout(context, attrs, defStyleAttr) {
     private val icon: ImageView
     val textSummary: TextView
@@ -41,7 +41,10 @@ class SettingsTextView
 
       val a =
         context.theme.obtainStyledAttributes(
-          attrs, R.styleable.SettingsTextView, defStyleAttr, 0
+          attrs,
+          R.styleable.SettingsTextView,
+          defStyleAttr,
+          0,
         )
 
       try {

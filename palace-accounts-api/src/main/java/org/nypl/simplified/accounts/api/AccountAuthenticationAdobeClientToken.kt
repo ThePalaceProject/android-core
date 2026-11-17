@@ -10,7 +10,7 @@ package org.nypl.simplified.accounts.api
 data class AccountAuthenticationAdobeClientToken(
   val userName: String,
   val password: String,
-  val rawToken: String
+  val rawToken: String,
 ) {
   companion object {
     /**
@@ -23,7 +23,7 @@ data class AccountAuthenticationAdobeClientToken(
       return AccountAuthenticationAdobeClientToken(
         userName = username,
         password = password,
-        rawToken = raw
+        rawToken = raw,
       )
     }
   }

@@ -6,11 +6,11 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.data.DataFetcher
 
 class DataURIDataFetcher(
-  private val bitmap: Bitmap
+  private val bitmap: Bitmap,
 ) : DataFetcher<Bitmap> {
   override fun loadData(
     priority: Priority,
-    callback: DataFetcher.DataCallback<in Bitmap>
+    callback: DataFetcher.DataCallback<in Bitmap>,
   ) {
     callback.onDataReady(bitmap)
   }

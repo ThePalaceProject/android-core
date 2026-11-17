@@ -10,7 +10,7 @@ class NotificationsService(
   private val context: Context,
   private val notificationResources: NotificationResourcesType,
   httpCalls: NotificationTokenHTTPCallsType,
-  profilesController: ProfilesControllerType
+  profilesController: ProfilesControllerType,
 ) : NotificationsServiceType {
   private val logger =
     LoggerFactory.getLogger(NotificationsService::class.java)
@@ -43,7 +43,7 @@ class NotificationsService(
           NotificationChannel(
             channelDescription.id,
             channelDescription.name,
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_DEFAULT,
           )
 
         channelInfo.description = channelDescription.description

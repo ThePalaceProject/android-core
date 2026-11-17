@@ -77,7 +77,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
   fun passphrase(): String =
     this.passphrase
       ?: throw IllegalStateException(
-        "Please provide a passphrase to the LCPContentProtectionProvider before use!"
+        "Please provide a passphrase to the LCPContentProtectionProvider before use!",
       )
 
   private val logger =
@@ -85,7 +85,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
 
   private suspend fun askPassphrase(
     context: Context,
-    hint: String
+    hint: String,
   ): String? {
     val view = LayoutInflater.from(context).inflate(R.layout.view_manual_lcp_passphrase, null)
     val inputPassphrase = view.findViewById<TextView>(R.id.inputPassphrase)
@@ -143,7 +143,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
     val lcpService =
       LcpService(
         context = context,
-        assetRetriever = assetRetriever
+        assetRetriever = assetRetriever,
       )
 
     return if (lcpService == null) {
@@ -155,12 +155,12 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
           override suspend fun retrievePassphrase(
             license: LcpAuthenticating.AuthenticatedLicense,
             reason: LcpAuthenticating.AuthenticationReason,
-            allowUserInteraction: Boolean
+            allowUserInteraction: Boolean,
           ): String? {
             logger.debug(
               "Retrieving passphrase: {} (allowUserInteraction: {})",
               reason,
-              isLCPManualPassphraseEnabled
+              isLCPManualPassphraseEnabled,
             )
 
             if (!isLCPManualPassphraseEnabled) {
@@ -171,7 +171,7 @@ class LCPContentProtectionProvider : ContentProtectionProvider {
               this@LCPContentProtectionProvider.askPassphrase(context, license.hint)
             }
           }
-        }
+        },
       )
     }
   }

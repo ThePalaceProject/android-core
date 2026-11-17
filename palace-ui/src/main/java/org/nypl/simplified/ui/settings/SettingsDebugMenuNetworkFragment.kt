@@ -30,7 +30,8 @@ class SettingsDebugMenuNetworkFragment :
       override fun fragment(): SettingsDebugMenuNetworkFragment = SettingsDebugMenuNetworkFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuNetworkFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuNetworkFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -48,7 +49,7 @@ class SettingsDebugMenuNetworkFragment :
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -89,7 +90,7 @@ class SettingsDebugMenuNetworkFragment :
             // Don't care
           }
         }
-      }
+      },
     )
     this.subscriptions.add(
       networkAccess.cellularAvailable.subscribe { _, now ->
@@ -104,7 +105,7 @@ class SettingsDebugMenuNetworkFragment :
             // Don't care
           }
         }
-      }
+      },
     )
     this.subscriptions.add(
       networkAccess.wifiPermitted.subscribe { _, now ->
@@ -119,7 +120,7 @@ class SettingsDebugMenuNetworkFragment :
             // Don't care
           }
         }
-      }
+      },
     )
     this.subscriptions.add(
       networkAccess.wifiAvailable.subscribe { _, now ->
@@ -134,7 +135,7 @@ class SettingsDebugMenuNetworkFragment :
             // Don't care
           }
         }
-      }
+      },
     )
   }
 

@@ -19,7 +19,7 @@ internal class DocumentStore private constructor(
   override val eula: EULAType?,
   override val licenses: DocumentType?,
   override val privacyPolicy: DocumentType?,
-  override val faq: DocumentType?
+  override val faq: DocumentType?,
 ) : DocumentStoreType {
   companion object {
     private val logger =
@@ -29,14 +29,14 @@ internal class DocumentStore private constructor(
       assetManager: AssetManager,
       http: LSHTTPClientType,
       baseDirectory: File,
-      configuration: DocumentConfigurationServiceType
+      configuration: DocumentConfigurationServiceType,
     ): DocumentStoreType {
       val about =
         this.documentForMaybe(
           assetManager = assetManager,
           http = http,
           baseDirectory = baseDirectory,
-          config = configuration.about
+          config = configuration.about,
         )
 
       val acknowledgements =
@@ -44,7 +44,7 @@ internal class DocumentStore private constructor(
           assetManager = assetManager,
           http = http,
           baseDirectory = baseDirectory,
-          config = configuration.acknowledgements
+          config = configuration.acknowledgements,
         )
 
       val eula =
@@ -52,7 +52,7 @@ internal class DocumentStore private constructor(
           assetManager = assetManager,
           http = http,
           baseDirectory = baseDirectory,
-          config = configuration.eula
+          config = configuration.eula,
         )
 
       val licenses =
@@ -60,7 +60,7 @@ internal class DocumentStore private constructor(
           assetManager = assetManager,
           http = http,
           baseDirectory = baseDirectory,
-          config = configuration.licenses
+          config = configuration.licenses,
         )
 
       val privacyPolicy =
@@ -68,7 +68,7 @@ internal class DocumentStore private constructor(
           assetManager = assetManager,
           http = http,
           baseDirectory = baseDirectory,
-          config = configuration.privacyPolicy
+          config = configuration.privacyPolicy,
         )
 
       val faq =
@@ -76,7 +76,7 @@ internal class DocumentStore private constructor(
           assetManager = assetManager,
           http = http,
           baseDirectory = baseDirectory,
-          config = configuration.faq
+          config = configuration.faq,
         )
 
       return DocumentStore(
@@ -85,7 +85,7 @@ internal class DocumentStore private constructor(
         eula = eula,
         licenses = licenses,
         privacyPolicy = privacyPolicy,
-        faq = faq
+        faq = faq,
       )
     }
 
@@ -93,7 +93,7 @@ internal class DocumentStore private constructor(
       assetManager: AssetManager,
       http: LSHTTPClientType,
       baseDirectory: File,
-      config: DocumentConfiguration?
+      config: DocumentConfiguration?,
     ): EULAType? =
       config?.let {
         this.eulaFor(assetManager, http, baseDirectory, config)
@@ -103,7 +103,7 @@ internal class DocumentStore private constructor(
       assetManager: AssetManager,
       http: LSHTTPClientType,
       baseDirectory: File,
-      config: DocumentConfiguration
+      config: DocumentConfiguration,
     ): EULAType {
       this.logger.debug("eula {} ({})", config.name, config.remoteURI)
 
@@ -116,7 +116,7 @@ internal class DocumentStore private constructor(
           file = File(baseDirectory, config.name),
           fileTmp = File(baseDirectory, config.name + ".tmp"),
           fileAgreed = File(baseDirectory, "eula_agreed.dat"),
-          remoteURL = config.remoteURI.toURL()
+          remoteURL = config.remoteURI.toURL(),
         )
       } else {
         EULA(
@@ -125,7 +125,7 @@ internal class DocumentStore private constructor(
           file = null,
           fileTmp = null,
           fileAgreed = File(baseDirectory, "eula_agreed.dat"),
-          remoteURL = config.remoteURI.toURL()
+          remoteURL = config.remoteURI.toURL(),
         )
       }
     }
@@ -134,7 +134,7 @@ internal class DocumentStore private constructor(
       assetManager: AssetManager,
       http: LSHTTPClientType,
       baseDirectory: File,
-      config: DocumentConfiguration?
+      config: DocumentConfiguration?,
     ): DocumentType? =
       config?.let {
         this.documentFor(assetManager, http, baseDirectory, config)
@@ -144,7 +144,7 @@ internal class DocumentStore private constructor(
       assetManager: AssetManager,
       http: LSHTTPClientType,
       baseDirectory: File,
-      config: DocumentConfiguration
+      config: DocumentConfiguration,
     ): DocumentType {
       this.logger.debug("plain document {} ({})", config.name, config.remoteURI)
 
@@ -156,7 +156,7 @@ internal class DocumentStore private constructor(
           },
           file = File(baseDirectory, config.name),
           fileTmp = File(baseDirectory, config.name + ".tmp"),
-          remoteURL = config.remoteURI.toURL()
+          remoteURL = config.remoteURI.toURL(),
         )
       } else {
         PlainDocument(
@@ -164,7 +164,7 @@ internal class DocumentStore private constructor(
           initialStreams = null,
           file = null,
           fileTmp = null,
-          remoteURL = config.remoteURI.toURL()
+          remoteURL = config.remoteURI.toURL(),
         )
       }
     }
@@ -177,13 +177,13 @@ internal class DocumentStore private constructor(
         this.updateOne(executor, this.acknowledgements),
         this.updateOne(executor, this.eula),
         this.updateOne(executor, this.licenses),
-        this.updateOne(executor, this.privacyPolicy)
-      )
+        this.updateOne(executor, this.privacyPolicy),
+      ),
     )
 
   private fun updateOne(
     executor: ListeningExecutorService,
-    document: DocumentType?
+    document: DocumentType?,
   ): ListenableFuture<*> =
     executor.submit {
       try {

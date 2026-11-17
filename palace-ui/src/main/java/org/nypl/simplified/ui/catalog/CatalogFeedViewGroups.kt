@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.librarysimplified.ui.R
 import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedFacets
 import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.thepalaceproject.theme.core.PalaceTabButtons
@@ -53,11 +54,11 @@ class CatalogFeedViewGroups(
     (this.listView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     this.listView.setItemViewCacheSize(8)
     this.listView.addItemDecoration(
-      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt())
+      CatalogFeedWithGroupsDecorator(this.screenSize.dpToPixels(16).toInt()),
     )
   }
 
-  fun configureTabs(feed: Feed.FeedWithGroups) {
+  fun configureTabs(feed: FeedDataWithGroups) {
     val facetGroup =
       FeedFacets.findEntryPointFacetGroup(feed.facetsByGroup)
 
@@ -70,7 +71,7 @@ class CatalogFeedViewGroups(
     PalaceTabButtons.configureGroup(
       context = this.root.context,
       group = this.tabs,
-      count = facetGroup.size
+      count = facetGroup.size,
     ) { index, button ->
       val facet = facetGroup[index]
       button.maxLines = Integer.MAX_VALUE
@@ -101,7 +102,7 @@ class CatalogFeedViewGroups(
 
   private fun updateSelectedFacet(
     facetTabs: RadioGroup,
-    index: Int
+    index: Int,
   ) {
     facetTabs.clearCheck()
     val button = facetTabs.getChildAt(index) as RadioButton

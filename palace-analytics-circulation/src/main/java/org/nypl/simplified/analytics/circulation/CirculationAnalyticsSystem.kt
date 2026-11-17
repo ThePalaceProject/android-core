@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService
 
 class CirculationAnalyticsSystem(
   private val configuration: AnalyticsConfiguration,
-  private val executor: ExecutorService
+  private val executor: ExecutorService,
 ) : AnalyticsSystem {
   private val logger =
     LoggerFactory.getLogger(CirculationAnalyticsSystem::class.java)
@@ -44,7 +44,7 @@ class CirculationAnalyticsSystem(
   private fun postURI(
     onAccessTokenUpdated: (String?) -> Unit,
     target: URI,
-    credentials: AccountAuthenticationCredentials?
+    credentials: AccountAuthenticationCredentials?,
   ) {
     val request =
       this.configuration.http

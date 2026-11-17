@@ -29,7 +29,7 @@ class ViewsForBasic(
   val onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit,
   val loginButton: Button,
   val logoutButton: Button,
-  val resetPasswordLabel: TextView
+  val resetPasswordLabel: TextView,
 ) : AccountAuthenticationViewBindings() {
   private val logger = LoggerFactory.getLogger(ViewsForBasic::class.java)
 
@@ -40,9 +40,9 @@ class ViewsForBasic(
       onChanged = { _, _, _, _ ->
         this.onUsernamePasswordChangeListener.invoke(
           AccountUsername(this.user.text.toString()),
-          AccountPassword(this.pass.text.toString())
+          AccountPassword(this.pass.text.toString()),
         )
-      }
+      },
     )
 
   private val passTextListener =
@@ -56,9 +56,9 @@ class ViewsForBasic(
 
         this.onUsernamePasswordChangeListener.invoke(
           AccountUsername(this.user.text.toString()),
-          AccountPassword(this.pass.text.toString())
+          AccountPassword(this.pass.text.toString()),
         )
-      }
+      },
     )
 
   init {
@@ -103,7 +103,7 @@ class ViewsForBasic(
 
   private fun setVisibility(
     view: View,
-    v: Int
+    v: Int,
   ) {
     if (view.visibility != v) {
       view.visibility = v
@@ -179,15 +179,16 @@ class ViewsForBasic(
   override fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,
     isVisible: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
   ) {
     this.resetPasswordLabel.setOnClickListener {
       onClick()
     }
-    this.resetPasswordLabel.isVisible = isVisible && (
-      status is AccountLoginButtonStatus.AsLoginButtonEnabled ||
-        status is AccountLoginButtonStatus.AsLoginButtonDisabled
-    )
+    this.resetPasswordLabel.isVisible = isVisible &&
+      (
+        status is AccountLoginButtonStatus.AsLoginButtonEnabled ||
+          status is AccountLoginButtonStatus.AsLoginButtonDisabled
+      )
   }
 
   override fun blank() {
@@ -196,7 +197,7 @@ class ViewsForBasic(
 
   fun setUserAndPass(
     user: String,
-    password: String
+    password: String,
   ) {
     this.user.setText(user, TextView.BufferType.EDITABLE)
     this.pass.setText(password, TextView.BufferType.EDITABLE)
@@ -225,7 +226,7 @@ class ViewsForBasic(
     this.showPass.text =
       res.getString(
         R.string.accountPasswordShow,
-        (description.labels["PASSWORD"] ?: res.getString(R.string.accountPassword))
+        (description.labels["PASSWORD"] ?: res.getString(R.string.accountPassword)),
       )
 
     // Set input types
@@ -233,7 +234,8 @@ class ViewsForBasic(
     this.user.inputType =
       when (description.keyboard) {
         AccountProviderAuthenticationDescription.KeyboardInput.DEFAULT,
-        AccountProviderAuthenticationDescription.KeyboardInput.NO_INPUT -> {
+        AccountProviderAuthenticationDescription.KeyboardInput.NO_INPUT,
+        -> {
           InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
         }
 
@@ -251,7 +253,8 @@ class ViewsForBasic(
       when (description.passwordKeyboard) {
         AccountProviderAuthenticationDescription.KeyboardInput.DEFAULT,
         AccountProviderAuthenticationDescription.KeyboardInput.NO_INPUT,
-        AccountProviderAuthenticationDescription.KeyboardInput.EMAIL_ADDRESS -> {
+        AccountProviderAuthenticationDescription.KeyboardInput.EMAIL_ADDRESS,
+        -> {
           InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
 
@@ -276,20 +279,20 @@ class ViewsForBasic(
     AccountPassword(
       this.pass.text
         .toString()
-        .trim()
+        .trim(),
     )
 
   fun getUser(): AccountUsername =
     AccountUsername(
       this.user.text
         .toString()
-        .trim()
+        .trim(),
     )
 
   companion object {
     fun bind(
       viewGroup: ViewGroup,
-      onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit
+      onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit,
     ): ViewsForBasic =
       ViewsForBasic(
         viewGroup = viewGroup,
@@ -301,7 +304,7 @@ class ViewsForBasic(
         onUsernamePasswordChangeListener = onUsernamePasswordChangeListener,
         loginButton = viewGroup.findViewById(R.id.authBasicLogin),
         logoutButton = viewGroup.findViewById(R.id.authBasicLogout),
-        resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel)
+        resetPasswordLabel = viewGroup.findViewById(R.id.resetPasswordLabel),
       )
   }
 }

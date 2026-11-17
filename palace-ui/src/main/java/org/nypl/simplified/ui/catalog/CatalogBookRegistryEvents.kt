@@ -13,13 +13,13 @@ import org.nypl.simplified.ui.events.UISubjectRelay
 
 class CatalogBookRegistryEvents private constructor(
   val registry: BookRegistryReadableType,
-  private val relay: UISubjectRelay<BookStatusEvent>
+  private val relay: UISubjectRelay<BookStatusEvent>,
 ) {
   companion object {
     fun create(bookRegistry: BookRegistryType): CatalogBookRegistryEvents =
       CatalogBookRegistryEvents(
         bookRegistry,
-        UISubjectRelay.create(bookRegistry.bookEvents())
+        UISubjectRelay.create(bookRegistry.bookEvents()),
       )
   }
 

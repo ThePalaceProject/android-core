@@ -10,6 +10,6 @@ object BookmarkService : BookmarkServiceProviderType {
       threads = requirements.threads,
       httpCalls = requirements.httpCalls,
       bookmarkEventsOut = requirements.events,
-      profilesController = requirements.profilesController
+      profilesController = requirements.profilesController,
     )
 }

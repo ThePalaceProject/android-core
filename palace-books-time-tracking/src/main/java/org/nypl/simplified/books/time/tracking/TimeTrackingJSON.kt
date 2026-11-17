@@ -38,7 +38,8 @@ object TimeTrackingJSON {
     return node
   }
 
-  fun serializeToBytes(request: TimeTrackingRequest): ByteArray = this.objectMapper.writeValueAsBytes(serializeRequest(request))
+  fun serializeToBytes(request: TimeTrackingRequest): ByteArray =
+    this.objectMapper.writeValueAsBytes(serializeRequest(request))
 
   @Throws(JSONParseException::class)
   fun deserializeResponse(data: ByteArray): TimeTrackingServerResponse {
@@ -50,7 +51,7 @@ object TimeTrackingJSON {
 
       else -> {
         throw JSONParseException(
-          "Server returned an unparseable JSON response (expected Object, but got ${r.javaClass})"
+          "Server returned an unparseable JSON response (expected Object, but got ${r.javaClass})",
         )
       }
     }
@@ -67,8 +68,8 @@ object TimeTrackingJSON {
         TimeTrackingServerResponseEntry(
           id = responseNode.get(this.NODE_ID).asText(),
           message = responseNode.get(this.NODE_MESSAGE).asText(),
-          status = responseNode.get(this.NODE_STATUS).asInt()
-        )
+          status = responseNode.get(this.NODE_STATUS).asInt(),
+        ),
       )
     }
 
@@ -79,12 +80,12 @@ object TimeTrackingJSON {
       TimeTrackingServerResponseSummary(
         failures = JSONParserUtilities.getInteger(summaryNode, this.NODE_FAILURES),
         successes = JSONParserUtilities.getInteger(summaryNode, this.NODE_SUCCESSES),
-        total = JSONParserUtilities.getInteger(summaryNode, this.NODE_TOTAL)
+        total = JSONParserUtilities.getInteger(summaryNode, this.NODE_TOTAL),
       )
 
     return TimeTrackingServerResponse(
       summary = summary,
-      responses = responses.toList()
+      responses = responses.toList(),
     )
   }
 }

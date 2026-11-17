@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.book_database
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import android.content.Context
 import org.joda.time.DateTime
@@ -31,7 +34,9 @@ import org.nypl.simplified.opds.core.OPDSAcquisition
 import org.nypl.simplified.opds.core.OPDSAcquisition.Relation.ACQUISITION_BORROW
 import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
+import org.nypl.simplified.feeds.opds12.FeedEntryParser
 import org.nypl.simplified.opds.core.OPDSJSONParser
+import org.nypl.simplified.feeds.opds12.FeedEntrySerializer
 import org.nypl.simplified.opds.core.OPDSJSONSerializer
 import org.nypl.simplified.tests.books.BookFormatsTesting
 import org.slf4j.LoggerFactory
@@ -73,8 +78,8 @@ abstract class BookDatabasePDFContract {
 
   @Test
   fun testEntryLastReadLocation() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val bookDatabase = BookDatabase.open(
       context = context(),
@@ -89,7 +94,7 @@ abstract class BookDatabasePDFContract {
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookIDs.newFromText("abcd")
 
-    val databaseEntry: BookDatabaseEntryType = bookDatabase.createOrUpdate(bookID, feedEntry)
+    val databaseEntry: BookDatabaseEntryType = bookDatabase.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle =
@@ -130,8 +135,8 @@ abstract class BookDatabasePDFContract {
 
   @Test
   fun testEntryDRM() {
-    val parser = OPDSJSONParser.newParser()
-    val serializer = OPDSJSONSerializer.newSerializer()
+    val parser = FeedEntryParser(OPDSJSONParser.newParser())
+    val serializer = FeedEntrySerializer(OPDSJSONSerializer.newSerializer())
     val directory = DirectoryUtilities.directoryCreateTemporary()
     val database0 = BookDatabase.open(
       context = context(),
@@ -145,7 +150,7 @@ abstract class BookDatabasePDFContract {
 
     val feedEntry: OPDSAcquisitionFeedEntry = this.acquisitionFeedEntryWithPDF()
     val bookID = BookIDs.newFromText("abcd")
-    val entry = database0.createOrUpdate(bookID, feedEntry)
+    val entry = database0.createOrUpdate(bookID, OPDS12FeedConverter.convertEntry(this.accountID, feedEntry))
 
     this.run {
       val formatHandle = entry.findFormatHandle(BookDatabaseEntryFormatHandlePDF::class.java)!!

@@ -12,5 +12,5 @@ import org.nypl.simplified.links.Link
 data class OPDSAcquisitionPathElement(
   val mimeType: MIMEType,
   val target: Link?,
-  val properties: Map<String, String>
+  val properties: Map<String, String>,
 )

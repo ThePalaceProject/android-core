@@ -37,7 +37,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean =
       if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, lcpLicenseFiles)) {
         val next = remaining.firstOrNull()
@@ -67,12 +67,12 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
   private data class DownloadedManifest(
     val manifestURI: URI?,
     val manifestData: ByteArray,
-    val licenseData: ByteArray
+    val licenseData: ByteArray,
   )
 
   private fun fulfill(
     context: BorrowContextType,
-    passphrase: String
+    passphrase: String,
   ): DownloadedManifest {
     context.taskRecorder.beginNewStep("Executing audio book manifest strategy...")
 
@@ -87,7 +87,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
           services = context.services,
           target = AudioBookLink.License(context.currentURICheck()),
           palaceID = PlayerPalaceID(context.bookCurrent.entry.id),
-        )
+        ),
       )
 
     val subscription =
@@ -96,7 +96,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
           message = message,
           receivedSize = 50L,
           expectedSize = 100L,
-          bytesPerSecond = 0L
+          bytesPerSecond = 0L,
         )
       }
 
@@ -113,7 +113,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
               "Download succeeded, but no LCP license was provided!",
               audioStrategyFailed,
               exception = exception,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
             throw exception
           }
@@ -128,7 +128,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
           DownloadedManifest(
             manifestURI = result.result.fulfilled.source,
             manifestData = result.result.fulfilled.data,
-            licenseData = licenseBytes
+            licenseData = licenseBytes,
           )
         }
 
@@ -141,7 +141,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
             message = "Strategy failed.",
             errorCode = audioStrategyFailed,
             exception = exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw exception
         }
@@ -154,7 +154,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
   private fun saveFulfilledBook(
     context: BorrowContextType,
     passphrase: String,
-    manifest: DownloadedManifest
+    manifest: DownloadedManifest,
   ) {
     context.taskRecorder.beginNewStep("Saving fulfilled book...")
 
@@ -168,14 +168,15 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
       is BookDatabaseEntryFormatHandleAudioBook -> {
         formatHandle.copyInManifestAndURI(
           data = manifest.manifestData,
-          manifestURI = manifest.manifestURI
+          manifestURI = manifest.manifestURI,
         )
         context.taskRecorder.currentStepSucceeded("Saved book.")
         context.bookDownloadSucceeded()
       }
 
       is BookDatabaseEntryFormatHandleEPUB,
-      is BookDatabaseEntryFormatHandlePDF -> {
+      is BookDatabaseEntryFormatHandlePDF,
+      -> {
         throw UnreachableCodeException()
       }
     }
@@ -194,7 +195,7 @@ class BorrowLCPAudiobook : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "No format handle available for ${eventualType.fullType}",
         errorCode = BorrowErrorCodes.noFormatHandle,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }

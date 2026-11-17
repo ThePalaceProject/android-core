@@ -29,7 +29,7 @@ object CatalogSAML20Model {
   init {
     MainAttributes.wrapAttribute(
       source = this.borrowStateAttribute,
-      target = this.webViewCommandAttributeUI
+      target = this.webViewCommandAttributeUI,
     )
   }
 
@@ -42,7 +42,7 @@ object CatalogSAML20Model {
   fun start(
     account: AccountType,
     book: BookID,
-    downloadURI: URI
+    downloadURI: URI,
   ) {
     val services =
       Services.serviceDirectory()
@@ -65,13 +65,13 @@ object CatalogSAML20Model {
         downloadURI = downloadURI,
         account = account,
         webViewDataDir = webViewDataDir,
-        startURL = downloadURI.toString()
+        startURL = downloadURI.toString(),
       )
   }
 
   fun onDownloadStarted(
     downloadURL: String?,
-    mimeType: String?
+    mimeType: String?,
   ) {
     this.logger.debug("WebView reported download started.")
 
@@ -91,8 +91,8 @@ object CatalogSAML20Model {
     this.borrowStateAttribute.set(
       CatalogSAML20BorrowState.MakeRequest(
         url = url,
-        headers = emptyMap()
-      )
+        headers = emptyMap(),
+      ),
     )
   }
 }

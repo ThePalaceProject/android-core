@@ -5,7 +5,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.borrowing.SAMLDownloadContext
 import org.nypl.simplified.feeds.api.FeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.taskrecorder.api.TaskResult
 
 /**
@@ -24,8 +24,8 @@ interface BooksControllerType {
   fun bookBorrow(
     accountID: AccountID,
     bookID: BookID,
-    entry: OPDSAcquisitionFeedEntry,
-    samlDownloadContext: SAMLDownloadContext? = null
+    entry: FeedEntryBook,
+    samlDownloadContext: SAMLDownloadContext? = null,
   ): FluentFuture<TaskResult<*>>
 
   /**
@@ -37,7 +37,7 @@ interface BooksControllerType {
 
   fun bookBorrowFailedDismiss(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   )
 
   /**
@@ -49,7 +49,7 @@ interface BooksControllerType {
 
   fun bookCancelDownloadAndDelete(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): FluentFuture<TaskResult<Unit>>
 
   /**
@@ -62,8 +62,8 @@ interface BooksControllerType {
 
   fun bookReport(
     accountID: AccountID,
-    feedEntry: FeedEntry.FeedEntryOPDS,
-    reportType: String
+    feedEntry: FeedEntryBook,
+    reportType: String,
   ): FluentFuture<TaskResult<Unit>>
 
   /**
@@ -95,7 +95,7 @@ interface BooksControllerType {
 
   fun bookDelete(
     accountID: AccountID,
-    bookId: BookID
+    bookId: BookID,
   ): FluentFuture<TaskResult<Unit>>
 
   /**
@@ -107,6 +107,6 @@ interface BooksControllerType {
 
   fun bookRevokeFailedDismiss(
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): FluentFuture<TaskResult<Unit>>
 }

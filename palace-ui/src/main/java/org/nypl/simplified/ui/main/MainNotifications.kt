@@ -13,9 +13,9 @@ object MainNotifications {
       arrayOf(
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
       ),
-      1000
+      1000,
     )
   }
 
@@ -23,7 +23,7 @@ object MainNotifications {
     val notificationsOk =
       ContextCompat.checkSelfPermission(
         activity,
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
       ) == PackageManager.PERMISSION_GRANTED
 
     val foregroundOk =

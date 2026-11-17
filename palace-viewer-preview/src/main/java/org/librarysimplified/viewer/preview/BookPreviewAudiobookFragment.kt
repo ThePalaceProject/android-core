@@ -26,6 +26,7 @@ import org.joda.time.Duration
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -41,25 +42,20 @@ class BookPreviewAudiobookFragment :
   private lateinit var imageLoader: ImageLoader2Type
 
   companion object {
-    private const val BUNDLE_EXTRA_FILE =
-      "org.librarysimplified.viewer.preview.BookPreviewAudiobookFragment.file"
-
-    private const val BUNDLE_EXTRA_FEED_ENTRY =
-      "org.librarysimplified.viewer.preview.BookPreviewAudiobookFragment.entry"
-
     private const val PLAYER_MOVE_THRESHOLD = 30000L
 
     fun newInstance(
       file: File,
-      feedEntry: FeedEntry.FeedEntryOPDS
-    ): BookPreviewAudiobookFragment =
-      BookPreviewAudiobookFragment().apply {
-        this.arguments =
-          Bundle().apply {
-            this.putSerializable(this@Companion.BUNDLE_EXTRA_FILE, file)
-            this.putSerializable(this@Companion.BUNDLE_EXTRA_FEED_ENTRY, feedEntry)
-          }
+      feedEntry: FeedEntryBook,
+    ): BookPreviewAudiobookFragment {
+      return BookPreviewAudiobookFragment().apply {
+        BookPreviewModel.current =
+          BookPreviewModelData(
+            feedEntry = feedEntry,
+            audioFile = file,
+          )
       }
+    }
   }
 
   override fun onStart() {
@@ -80,9 +76,9 @@ class BookPreviewAudiobookFragment :
     BookPreviewPlayerMediaReceiver(
       onAudioBecomingNoisy = {
         this.onPauseButtonPressed(
-          abandonAudioFocus = false
+          abandonAudioFocus = false,
         )
-      }
+      },
     )
   }
 
@@ -93,7 +89,7 @@ class BookPreviewAudiobookFragment :
   private val disposables = CompositeDisposable()
 
   private lateinit var audioFile: File
-  private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
+  private lateinit var feedEntry: FeedEntryBook
   private lateinit var mediaPlayer: MediaPlayer
   private lateinit var previewAuthor: TextView
   private lateinit var previewBackwardButton: ImageView
@@ -115,23 +111,33 @@ class BookPreviewAudiobookFragment :
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? = inflater.inflate(R.layout.fragment_book_preview_audiobook, container, false)
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
-    this.audioFile = this
-      .requireArguments()
-      .getSerializable(BUNDLE_EXTRA_FILE)
-      as? File ?: throw RuntimeException("Invalid file")
-    this.feedEntry = this
-      .requireArguments()
-      .getSerializable(BUNDLE_EXTRA_FEED_ENTRY)
-      as? FeedEntry.FeedEntryOPDS ?: throw RuntimeException("Invalid entry")
+    val services =
+      Services.serviceDirectory()
+    this.imageLoader =
+      services.requireService(ImageLoader2Type::class.java)
+
+    val data = BookPreviewModel.current
+
+    val audioFileMaybe = data?.audioFile
+    if (audioFileMaybe == null) {
+      throw RuntimeException("Invalid file")
+    }
+    this.audioFile = audioFileMaybe
+
+    val feedEntryMaybe = data?.feedEntry
+    if (feedEntryMaybe == null) {
+      throw RuntimeException("Invalid entry")
+    }
+    this.feedEntry = feedEntryMaybe
 
     this.previewAuthor = view.findViewById(R.id.player_author)
     this.previewBackwardButton = view.findViewById(R.id.player_jump_backwards)
@@ -146,7 +152,7 @@ class BookPreviewAudiobookFragment :
 
     this.requireActivity().registerReceiver(
       this.playerMediaReceiver,
-      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY),
     )
 
     this.configureToolbar()
@@ -188,12 +194,13 @@ class BookPreviewAudiobookFragment :
       }
 
       AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK,
-      AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+      AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
+      -> {
         if (this.mediaPlayer.isPlaying) {
           this.playOnAudioFocus = true
           this.audioFocusDelayed = false
           this.onPauseButtonPressed(
-            abandonAudioFocus = false
+            abandonAudioFocus = false,
           )
         }
       }
@@ -202,7 +209,7 @@ class BookPreviewAudiobookFragment :
         this.audioFocusDelayed = false
         this.playOnAudioFocus = false
         this.onPauseButtonPressed(
-          abandonAudioFocus = true
+          abandonAudioFocus = true,
         )
       }
     }
@@ -218,11 +225,11 @@ class BookPreviewAudiobookFragment :
       hasBadge = false,
       imageView = this.previewCover,
       width = 0,
-      height = 0
+      height = 0,
     )
 
-    this.previewAuthor.text = this.feedEntry.feedEntry.authorsCommaSeparated
-    this.previewTitle.text = this.feedEntry.feedEntry.title
+    this.previewAuthor.text = this.feedEntry.authorsCommaSeparated
+    this.previewTitle.text = this.feedEntry.title
 
     this.mediaPlayer = MediaPlayer()
     this.mediaPlayer.setDataSource(this.requireContext(), Uri.fromFile(this.audioFile))
@@ -238,7 +245,7 @@ class BookPreviewAudiobookFragment :
     this.mediaPlayer.setOnCompletionListener {
       this.mediaPlayer.seekTo(0)
       this.onPauseButtonPressed(
-        abandonAudioFocus = false
+        abandonAudioFocus = false,
       )
     }
   }
@@ -251,7 +258,7 @@ class BookPreviewAudiobookFragment :
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
           this.updatePlayerUI()
-        }
+        },
     )
   }
 
@@ -268,7 +275,7 @@ class BookPreviewAudiobookFragment :
   private fun updateCurrentTime(currentPosition: Long) {
     this.previewCurrentTime.text =
       BookPreviewTimeUtils.hourMinuteSecondTextFromDuration(
-        Duration.millis(currentPosition)
+        Duration.millis(currentPosition),
       )
     this.previewCurrentTime.contentDescription =
       this.playerTimeCurrentSpoken(currentPosition)
@@ -279,7 +286,7 @@ class BookPreviewAudiobookFragment :
 
     this.previewRemainingTime.text =
       BookPreviewTimeUtils.hourMinuteSecondTextFromDuration(
-        Duration.millis(duration - currentPosition)
+        Duration.millis(duration - currentPosition),
       )
     this.previewRemainingTime.contentDescription =
       this.playerTimeRemainingSpoken(currentPosition, duration)
@@ -349,8 +356,9 @@ class BookPreviewAudiobookFragment :
       this.audioManager.requestAudioFocus(this.audioRequest!!)
     } else {
       this.audioManager.requestAudioFocus(
-        this, AudioManager.STREAM_MUSIC,
-        AudioManager.AUDIOFOCUS_GAIN
+        this,
+        AudioManager.STREAM_MUSIC,
+        AudioManager.AUDIOFOCUS_GAIN,
       )
     }
   }
@@ -366,7 +374,7 @@ class BookPreviewAudiobookFragment :
     this.previewPlayPauseButton.setOnClickListener {
       if (this.mediaPlayer.isPlaying) {
         this.onPauseButtonPressed(
-          abandonAudioFocus = true
+          abandonAudioFocus = true,
         )
       } else {
         this.onPlayButtonPressed()
@@ -381,7 +389,7 @@ class BookPreviewAudiobookFragment :
           position.toInt()
         } else {
           duration
-        }
+        },
       )
     }
 
@@ -392,7 +400,7 @@ class BookPreviewAudiobookFragment :
           position.toInt()
         } else {
           0
-        }
+        },
       )
     }
   }
@@ -450,19 +458,19 @@ class BookPreviewAudiobookFragment :
       R.string.bookPreviewAccessibilityTimeCurrent,
       BookPreviewTimeUtils.hourMinuteSecondSpokenFromDuration(
         this.timeStrings,
-        Duration.millis(offsetMilliseconds)
-      )
+        Duration.millis(offsetMilliseconds),
+      ),
     )
 
   private fun playerTimeRemainingSpoken(
     offsetMilliseconds: Long,
-    duration: Long
+    duration: Long,
   ): String {
     val remaining = Duration.millis(duration - offsetMilliseconds)
 
     return this.getString(
       R.string.bookPreviewAccessibilityTimeRemaining,
-      BookPreviewTimeUtils.hourMinuteSecondSpokenFromDuration(this.timeStrings, remaining)
+      BookPreviewTimeUtils.hourMinuteSecondSpokenFromDuration(this.timeStrings, remaining),
     )
   }
 }

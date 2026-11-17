@@ -1,6 +1,5 @@
 package org.nypl.simplified.ui.catalog
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -23,13 +22,14 @@ import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.librarysimplified.viewer.preview.BookPreviewActivity
-import org.nypl.simplified.accessibility.AccessibilityServiceType
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookPreviewRegistryType
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
@@ -37,21 +37,26 @@ import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
+import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
+import org.nypl.simplified.feeds.api.FeedAvailabilityHoldable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoanable
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
+import org.nypl.simplified.feeds.api.FeedAvailabilityOpenAccess
+import org.nypl.simplified.feeds.api.FeedAvailabilityRevoked
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedFacet
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Composite
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetPseudo
+import org.nypl.simplified.feeds.api.FeedFacetComposite
+import org.nypl.simplified.feeds.api.FeedFacetData
+import org.nypl.simplified.feeds.api.FeedFacetPseudoFiltering
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.feeds.api.FeedSearch
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeld
-import org.nypl.simplified.opds.core.OPDSAvailabilityHeldReady
-import org.nypl.simplified.opds.core.OPDSAvailabilityHoldable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoanable
-import org.nypl.simplified.opds.core.OPDSAvailabilityLoaned
-import org.nypl.simplified.opds.core.OPDSAvailabilityOpenAccess
-import org.nypl.simplified.opds.core.OPDSAvailabilityRevoked
+import org.nypl.simplified.feeds.api.FeedSearchLocal
+import org.nypl.simplified.feeds.api.FeedSearchOpen1_1
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -90,6 +95,8 @@ import org.thepalaceproject.opds.client.OPDSState.LoadedFeedEntry
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithGroups
 import org.thepalaceproject.opds.client.OPDSState.LoadedFeedWithoutGroups
 import org.thepalaceproject.opds.client.OPDSState.Loading
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -122,7 +129,6 @@ sealed class CatalogFragment :
   private var perViewSubscriptions =
     CloseableCollection.create()
 
-  private lateinit var accessibility: AccessibilityServiceType
   private lateinit var bookPreviewRegistry: BookPreviewRegistryType
   private lateinit var bookRegistry: BookRegistryReadableType
   private lateinit var buttonCreator: CatalogButtons
@@ -141,7 +147,7 @@ sealed class CatalogFragment :
   final override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     val view =
       inflater.inflate(R.layout.catalog, container, false)
@@ -191,30 +197,47 @@ sealed class CatalogFragment :
       CatalogButtons(this.requireContext())
     this.catalogBookEvents =
       services.requireService(CatalogBookRegistryEvents::class.java)
-    this.accessibility =
-      services.requireService(AccessibilityServiceType::class.java)
 
     this.opdsClient =
       opdsClients.clientFor(this.catalogPart)
 
     this.subscriptions.add(
-      this.opdsClient.state.subscribe(this::onStateChanged)
+      this.opdsClient.state.subscribe(this::onStateChanged),
     )
     this.subscriptions.add(
-      this.opdsClient.entry.subscribe(this::onEntryChanged)
+      this.opdsClient.entry.subscribe(this::onEntryChanged),
     )
     this.subscriptions.add(
       this.httpStatus.anyAvailable.subscribe { availableThen, availableNow ->
         UIThread.runOnUIThread {
           this.onNetworkStatusChanged(availableThen, availableNow)
         }
-      }
+      },
     )
+    this.subscriptions.add(
+      CatalogWIPROMigration.migrationInProgress.subscribe { migrationThen, migrationNow ->
+        this.onWIPROMigrationChanged(migrationThen, migrationNow)
+      },
+    )
+  }
+
+  private fun onWIPROMigrationChanged(
+    migrationThen: Boolean,
+    migrationNow: Boolean,
+  ) {
+    if (migrationNow && !migrationThen) {
+      this.switchView(CatalogFeedViewLoading.create(this.layoutInflater, this.contentContainer))
+      return
+    }
+    if (migrationThen && !migrationNow) {
+      this.opdsClient.retry()
+      return
+    }
   }
 
   private fun onNetworkStatusChanged(
     availableThen: Boolean,
-    availableNow: Boolean
+    availableNow: Boolean,
   ) {
     if (!this.catalogPart.requiresNetwork) {
       return
@@ -234,7 +257,7 @@ sealed class CatalogFragment :
   final override fun onFeedSelected(
     accountID: AccountID,
     title: String,
-    uri: URI
+    uri: URI,
   ) {
     this.logger.debug("onFeedSelected: \"{}\" {}", title, uri)
 
@@ -250,31 +273,31 @@ sealed class CatalogFragment :
           uri = uri,
           credentials = account.loginState.credentials,
           historyBehavior = ADD_TO_HISTORY,
-          method = "GET"
-        )
+          method = "GET",
+        ),
       )
     } catch (e: Throwable) {
       this.logger.warn("Error fetching account/feed: ", e)
     }
   }
 
-  final override fun onBookSelected(entry: FeedEntry.FeedEntryOPDS) {
+  final override fun onBookSelected(entry: FeedEntryBook) {
     UIThread.checkIsUIThread()
     this.opdsClient.goTo(
       OPDSClientRequest.ExistingEntry(
         entry = entry,
-        historyBehavior = ADD_TO_HISTORY
-      )
+        historyBehavior = ADD_TO_HISTORY,
+      ),
     )
   }
 
   private fun onEntryChanged(
     oldEntry: FeedEntry,
-    newEntry: FeedEntry
+    newEntry: FeedEntry,
   ) {
     UIThread.checkIsUIThread()
 
-    if (newEntry is FeedEntry.FeedEntryOPDS) {
+    if (newEntry is FeedEntryBook) {
       val view = this.viewNow
       if (view is CatalogFeedViewDetails2) {
         val account =
@@ -290,9 +313,9 @@ sealed class CatalogFragment :
 
   private fun onLoadRelatedFeed(
     view: CatalogFeedViewDetails2,
-    newEntry: FeedEntry.FeedEntryOPDS
+    newEntry: FeedEntryBook,
   ) {
-    val related = newEntry.feedEntry.related
+    val related = newEntry.related
     if (related != null) {
       this.logger.debug("Loading related feed ({})", related)
       val relatedFuture =
@@ -300,7 +323,7 @@ sealed class CatalogFragment :
           accountID = newEntry.accountID,
           uri = related,
           credentials = null,
-          method = "GET"
+          method = "GET",
         )
       relatedFuture.thenAccept { feedResult ->
         view.root.post {
@@ -318,12 +341,13 @@ sealed class CatalogFragment :
 
   private fun onStateChanged(
     oldState: OPDSState,
-    newState: OPDSState
+    newState: OPDSState,
   ) {
     UIThread.checkIsUIThread()
 
     this.resetPerViewSubscriptions()
     this.contentContainer.removeAllViews()
+    CatalogSearchResultsAccessibility.searchCleared()
 
     when (newState) {
       is OPDSState.Error -> {
@@ -345,12 +369,29 @@ sealed class CatalogFragment :
 
       is LoadedFeedWithGroups -> {
         this.onStateChangedToGroups(newState)
-        this.viewNow.startFocusDelayed()
+        if (this.isCatalogSearch(newState.request)) {
+          val view = this.viewNow as CatalogFeedViewGroups
+          val feed = newState.handle.feed()
+          CatalogSearchResultsAccessibility.searchResultsLoaded(
+            listView = view.listView,
+            itemCount = feed.groups.sumOf { it.groupEntries.size },
+          )
+        } else {
+          this.viewNow.startFocusDelayed()
+        }
       }
 
       is LoadedFeedWithoutGroups -> {
         this.onStateChangedToInfinite(newState)
-        this.viewNow.startFocusDelayed()
+        if (this.isCatalogSearch(newState.request)) {
+          val view = this.viewNow as CatalogFeedViewInfinite
+          CatalogSearchResultsAccessibility.searchResultsLoaded(
+            listView = view.listView,
+            itemCount = newState.handle.feed().size,
+          )
+        } else {
+          this.viewNow.startFocusDelayed()
+        }
       }
     }
   }
@@ -380,11 +421,11 @@ sealed class CatalogFragment :
       )
 
     when (val entry = this.opdsClient.entry.get()) {
-      is FeedEntry.FeedEntryCorrupt -> {
+      is FeedEntryCorrupt -> {
         // Nothing to do.
       }
 
-      is FeedEntry.FeedEntryOPDS -> {
+      is FeedEntryBook -> {
         val services =
           Services.serviceDirectory()
         val account =
@@ -404,9 +445,11 @@ sealed class CatalogFragment :
         val catalogBookRegistry =
           services.requireService(CatalogBookRegistryEvents::class.java)
 
+        val bookID = FeedBookIDConversions.toBookID(entry.bookID)
+
         val statusSubscription =
           catalogBookRegistry.events
-            .filter { e -> e.bookId == entry.bookID }
+            .filter { e -> e.bookId == bookID }
             .filter { e -> e.statusNow != null }
             .subscribe { e ->
               UIThread.checkIsUIThread()
@@ -414,7 +457,7 @@ sealed class CatalogFragment :
             }
 
         this.perViewSubscriptions.add(
-          AutoCloseable { statusSubscription.dispose() }
+          AutoCloseable { statusSubscription.dispose() },
         )
 
         view.onStatusUpdate(CatalogBookStatus.create(this.bookRegistry, entry))
@@ -429,11 +472,11 @@ sealed class CatalogFragment :
     this.perViewSubscriptions.add(
       this.opdsClient.entry.subscribe { _, item ->
         when (item) {
-          is FeedEntry.FeedEntryCorrupt -> {
+          is FeedEntryCorrupt -> {
             // Nothing sensible to do here.
           }
 
-          is FeedEntry.FeedEntryOPDS -> {
+          is FeedEntryBook -> {
             val services =
               Services.serviceDirectory()
             val account =
@@ -445,7 +488,7 @@ sealed class CatalogFragment :
             view.bind(account.provider, item)
           }
         }
-      }
+      },
     )
 
     this.switchView(view)
@@ -466,8 +509,8 @@ sealed class CatalogFragment :
             body = "",
             subject = "[palace-error-report]",
             attributes = error.attributes.toSortedMap(),
-            taskSteps = error.steps
-          )
+            taskSteps = error.steps,
+          ),
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)
@@ -482,11 +525,11 @@ sealed class CatalogFragment :
 
     books.bookBorrowFailedDismiss(
       accountID = book.account,
-      bookID = book.id
+      bookID = book.id,
     )
   }
 
-  final override fun onBookRequestBorrowCancel(book: Book,) {
+  final override fun onBookRequestBorrowCancel(book: Book) {
     val services =
       Services.serviceDirectory()
     val books =
@@ -494,21 +537,28 @@ sealed class CatalogFragment :
 
     books.bookBorrowFailedDismiss(
       accountID = book.account,
-      bookID = book.id
+      bookID = book.id,
     )
   }
 
   @Deprecated("Unclear why this has its own special method.")
-  final override fun onBookRequestSAMLDownload(status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>) {
+  final override fun onBookRequestSAMLDownload(
+    status: CatalogBookStatus<BookStatus.DownloadWaitingForExternalAuthentication>,
+  ) {
     val account =
-      this.profiles
-        .profileCurrent()
-        .account(status.book.account)
+      try {
+        this.profiles
+          .profileCurrent()
+          .account(status.book.account)
+      } catch (e: AccountsDatabaseNonexistentException) {
+        this.logBookActionStaleAccount(status.book.account)
+        return
+      }
 
     CatalogSAML20Model.start(
       account = account,
       book = status.book.id,
-      downloadURI = status.status.downloadURI
+      downloadURI = status.status.downloadURI,
     )
 
     try {
@@ -528,9 +578,14 @@ sealed class CatalogFragment :
     val profiles =
       services.requireService(ProfilesControllerType::class.java)
     val account =
-      profiles
-        .profileCurrent()
-        .account(parameters.accountID)
+      try {
+        profiles
+          .profileCurrent()
+          .account(parameters.accountID)
+      } catch (e: AccountsDatabaseNonexistentException) {
+        this.logBookActionStaleAccount(parameters.accountID)
+        return
+      }
 
     if (this.isLoginRequired(parameters.accountID)) {
       MainNavigation.showLoginDialog(account)
@@ -543,23 +598,43 @@ sealed class CatalogFragment :
             accountID = parameters.accountID,
             bookID = parameters.bookID,
             entry = parameters.entry,
-            samlDownloadContext = parameters.samlDownloadContext
+            samlDownloadContext = parameters.samlDownloadContext,
           )
 
           UIThread.runOnUIThread {
             MainNavigation.requestTabChangeForPart(this.catalogPart)
             MainNavigation.Settings.goUp()
           }
-        }
+        },
       )
     } else {
       books.bookBorrow(
         accountID = parameters.accountID,
         bookID = parameters.bookID,
         entry = parameters.entry,
-        samlDownloadContext = parameters.samlDownloadContext
+        samlDownloadContext = parameters.samlDownloadContext,
       )
     }
+  }
+
+  /**
+   * A book action was requested for an account that no longer exists in the
+   * profile (for example, it was deleted while its catalog feed was still on
+   * screen). The action cannot be recovered, so it is a no-op; the situation
+   * is recorded with a distinct error code for later diagnosis.
+   */
+
+  private fun logBookActionStaleAccount(accountID: AccountID) {
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.CATALOG_BOOK_ACTION_STALE_ACCOUNT,
+      data = mapOf(Pair("AccountID", accountID.toString())),
+    )
+    this.logger.error(
+      "Book action requested for a nonexistent account: {}",
+      accountID,
+    )
   }
 
   /**
@@ -584,10 +659,7 @@ sealed class CatalogFragment :
     try {
       BookPreviewActivity.startActivity(
         this.requireActivity(),
-        FeedEntry.FeedEntryOPDS(
-          book.account,
-          book.entry
-        )
+        book.entry,
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to start activity: ", e)
@@ -596,7 +668,7 @@ sealed class CatalogFragment :
 
   final override fun onBookCanBeRevoked(
     book: Book,
-    status: BookStatus
+    status: BookStatus,
   ): Boolean =
     try {
       val services =
@@ -639,7 +711,7 @@ sealed class CatalogFragment :
 
     books.bookDelete(
       accountID = book.account,
-      bookId = book.id
+      bookId = book.id,
     )
   }
 
@@ -678,7 +750,7 @@ sealed class CatalogFragment :
                 MainNavigation.requestTabChangeForPart(this.catalogPart)
                 MainNavigation.Settings.goUp()
               }
-            }
+            },
           )
         } else {
           books.bookRevoke(
@@ -701,7 +773,19 @@ sealed class CatalogFragment :
 
   final override fun onBookRequestViewerOpen(
     book: Book,
-    bookFormat: BookFormat
+    bookFormat: BookFormat,
+  ) {
+    if (CatalogWIPROMigration.isMigrationRequired(book, bookFormat)) {
+      CatalogWIPROMigration.executeNow(context = this.requireContext(), book)
+      return
+    }
+
+    this.onBookRequestViewerOpenNow(book, bookFormat)
+  }
+
+  private fun onBookRequestViewerOpenNow(
+    book: Book,
+    bookFormat: BookFormat,
   ) {
     val services =
       Services.serviceDirectory()
@@ -727,7 +811,7 @@ sealed class CatalogFragment :
           } catch (e: Throwable) {
             this.logger.error("Unable to open login dialog: ", e)
           }
-        }
+        },
       )
 
     try {
@@ -735,7 +819,7 @@ sealed class CatalogFragment :
         context = this.requireActivity(),
         preferences = viewerParameters,
         book = book,
-        format = bookFormat
+        format = bookFormat,
       )
     } catch (e: Throwable) {
       this.openErrorForBookException(book, e)
@@ -744,7 +828,7 @@ sealed class CatalogFragment :
 
   private fun openErrorForBookException(
     book: Book,
-    e: Throwable
+    e: Throwable,
   ) {
     try {
       val services =
@@ -767,7 +851,7 @@ sealed class CatalogFragment :
         message = e.message ?: e.javaClass.name,
         errorCode = "error-book-open-failed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       val error = task.finishFailure<Unit>()
 
@@ -779,8 +863,8 @@ sealed class CatalogFragment :
             body = "",
             subject = "[palace-error-report]",
             attributes = error.attributes.toSortedMap(),
-            taskSteps = error.steps
-          )
+            taskSteps = error.steps,
+          ),
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)
@@ -858,7 +942,7 @@ sealed class CatalogFragment :
     this.perViewSubscriptions.add(
       this.opdsClient.entriesGrouped.subscribe { _, items ->
         entriesGroupedAdapter.submitList(items)
-      }
+      },
     )
 
     this.switchView(view)
@@ -923,7 +1007,7 @@ sealed class CatalogFragment :
         val pager =
           Pager(
             config = PagingConfig(pageSize = 50),
-            pagingSourceFactory = { feedSource }
+            pagingSourceFactory = { feedSource },
           )
         pager.flow.collect { data -> feedAdapter.submitData(data) }
       }
@@ -940,7 +1024,7 @@ sealed class CatalogFragment :
           override fun onScrolled(
             recyclerView: RecyclerView,
             dx: Int,
-            dy: Int
+            dy: Int,
           ) {
             val linearLayoutManager =
               recyclerView.layoutManager as LinearLayoutManager
@@ -950,13 +1034,13 @@ sealed class CatalogFragment :
             this@CatalogFragment.logger.trace("Saving scroll position {}", position)
             feedHandle.scrollPositionSave(position)
           }
-        }
+        },
       )
 
       view.listView.adapter = feedAdapter
       view.configureFacets(
         screen = this.screenSize,
-        feed = feed
+        feed = feed,
       )
 
       view.toolbar.configure(
@@ -1002,10 +1086,9 @@ sealed class CatalogFragment :
           CATALOG -> context.getString(R.string.feedEmpty)
           BOOKS -> context.getString(R.string.feedWithGroupsEmptyLoaned)
           HOLDS -> context.getString(R.string.feedWithGroupsEmptyHolds)
-        }
+        },
     )
     this.switchView(view)
-    this.announceSearchResults(context, newState, view)
 
     /*
      * Set up a listener to restore the scroll position. This works around multiple pieces of
@@ -1032,29 +1115,7 @@ sealed class CatalogFragment :
     this.setupRefreshForLocalFeeds(feedHandle)
   }
 
-  private fun announceSearchResults(
-    context: Context,
-    newState: LoadedFeedWithoutGroups,
-    view: CatalogFeedViewInfinite
-  ) {
-    if (!this.accessibility.spokenFeedbackEnabled) {
-      return
-    }
-    if (!newState.request.isSearch) {
-      return
-    }
-    if (this.catalogPart != CATALOG) {
-      return
-    }
-
-    if (newState.handle.feed().size == 0) {
-      this.accessibility.speak(context.getString(R.string.feedEmpty))
-      return
-    }
-
-    this.accessibility.speak(context.getString(R.string.feedSearchResultsAvailable))
-    view.listView.requestFocus()
-  }
+  private fun isCatalogSearch(request: OPDSClientRequest): Boolean = request.isSearch && this.catalogPart == CATALOG
 
   final override fun onIsBookReturnable(book: Book): Boolean {
     val profile = this.profiles.profileCurrent()
@@ -1089,13 +1150,13 @@ sealed class CatalogFragment :
       val account = profile.account(book.account)
       return if (account.bookDatabase.books().contains(book.id)) {
         when (val availability = book.entry.availability) {
-          is OPDSAvailabilityHeld -> false
-          is OPDSAvailabilityHeldReady -> false
-          is OPDSAvailabilityHoldable -> false
-          is OPDSAvailabilityLoanable -> true
-          is OPDSAvailabilityLoaned -> availability.revoke == null && book.isDownloaded
-          is OPDSAvailabilityOpenAccess -> true
-          is OPDSAvailabilityRevoked -> false
+          is FeedAvailabilityHeld -> false
+          is FeedAvailabilityHeldReady -> false
+          is FeedAvailabilityHoldable -> false
+          is FeedAvailabilityLoanable -> true
+          is FeedAvailabilityLoaned -> availability.revoke == null && book.isDownloaded
+          is FeedAvailabilityOpenAccess -> true
+          is FeedAvailabilityRevoked -> false
         }
       } else {
         false
@@ -1125,7 +1186,8 @@ sealed class CatalogFragment :
               }
 
               is BookStatusEvent.BookStatusEventAdded,
-              is BookStatusEvent.BookStatusEventRemoved -> {
+              is BookStatusEvent.BookStatusEventRemoved,
+              -> {
                 feedHandle.refresh()
               }
             }
@@ -1138,7 +1200,7 @@ sealed class CatalogFragment :
   final override fun onSearchSubmitted(
     accountID: AccountID,
     feedSearch: FeedSearch,
-    queryText: String
+    queryText: String,
   ) {
     UIThread.checkIsUIThread()
     this.logger.debug("onSearchSubmitted: {}", queryText)
@@ -1158,7 +1220,7 @@ sealed class CatalogFragment :
       }
 
     when (feedSearch) {
-      FeedSearch.FeedSearchLocal -> {
+      FeedSearchLocal -> {
         this.opdsClient.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = accountID,
@@ -1173,15 +1235,15 @@ sealed class CatalogFragment :
                     feedSelection = feedSelection,
                     facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                     sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
-                    filterByAccountID = null
-                  )
+                    filterByAccountID = null,
+                  ),
                 ).get(10L, TimeUnit.SECONDS)
-            }
-          )
+            },
+          ),
         )
       }
 
-      is FeedSearch.FeedSearchOpen1_1 -> {
+      is FeedSearchOpen1_1 -> {
         this.opdsClient.goTo(
           OPDSClientRequest.NewFeed(
             accountID = accountID,
@@ -1189,8 +1251,8 @@ sealed class CatalogFragment :
             historyBehavior = ADD_TO_HISTORY,
             isSearch = true,
             method = "GET",
-            uri = feedSearch.search.getQueryURIForTerms(queryText),
-          )
+            uri = feedSearch.getQueryURIForTerms(queryText),
+          ),
         )
       }
     }
@@ -1207,22 +1269,25 @@ sealed class CatalogFragment :
       }
 
     when (feedFacet) {
-      is FeedFacetOPDS12Single -> {
-        val credentials =
-          this.credentialsOf(feedFacet.accountID)
+      is FeedFacetData -> {
+        val facetURI = feedFacet.uri
+        if (facetURI != null) {
+          val credentials =
+            this.credentialsOf(feedFacet.accountID)
 
-        this.opdsClient.goTo(
-          OPDSClientRequest.NewFeed(
-            accountID = feedFacet.accountID,
-            uri = feedFacet.opdsFacet.uri,
-            credentials = credentials,
-            historyBehavior = ADD_TO_HISTORY,
-            method = "GET"
+          this.opdsClient.goTo(
+            OPDSClientRequest.NewFeed(
+              accountID = feedFacet.accountID,
+              uri = facetURI,
+              credentials = credentials,
+              historyBehavior = ADD_TO_HISTORY,
+              method = "GET",
+            ),
           )
-        )
+        }
       }
 
-      is FeedFacetOPDS12Composite -> {
+      is FeedFacetComposite -> {
         val credentials =
           this.credentialsOf(feedFacet.accountID)
 
@@ -1231,12 +1296,12 @@ sealed class CatalogFragment :
             historyBehavior = ADD_TO_HISTORY,
             facet = feedFacet,
             credentials = credentials,
-            method = "GET"
-          )
+            method = "GET",
+          ),
         )
       }
 
-      is FeedFacetPseudo.FilteringForAccount -> {
+      is FeedFacetPseudoFiltering -> {
         this.opdsClient.goTo(
           OPDSClientRequest.GeneratedFeed(
             accountID = this.currentAccount().id,
@@ -1250,15 +1315,15 @@ sealed class CatalogFragment :
                     feedSelection = feedSelection,
                     facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                     sortBy = CatalogFeedFacetSortModel.facetSelectedPseudoOrDefault(this.catalogPart),
-                    filterByAccountID = feedFacet.account
-                  )
+                    filterByAccountID = feedFacet.account,
+                  ),
                 ).get(10L, TimeUnit.SECONDS)
-            }
-          )
+            },
+          ),
         )
       }
 
-      is FeedFacetPseudo.Sorting -> {
+      is FeedFacetPseudoSorting -> {
         val filterByAccountID =
           this.findFilterByAccountID()
 
@@ -1275,11 +1340,11 @@ sealed class CatalogFragment :
                     feedSelection = feedSelection,
                     facetTitleProvider = CatalogOPDSClients.facetTitleProvider,
                     sortBy = feedFacet.sortBy,
-                    filterByAccountID = filterByAccountID
-                  )
+                    filterByAccountID = filterByAccountID,
+                  ),
                 ).get(10L, TimeUnit.SECONDS)
-            }
-          )
+            },
+          ),
         )
       }
     }
@@ -1289,7 +1354,7 @@ sealed class CatalogFragment :
     if (CatalogFeedFacetFilterModels.filterModel.facets.isNotEmpty()) {
       val filterFacet =
         CatalogFeedFacetFilterModels.filterModel.createResultFacet("")
-      if (filterFacet is FeedFacetPseudo.FilteringForAccount) {
+      if (filterFacet is FeedFacetPseudoFiltering) {
         filterFacet.account
       } else {
         null
@@ -1319,10 +1384,10 @@ sealed class CatalogFragment :
                   newState.message.message,
                   newState.message.exception,
                   "?",
-                  listOf()
-                )
-            )
-          )
+                  listOf(),
+                ),
+            ),
+          ),
       )
 
     this.switchView(
@@ -1332,13 +1397,13 @@ sealed class CatalogFragment :
         onShowErrorDetails = {
           MainNavigation.openErrorPage(
             activity = this.requireActivity(),
-            parameters = errorPageParameters
+            parameters = errorPageParameters,
           )
         },
         onRetry = {
           this.opdsClient.retry()
-        }
-      )
+        },
+      ),
     )
   }
 
@@ -1359,7 +1424,7 @@ sealed class CatalogFragment :
 
     opdsClients.goToRootFeedFor(
       catalogPart = this.catalogPart,
-      account = account
+      account = account,
     )
   }
 

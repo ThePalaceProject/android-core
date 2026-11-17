@@ -1,7 +1,6 @@
 package org.nypl.simplified.books.controller
 
 import io.reactivex.subjects.Subject
-import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventCreation.AccountEventCreationFailed
 import org.nypl.simplified.accounts.api.AccountEventCreation.AccountEventCreationInProgress
@@ -17,7 +16,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.net.URI
 import java.util.concurrent.Callable
 
@@ -26,7 +24,7 @@ class ProfileAccountCreateTask(
   private val accountProviderID: URI,
   private val accountProviders: AccountProviderRegistryType,
   private val profiles: ProfilesDatabaseType,
-  private val strings: ProfileAccountCreationStringResourcesType
+  private val strings: ProfileAccountCreationStringResourcesType,
 ) : Callable<TaskResult<AccountType>> {
   private val logger = LoggerFactory.getLogger(ProfileAccountCreateTask::class.java)
   private val taskRecorder = TaskRecorder.create()
@@ -37,10 +35,6 @@ class ProfileAccountCreateTask(
       val accountProvider = this.resolveAccountProvider()
       val account = this.createAccount(accountProvider)
 
-      MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.id.uuid.toString())
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, account.provider.displayName)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, account.provider.id.toString())
-
       this.publishSuccessEvent(account)
       this.taskRecorder.finishSuccess(account)
     } catch (e: Throwable) {
@@ -50,7 +44,7 @@ class ProfileAccountCreateTask(
         message = this.strings.unexpectedException,
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
 
       this.publishFailureEvent()
@@ -70,7 +64,7 @@ class ProfileAccountCreateTask(
         message = e.message ?: e.javaClass.name,
         errorCode = "creatingAccountFailed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishFailureEvent()
       throw e
@@ -80,18 +74,20 @@ class ProfileAccountCreateTask(
   private fun publishSuccessEvent(account: AccountType) =
     this.accountEvents.onNext(
       AccountEventCreationSucceeded(
-        this.strings.creatingAccountSucceeded, account.id
-      )
+        this.strings.creatingAccountSucceeded,
+        account.id,
+      ),
     )
 
   private fun publishFailureEvent() =
     this.accountEvents.onNext(
       AccountEventCreationFailed(
-        this.taskRecorder.finishFailure<AccountType>()
-      )
+        this.taskRecorder.finishFailure<AccountType>(),
+      ),
     )
 
-  private fun publishProgressEvent(step: TaskStep) = this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
+  private fun publishProgressEvent(step: TaskStep) =
+    this.accountEvents.onNext(AccountEventCreationInProgress(step.description))
 
   private fun resolveAccountProvider(): AccountProviderType {
     this.publishProgressEvent(this.taskRecorder.beginNewStep(this.strings.resolvingAccountProvider))
@@ -106,7 +102,7 @@ class ProfileAccountCreateTask(
           { _, status ->
             this.publishProgressEvent(this.taskRecorder.beginNewStep(status))
           },
-          description
+          description,
         )
 
       return when (resolution) {
@@ -120,7 +116,7 @@ class ProfileAccountCreateTask(
           this.taskRecorder.currentStepFailed(
             message = resolution.message,
             errorCode = "resolutionFailed",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw AccountUnresolvableProviderException(resolution.message)
         }

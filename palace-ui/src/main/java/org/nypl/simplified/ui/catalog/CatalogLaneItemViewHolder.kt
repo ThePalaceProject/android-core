@@ -5,6 +5,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.thepalaceproject.palace.images.ImageDimensions
 import java.util.concurrent.CompletableFuture
@@ -25,7 +26,7 @@ class CatalogLaneItemViewHolder(
   private val targetHeight =
     view.resources.getDimensionPixelSize(ImageDimensions.coverThumbnailHeight)
 
-  fun bindTo(entry: FeedEntry.FeedEntryOPDS) {
+  fun bindTo(entry: FeedEntryBook) {
     view.contentDescription =
       CatalogBookAccessibilityStrings.coverDescription(view.resources, entry)
 

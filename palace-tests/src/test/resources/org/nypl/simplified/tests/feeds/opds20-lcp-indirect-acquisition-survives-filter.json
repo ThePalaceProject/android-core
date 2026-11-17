@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "title": "LCP Feed"
+  },
+  "publications": [
+    {
+      "metadata": {
+        "identifier": "urn:test:lcp1",
+        "title": "LCP Book"
+      },
+      "links": [
+        {
+          "href": "https://example.com/acquire/lcp1",
+          "type": "application/opds-publication+json",
+          "rel": "http://opds-spec.org/acquisition/borrow",
+          "properties": {
+            "indirectAcquisition": [
+              {
+                "type": "application/vnd.readium.lcp.license.v1.0+json",
+                "child": [
+                  {
+                    "type": "application/epub+zip"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

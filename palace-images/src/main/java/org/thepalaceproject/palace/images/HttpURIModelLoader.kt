@@ -16,14 +16,14 @@ class HttpURIModelLoader : ModelLoader<URI, InputStream> {
     uri: URI,
     width: Int,
     height: Int,
-    options: com.bumptech.glide.load.Options
+    options: com.bumptech.glide.load.Options,
   ): ModelLoader.LoadData<InputStream> {
     val glideUrl = GlideUrl(uri.toURL())
     val timeout = options.get(HttpGlideUrlLoader.TIMEOUT) ?: 2500
     return ModelLoader.LoadData(
       ObjectKey(uri),
       com.bumptech.glide.load.data
-        .HttpUrlFetcher(glideUrl, timeout)
+        .HttpUrlFetcher(glideUrl, timeout),
     )
   }
 

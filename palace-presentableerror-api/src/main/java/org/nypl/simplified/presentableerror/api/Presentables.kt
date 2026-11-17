@@ -11,7 +11,7 @@ object Presentables {
 
   fun mergeAttributes(
     map0: Map<String, String>,
-    map1: Map<String, String>
+    map1: Map<String, String>,
   ): Map<String, String> {
     val attributes = mutableMapOf<String, String>()
     attributes.putAll(map0)
@@ -29,7 +29,7 @@ object Presentables {
   fun putRetry(
     attributes: MutableMap<String, String>,
     key: String,
-    value: String
+    value: String,
   ) {
     if (!attributes.containsKey(key)) {
       attributes[key] = value

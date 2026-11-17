@@ -1,0 +1,28 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:7070707070",
+        "title": "Ready Hold Book"
+      },
+      "links": [
+        {
+          "href": "https://example.com/borrow",
+          "type": "application/opds-publication+json",
+          "rel": "http://opds-spec.org/acquisition/borrow",
+          "properties": {
+            "availability": {
+              "state": "ready",
+              "until": "2024-02-04T14:46:46.889Z"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

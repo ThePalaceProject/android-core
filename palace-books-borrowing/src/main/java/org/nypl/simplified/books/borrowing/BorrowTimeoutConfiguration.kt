@@ -8,5 +8,5 @@ import java.util.concurrent.TimeUnit
 
 data class BorrowTimeoutConfiguration(
   val time: Long,
-  val timeUnit: TimeUnit
+  val timeUnit: TimeUnit,
 )

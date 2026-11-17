@@ -33,7 +33,7 @@ internal object DBQAccountProviderList : DBQAccountProviderListType {
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: DBQAccountProviderListType.Parameters
+    parameters: DBQAccountProviderListType.Parameters,
   ): List<AccountProvider> {
     val startingId = parameters.startingId
     return if (startingId != null) {
@@ -60,7 +60,7 @@ internal object DBQAccountProviderList : DBQAccountProviderListType {
 
   private fun parseResults(
     transaction: DBTransactionType,
-    resultSet: ResultSet
+    resultSet: ResultSet,
   ): List<AccountProvider> {
     val data = mutableListOf<AccountProvider>()
     while (resultSet.next()) {

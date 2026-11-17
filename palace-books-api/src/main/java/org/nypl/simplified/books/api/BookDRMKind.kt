@@ -27,5 +27,5 @@ enum class BookDRMKind {
    * See [BookDRMInformation.Boundless]
    */
 
-  BOUNDLESS
+  BOUNDLESS,
 }

@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class BookDRMInformationHandleNone(
   directory: File,
-  format: BookFormats.BookFormatDefinition
+  format: BookFormats.BookFormatDefinition,
 ) : BookDRMInformationHandle.NoneHandle(),
   BookDRMInformationHandleBase {
   private val closed = AtomicBoolean(false)
@@ -22,7 +22,7 @@ class BookDRMInformationHandleNone(
     BookDRMInformationHandles.writeDRMInfo(
       directory = directory,
       format = format,
-      kind = BookDRMKind.NONE
+      kind = BookDRMKind.NONE,
     )
   }
 

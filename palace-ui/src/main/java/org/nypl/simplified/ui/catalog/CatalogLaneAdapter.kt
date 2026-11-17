@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import org.librarysimplified.ui.R
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.ui.images.ImageLoader2Type
 
 /**
@@ -16,25 +17,25 @@ import org.nypl.simplified.ui.images.ImageLoader2Type
 class CatalogLaneAdapter(
   private val imageLoader: ImageLoader2Type,
   private val callbacks: CatalogViewCallbacksType,
-) : ListAdapter<FeedEntry.FeedEntryOPDS, CatalogLaneItemViewHolder>(diffCallback) {
+) : ListAdapter<FeedEntryBook, CatalogLaneItemViewHolder>(diffCallback) {
   companion object {
     private val diffCallback =
-      object : DiffUtil.ItemCallback<FeedEntry.FeedEntryOPDS>() {
+      object : DiffUtil.ItemCallback<FeedEntryBook>() {
         override fun areContentsTheSame(
-          oldItem: FeedEntry.FeedEntryOPDS,
-          newItem: FeedEntry.FeedEntryOPDS
+          oldItem: FeedEntryBook,
+          newItem: FeedEntryBook,
         ): Boolean = oldItem == newItem
 
         override fun areItemsTheSame(
-          oldItem: FeedEntry.FeedEntryOPDS,
-          newItem: FeedEntry.FeedEntryOPDS
-        ): Boolean = oldItem.feedEntry.id == newItem.feedEntry.id
+          oldItem: FeedEntryBook,
+          newItem: FeedEntryBook,
+        ): Boolean = oldItem.id == newItem.id
       }
   }
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): CatalogLaneItemViewHolder {
     val inflater =
       LayoutInflater.from(parent.context)
@@ -46,7 +47,7 @@ class CatalogLaneAdapter(
 
   override fun onBindViewHolder(
     holder: CatalogLaneItemViewHolder,
-    position: Int
+    position: Int,
   ) {
     holder.bindTo(this.getItem(position))
   }

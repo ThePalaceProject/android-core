@@ -16,7 +16,7 @@ sealed class FeedLoaderResult {
 
   data class FeedLoaderSuccess(
     val feed: Feed,
-    val accessToken: String?
+    val accessToken: String?,
   ) : FeedLoaderResult()
 
   /**
@@ -34,14 +34,22 @@ sealed class FeedLoaderResult {
       val problemReport: LSHTTPProblemReport?,
       override val exception: Exception,
       override val message: String,
-      private val attributesInitial: Map<String, String>
+      private val attributesInitial: Map<String, String>,
     ) : FeedLoaderFailure() {
       override val attributes: Map<String, String>
-        get() =
-          Presentables.mergeAttributes(
+        get() {
+          val reportMap: Map<String, String>
+          val report = this.problemReport
+          if (report == null) {
+            reportMap = emptyMap()
+          } else {
+            reportMap = report.toMap()
+          }
+          return Presentables.mergeAttributes(
             map0 = this.attributesInitial,
-            map1 = this.problemReport?.toMap() ?: emptyMap()
+            map1 = reportMap,
           )
+        }
     }
 
     /**
@@ -52,14 +60,22 @@ sealed class FeedLoaderResult {
       val problemReport: LSHTTPProblemReport?,
       override val exception: Exception,
       override val message: String,
-      private val attributesInitial: Map<String, String>
+      private val attributesInitial: Map<String, String>,
     ) : FeedLoaderFailure() {
       override val attributes: Map<String, String>
-        get() =
-          Presentables.mergeAttributes(
+        get() {
+          val reportMap: Map<String, String>
+          val report = this.problemReport
+          if (report == null) {
+            reportMap = emptyMap()
+          } else {
+            reportMap = report.toMap()
+          }
+          return Presentables.mergeAttributes(
             map0 = this.attributesInitial,
-            map1 = this.problemReport?.toMap() ?: emptyMap()
+            map1 = reportMap,
           )
+        }
     }
   }
 
@@ -70,18 +86,29 @@ sealed class FeedLoaderResult {
 
     fun wrapException(
       uri: URI,
-      exception: Throwable
-    ): FeedLoaderFailure =
-      FeedLoaderFailure.FeedLoaderFailedGeneral(
+      exception: Throwable,
+    ): FeedLoaderFailure {
+      val wrappedException: java.lang.Exception
+      if (exception is java.lang.Exception) {
+        wrappedException = exception
+      } else {
+        wrappedException = java.lang.Exception(exception)
+      }
+
+      val message: String
+      val localizedMessage = exception.localizedMessage
+      if (localizedMessage == null) {
+        message = ""
+      } else {
+        message = localizedMessage
+      }
+
+      return FeedLoaderFailure.FeedLoaderFailedGeneral(
         problemReport = null,
-        exception =
-          if (exception is java.lang.Exception) {
-            exception
-          } else {
-            java.lang.Exception(exception)
-          },
-        message = exception.localizedMessage ?: "",
-        attributesInitial = sortedMapOf(Pair("Feed URI", uri.toASCIIString()))
+        exception = wrappedException,
+        message = message,
+        attributesInitial = sortedMapOf(Pair("Feed URI", uri.toASCIIString())),
       )
+    }
   }
 }

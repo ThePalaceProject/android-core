@@ -13,8 +13,15 @@ import java.net.URLEncoder
  */
 
 data class OPDSOpenSearch1_1(
-  private val template: String
+  private val template: String,
 ) {
+  /**
+   * The raw URL template containing `{searchTerms}`.
+   */
+  fun template(): String {
+    return this.template
+  }
+
   /**
    * @param terms The search terms
    * @return A query URI for searching with the given search terms

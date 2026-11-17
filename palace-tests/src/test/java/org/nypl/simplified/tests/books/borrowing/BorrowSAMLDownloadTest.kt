@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.disposables.Disposable
 import okhttp3.mockwebserver.Dispatcher
@@ -47,7 +50,7 @@ import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericEPUBFiles
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericPDFFiles
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -168,7 +171,7 @@ class BorrowSAMLDownloadTest {
     val initialFeedEntry =
       BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericEPUBFiles.fullType)
     this.bookID =
-      BookIDs.newFromOPDSEntry(initialFeedEntry)
+      BookIDs.newFromText(initialFeedEntry.id)
 
     val bookInitial =
       Book(
@@ -176,7 +179,7 @@ class BorrowSAMLDownloadTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountId, initialFeedEntry),
         formats = listOf()
       )
 
@@ -230,7 +233,7 @@ class BorrowSAMLDownloadTest {
     val task = BorrowSAMLDownload.createSubtask()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -258,7 +261,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -286,7 +289,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.webServer.enqueue(MockResponse().setResponseCode(404))
 
@@ -316,7 +319,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     val response =
       MockResponse()
@@ -352,7 +355,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     val response =
       MockResponse()
@@ -385,7 +388,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
     this.context.samlDownloadContext = SAMLDownloadContext(
       isSAMLAuthComplete = true,
       downloadURI = this.context.currentURICheck(),
@@ -425,10 +428,10 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericPDFFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericPDFFiles, null, emptyMap())
 
     this.bookDatabaseEntry.writeOPDSEntry(
-      BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType)
+      OPDS12FeedConverter.convertEntry(this.accountId, BorrowTestFeeds.opdsLoanedFeedEntryOfType(this.webServer, genericPDFFiles.fullType))
     )
     this.bookDatabaseEntry.entryWrites = 0
     this.bookDatabaseEntry.formatHandlesField.clear()
@@ -468,7 +471,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)
@@ -508,7 +511,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/original/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
     this.context.samlDownloadContext = SAMLDownloadContext(
       isSAMLAuthComplete = true,
       downloadURI = this.context.currentURICheck(),
@@ -558,7 +561,7 @@ class BorrowSAMLDownloadTest {
     this.context.currentURIField =
       Link.LinkBasic(this.webServer.url("/book.epub").toUri())
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
+      FeedAcquisitionPathElement(genericEPUBFiles, null, emptyMap())
 
     this.bookDatabaseEntry.formatHandlesField.clear()
     this.bookDatabaseEntry.formatHandlesField.add(this.epubHandle)

@@ -13,7 +13,7 @@ class PdfReaderDocument(
   val core: PdfiumCore,
   val document: PdfiumDocument,
   override val identifier: String?,
-  override val pageCount: Int
+  override val pageCount: Int,
 ) : PdfDocument {
   override val title: String?
     get() = metadata.title

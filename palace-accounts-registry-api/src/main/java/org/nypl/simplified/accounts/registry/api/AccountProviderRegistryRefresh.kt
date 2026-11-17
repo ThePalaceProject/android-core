@@ -13,7 +13,7 @@ sealed interface AccountProviderRegistryRefresh {
 
   data class Full(
     val clearBeforeRefresh: Boolean,
-    override val includeTestingLibraries: Boolean
+    override val includeTestingLibraries: Boolean,
   ) : AccountProviderRegistryRefresh
 
   /**
@@ -22,6 +22,6 @@ sealed interface AccountProviderRegistryRefresh {
    */
 
   data class Incremental(
-    override val includeTestingLibraries: Boolean
+    override val includeTestingLibraries: Boolean,
   ) : AccountProviderRegistryRefresh
 }

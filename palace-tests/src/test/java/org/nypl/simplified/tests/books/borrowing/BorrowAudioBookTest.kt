@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.books.borrowing
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.app.Application
 import io.reactivex.disposables.Disposable
 import org.joda.time.Instant
@@ -45,7 +48,7 @@ import org.nypl.simplified.books.borrowing.internal.BorrowErrorCodes.requiredURI
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
 import org.nypl.simplified.books.formats.api.StandardFormatNames.genericAudioBooks
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -169,7 +172,7 @@ class BorrowAudioBookTest {
     val initialFeedEntry =
       BorrowTestFeeds.opdsContentURILoanedFeedEntryOfType(genericAudioBooks.first().fullType)
     this.bookID =
-      BookIDs.newFromOPDSEntry(initialFeedEntry)
+      BookIDs.newFromText(initialFeedEntry.id)
 
     val bookInitial =
       Book(
@@ -177,7 +180,7 @@ class BorrowAudioBookTest {
         account = this.accountId,
         cover = null,
         thumbnail = null,
-        entry = initialFeedEntry,
+        entry = OPDS12FeedConverter.convertEntry(this.accountId, initialFeedEntry),
         formats = listOf()
       )
 
@@ -260,7 +263,7 @@ class BorrowAudioBookTest {
     val task = BorrowAudioBook.createSubtask()
 
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
+      FeedAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 
     try {
       task.execute(this.context)
@@ -290,7 +293,7 @@ class BorrowAudioBookTest {
     this.context.currentURIField =
       Link.LinkBasic(URI.create("urn:whatever"))
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
+      FeedAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 
     this.audioBookManifestStrategies.strategy.onExecute = {
       TaskResult.fail("Running", "Water system breakdown at sector 6", audioStrategyFailed)
@@ -324,7 +327,7 @@ class BorrowAudioBookTest {
     this.context.currentURIField =
       Link.LinkBasic(URI.create("urn:whatever"))
     this.context.currentAcquisitionPathElement =
-      OPDSAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
+      FeedAcquisitionPathElement(genericAudioBooks.first(), null, emptyMap())
 
     this.audioBookManifestStrategies.strategy.onExecute = {
       val recorder = TaskRecorder.create()

@@ -44,4 +44,8 @@ data class ProfilePreferences(
   val audioBookPlaybackSkipIntervalBackwardMs: Long,
   /** @return The user has seen the audiobook dialog and says they don't want to see it again. */
   val audioBookBatteryDialogAccepted: Boolean,
+  /** @return `true` if per-book format and DRM debug labels should be drawn on book covers. */
+  val showBookCoverDebugLabels: Boolean,
+  /** @return `true` if the feed loader should prefer OPDS 2.0 over OPDS 1.2. */
+  val preferOPDS20: Boolean,
 )

@@ -45,6 +45,8 @@ import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronDRMAdobe
 import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 import org.nypl.simplified.taskrecorder.api.TaskStep
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
@@ -67,19 +69,19 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean = MIMECompatibility.isCompatibleStrictWithoutAttributes(type, adobeACSMFiles)
   }
 
   private data class ProcessedACSM(
     val acsmBytes: ByteArray,
     val acsmToken: AdobeAdeptFulfillmentToken,
-    val acsmFile: File
+    val acsmFile: File,
   )
 
   private data class RequiredCredentials(
     val preActivation: AccountAuthenticationAdobePreActivationCredentials,
-    val postActivation: AccountAuthenticationAdobePostActivationCredentials
+    val postActivation: AccountAuthenticationAdobePostActivationCredentials,
   )
 
   override fun execute(context: BorrowContextType) {
@@ -88,7 +90,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         "Downloading...",
         receivedSize = 0L,
         expectedSize = 100L,
-        bytesPerSecond = 1L
+        bytesPerSecond = 1L,
       )
 
       this.checkDRMSupport(context)
@@ -108,7 +110,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           BorrowHTTP.createDownloadRequest(
             context = context,
             target = currentURI,
-            outputFile = temporaryFile
+            outputFile = temporaryFile,
           )
 
         when (val result = LSHTTPDownloads.download(downloadRequest)) {
@@ -119,7 +121,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           is DownloadFailedServer -> {
             throw BorrowHTTP.onDownloadFailedServer(
               context = context,
-              result = result
+              result = result,
             )
           }
 
@@ -135,7 +137,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
             this.fulfillACSMFile(
               context = context,
               credentials = credentials,
-              acsm = this.processACSMFile(context, temporaryFile)
+              acsm = this.processACSMFile(context, temporaryFile),
             )
           }
         }
@@ -151,9 +153,25 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
   private fun activateDeviceIfNecessary(context: BorrowContextType): RequiredCredentials {
     context.taskRecorder.beginNewStep("Activating Adobe DRM device if necessary...")
 
-    if (this.adobeDeviceIsActivated(context)) {
+    val postActivation =
+      context.account.loginState
+        .credentials
+        ?.adobeCredentials
+        ?.postActivationCredentials
+
+    if (postActivation != null && !AdobeDRMExtensions.activationIsStale(postActivation.version)) {
       context.taskRecorder.currentStepSucceeded("Adobe DRM device is already activated.")
       return this.readRequireAdobeCredentials(context)
+    }
+
+    if (postActivation != null) {
+      /*
+       * The device has an activation, but it was performed with a pre-migration ADEPT provider
+       * binary. It is not usable by the current binaries: deactivate and delete it (best-effort),
+       * then fall through to a fresh activation.
+       */
+
+      this.adobeDeviceDeactivateStaleActivation(context, postActivation)
     }
 
     this.adobeDeviceActivate(context)
@@ -166,7 +184,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     val postActivation = preActivation.postActivationCredentials!!
     return RequiredCredentials(
       preActivation = preActivation,
-      postActivation = postActivation
+      postActivation = postActivation,
     )
   }
 
@@ -176,7 +194,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "The current account does not have the required credentials.",
         errorCode = "accountCredentialsRequired",
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -187,7 +205,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         patronParsers = PatronUserProfileParsers(),
         credentials = credentials,
         http = context.httpClient,
-        account = context.account
+        account = context.account,
       )
 
     val adobeDRM = patronProfile.drm.find { drm -> drm is PatronDRMAdobe } as PatronDRMAdobe?
@@ -195,7 +213,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "The patron user profile is missing Adobe DRM information.",
         errorCode = "patron-user-profile-missing-adobe",
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -205,7 +223,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         clientToken = AccountAuthenticationAdobeClientToken.parse(adobeDRM.clientToken),
         deviceManagerURI = null,
         postActivationCredentials = null,
-        vendorID = AdobeVendorID(adobeDRM.vendor)
+        vendorID = AdobeVendorID(adobeDRM.vendor),
       )
 
     context.account.updateCredentialsIfAvailable { c ->
@@ -221,7 +239,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         error = { message -> context.logError("{}", message) },
         debug = { message -> context.logDebug("{}", message) },
         vendorID = adobePreCredentials.vendorID,
-        clientToken = adobePreCredentials.clientToken
+        clientToken = adobePreCredentials.clientToken,
       )
 
     try {
@@ -230,7 +248,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
       Preconditions.checkState(
         postCredentials.isNotEmpty(),
-        "Must have returned at least one activation"
+        "Must have returned at least one activation",
       )
 
       /*
@@ -254,7 +272,12 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
       context.account.updateCredentialsIfAvailable { c ->
         c.withAdobePreActivationCredentials(
-          adobePreCredentials.copy(postActivationCredentials = newPostCredentials)
+          adobePreCredentials.copy(
+            postActivationCredentials =
+              newPostCredentials.copy(
+                version = AdobeDRMExtensions.versionCurrent(),
+              ),
+          ),
         )
       }
 
@@ -263,17 +286,124 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       val ex = e.cause!!
       context.logDebug("exception raised waiting for adept future: ", ex)
       this.handleAdobeDRMConnectorException(context.taskRecorder, ex)
+      this.reportDiagnostics(
+        context = context,
+        code = DiagnosticCodes.ADOBE_DRM_ACTIVATION_FAILED,
+        data = this.drmErrorData(ex),
+        throwable = ex,
+      )
       throw ex
     } catch (e: Throwable) {
       context.logDebug("exception raised waiting for adept future: ", e)
       this.handleAdobeDRMConnectorException(context.taskRecorder, e)
+      this.reportDiagnostics(
+        context = context,
+        code = DiagnosticCodes.ADOBE_DRM_ACTIVATION_FAILED,
+        data = this.drmErrorData(e),
+        throwable = e,
+      )
       throw e
+    }
+  }
+
+  /**
+   * Deactivate and delete a stale (pre-migration) device activation. Both operations are
+   * best-effort: the activation was performed against an older server, failures are expected,
+   * and a fresh activation is performed immediately afterwards regardless of the outcome.
+   */
+
+  private fun adobeDeviceDeactivateStaleActivation(
+    context: BorrowContextType,
+    postActivation: AccountAuthenticationAdobePostActivationCredentials,
+  ) {
+    context.taskRecorder.beginNewStep("Deactivating stale Adobe DRM device activation...")
+
+    val preActivation =
+      context.account.loginState.credentials!!
+        .adobeCredentials!!
+
+    val failure =
+      AdobeDRMExtensions.deactivateAndDeleteDevice(
+        executor = context.adobeExecutor!!,
+        timeout = 1L,
+        timeoutUnit = TimeUnit.MINUTES,
+        error = { message -> context.logError("{}", message) },
+        debug = { message -> context.logDebug("{}", message) },
+        vendorID = preActivation.vendorID,
+        userID = postActivation.userID,
+        clientToken = preActivation.clientToken,
+      )
+
+    if (failure != null) {
+      context.logDebug("Stale Adobe DRM device deactivation failed (best-effort): ", failure)
+      this.reportDiagnostics(
+        context = context,
+        code = DiagnosticCodes.ADOBE_DRM_DEACTIVATION_FAILED,
+        data = this.drmErrorData(failure),
+        throwable = failure,
+      )
+    }
+
+    context.account.updateCredentialsIfAvailable { c ->
+      c.withoutAdobePostActivationCredentials()
+    }
+
+    context.taskRecorder.currentStepSucceeded("Stale Adobe DRM device activation removed.")
+  }
+
+  /**
+   * Report a diagnostic event. Reporting must never interfere with the borrow.
+   */
+
+  private fun reportDiagnostics(
+    context: BorrowContextType,
+    code: String,
+    data: Map<String, String>,
+    throwable: Throwable?,
+  ) {
+    try {
+      context.services
+        .requireService(DiagnosticsServiceType::class.java)
+        .report(code, data, throwable)
+    } catch (e: Throwable) {
+      context.logDebug("Failed to report diagnostic {}: ", code, e)
+    }
+  }
+
+  /**
+   * Build the diagnostic data map for a DRM failure, preferring the low-cardinality DRM error
+   * code where one is available.
+   */
+
+  private fun drmErrorData(throwable: Throwable): Map<String, String> {
+    val cause =
+      when (throwable) {
+        is ExecutionException -> throwable.cause ?: throwable
+        else -> throwable
+      }
+
+    return when (cause) {
+      is AdobeDRMExtensions.AdobeDRMLoginConnectorException -> {
+        mapOf("DRMErrorCode" to cause.errorCode)
+      }
+
+      is AdobeDRMExtensions.AdobeDRMLogoutConnectorException -> {
+        mapOf("DRMErrorCode" to cause.errorCode)
+      }
+
+      is AdobeDRMFulfillmentException -> {
+        mapOf("DRMErrorCode" to cause.errorCode)
+      }
+
+      else -> {
+        mapOf("ExceptionType" to cause.javaClass.simpleName)
+      }
     }
   }
 
   private fun handleAdobeDRMConnectorException(
     taskRecorder: TaskRecorderType,
-    ex: Throwable
+    ex: Throwable,
   ): TaskStep {
     val text = ex.message ?: ex.javaClass.simpleName
     return when (ex) {
@@ -282,7 +412,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           message = text,
           errorCode = "Adobe ACS: drmNoAvailableActivations",
           exception = ex,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       }
 
@@ -291,7 +421,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           message = text,
           errorCode = "Adobe ACS: ${ex.errorCode}",
           exception = ex,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       }
 
@@ -300,17 +430,11 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           message = text,
           errorCode = "Adobe ACS: drmUnspecifiedError",
           exception = ex,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       }
     }
   }
-
-  private fun adobeDeviceIsActivated(context: BorrowContextType): Boolean =
-    context.account.loginState
-      .credentials
-      ?.adobeCredentials
-      ?.postActivationCredentials != null
 
   /**
    * Check that we actually have the required DRM support.
@@ -322,7 +446,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "This build of the application does not support Adobe ACS.",
         errorCode = acsNotSupported,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -334,7 +458,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
   private fun processACSMFile(
     context: BorrowContextType,
-    temporaryFile: File
+    temporaryFile: File,
   ): ProcessedACSM {
     context.taskRecorder.beginNewStep("Reading ACSM file...")
     val bytes = temporaryFile.readBytes()
@@ -343,7 +467,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       context = context,
       acsmBytes = bytes,
       acsmToken = acsm,
-      temporaryFile = temporaryFile
+      temporaryFile = temporaryFile,
     )
   }
 
@@ -355,7 +479,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
     context: BorrowContextType,
     acsmBytes: ByteArray,
     acsmToken: AdobeAdeptFulfillmentToken,
-    temporaryFile: File
+    temporaryFile: File,
   ): ProcessedACSM {
     context.taskRecorder.beginNewStep("Saving ACSM file...")
 
@@ -373,13 +497,14 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         ProcessedACSM(
           acsmBytes = acsmBytes,
           acsmToken = acsmToken,
-          acsmFile = drmHandle.info.acsmFile!!
+          acsmFile = drmHandle.info.acsmFile!!,
         )
       }
 
       is LCPHandle,
       is BoundlessHandle,
-      is NoneHandle -> {
+      is NoneHandle,
+      -> {
         throw UnreachableCodeException()
       }
     }
@@ -391,7 +516,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
   private fun parseACSMFile(
     context: BorrowContextType,
-    acsmBytes: ByteArray
+    acsmBytes: ByteArray,
   ): AdobeAdeptFulfillmentToken {
     context.taskRecorder.beginNewStep("Parsing ACSM file...")
     return try {
@@ -401,7 +526,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
         message = "Unparseable ACSM file: ${e.message}",
         errorCode = acsUnparseableACSM,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -414,7 +539,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
   private fun fulfillACSMFile(
     context: BorrowContextType,
     credentials: RequiredCredentials,
-    acsm: ProcessedACSM
+    acsm: ProcessedACSM,
   ) {
     context.taskRecorder.beginNewStep("Fulfilling ACSM file...")
 
@@ -441,11 +566,11 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
                 BorrowHTTP.downloadingMessage(
                   expectedSize = 100,
                   currentSize = 0L,
-                  perSecond = 1L
+                  perSecond = 1L,
                 ),
               receivedSize = 0L,
               expectedSize = 100L,
-              bytesPerSecond = 1L
+              bytesPerSecond = 1L,
             )
           },
           progress = { progress ->
@@ -459,17 +584,17 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
                   BorrowHTTP.downloadingMessage(
                     expectedSize = 100,
                     currentSize = progress.toLong(),
-                    perSecond = 1L
+                    perSecond = 1L,
                   ),
                 receivedSize = progress.toLong(),
                 expectedSize = 100L,
-                bytesPerSecond = 1L
+                bytesPerSecond = 1L,
               )
             }
           },
           outputFile = temporaryFile,
           data = acsm.acsmBytes,
-          userId = credentials.postActivation.userID
+          userId = credentials.postActivation.userID,
         )
 
       val fulfillment =
@@ -480,7 +605,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
             message = "Adobe ACS fulfillment timed out.",
             errorCode = acsTimedOut,
             exception = e,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw BorrowSubtaskFailed()
         } catch (e: ExecutionException) {
@@ -494,7 +619,13 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
                 message = "Adobe ACS fulfillment failed (${cause.errorCode})",
                 errorCode = "ACS: ${cause.errorCode}",
                 exception = cause,
-                extraMessages = listOf()
+                extraMessages = listOf(),
+              )
+              this.reportDiagnostics(
+                context = context,
+                code = DiagnosticCodes.ADOBE_DRM_FULFILLMENT_FAILED,
+                data = this.drmErrorData(cause),
+                throwable = cause,
               )
               BorrowSubtaskFailed()
             }
@@ -504,7 +635,13 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
                 message = "Adobe ACS fulfillment failed (${cause.javaClass})",
                 errorCode = "ACS: ${cause.javaClass}",
                 exception = cause,
-                extraMessages = listOf()
+                extraMessages = listOf(),
+              )
+              this.reportDiagnostics(
+                context = context,
+                code = DiagnosticCodes.ADOBE_DRM_FULFILLMENT_FAILED,
+                data = this.drmErrorData(cause),
+                throwable = cause,
               )
               BorrowSubtaskFailed()
             }
@@ -531,7 +668,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
   private fun saveFulfilledBook(
     context: BorrowContextType,
-    fulfillment: AdobeDRMExtensions.Fulfillment
+    fulfillment: AdobeDRMExtensions.Fulfillment,
   ) {
     context.taskRecorder.beginNewStep("Saving fulfilled book...")
     val formatHandle = this.findFormatHandle(context)
@@ -551,7 +688,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
           }
 
           is BookDatabaseEntryFormatHandlePDF,
-          is BookDatabaseEntryFormatHandleAudioBook -> {
+          is BookDatabaseEntryFormatHandleAudioBook,
+          -> {
             throw UnreachableCodeException()
           }
         }
@@ -559,7 +697,8 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
       is LCPHandle,
       is BoundlessHandle,
-      is NoneHandle -> {
+      is NoneHandle,
+      -> {
         throw UnreachableCodeException()
       }
     }
@@ -576,7 +715,7 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "No format handle available for ${eventualType.fullType}",
         errorCode = noFormatHandle,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }
@@ -585,14 +724,14 @@ class BorrowACSM private constructor() : BorrowSubtaskType {
 
   private fun onAdobeDebug(
     context: BorrowContextType,
-    message: String
+    message: String,
   ) {
     context.logDebug("{}", message)
   }
 
   private fun onAdobeError(
     context: BorrowContextType,
-    message: String
+    message: String,
   ) {
     context.logError("{}", message)
   }

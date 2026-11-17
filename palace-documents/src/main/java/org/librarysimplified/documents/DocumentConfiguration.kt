@@ -16,5 +16,5 @@ data class DocumentConfiguration(
    * The remote URI used to fetch new versions of the document.
    */
 
-  val remoteURI: URI
+  val remoteURI: URI,
 )

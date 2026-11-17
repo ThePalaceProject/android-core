@@ -39,7 +39,7 @@ object AccountAuthenticationCredentialsJSON20190424 : AccountAuthenticationCrede
       authenticationDescription = null,
       annotationsURI = null,
       deviceRegistrationURI = null,
-      patronAuthorization = null
+      patronAuthorization = null,
     )
   }
 }

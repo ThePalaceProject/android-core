@@ -13,7 +13,7 @@ internal abstract class AbstractDocument internal constructor(
   initialStreams: (() -> InputStream)?,
   private val file: File?,
   private val fileTmp: File?,
-  private val remoteURL: URL
+  private val remoteURL: URL,
 ) : DocumentType {
   private val logger =
     LoggerFactory.getLogger(AbstractDocument::class.java)
@@ -31,7 +31,9 @@ internal abstract class AbstractDocument internal constructor(
   }
 
   override fun update() {
-    this.file ?: return
+    if (this.file == null) {
+      return
+    }
 
     this.logger.debug("updating document {} from {}", this.file, this.remoteURL)
 
@@ -56,7 +58,8 @@ internal abstract class AbstractDocument internal constructor(
       }
 
       is LSHTTPResponseStatus.Responded.Error,
-      is LSHTTPResponseStatus.Failed -> {
+      is LSHTTPResponseStatus.Failed,
+      -> {
         Unit
       }
     }

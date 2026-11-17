@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   override fun onNewIntent(
     intent: Intent,
-    caller: ComponentCaller
+    caller: ComponentCaller,
   ) {
     super.onNewIntent(intent, caller)
     this.onHandleIntent(intent)
@@ -126,8 +126,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         profiles.profileAccountLogin(
           ProfileAccountLoginRequest.OIDCComplete(
             accountId = parsed.account,
-            accessToken = parsed.accessToken
-          )
+            accessToken = parsed.accessToken,
+          ),
         )
       }
 
@@ -139,7 +139,9 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   }
 
   private fun onHandleIntentAutomatedTesting() {
-    this.logger.warn("onHandleAutomatedTesting: Unimplemented code: Requested login to testing library for automated test suite.")
+    this.logger.warn(
+      "onHandleAutomatedTesting: Unimplemented code: Requested login to testing library for automated test suite.",
+    )
   }
 
   private fun isAutomatedTesting(intent: Intent): Boolean {
@@ -166,13 +168,13 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     this.subscriptions.add(
       SplashModel.splashScreenStatus.subscribe { _, newValue ->
         this.onSplashScreenStatusChanged(newValue)
-      }
+      },
     )
     this.switchFragment(SplashFragment())
 
     this.onBackPressedDispatcher.addCallback(
       this,
-      this.backCallback
+      this.backCallback,
     )
   }
 
@@ -185,7 +187,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.subscriptions.add(
           AnnouncementsModel.announcements.subscribe { _, newValue ->
             this.onAnnouncementsChanged(newValue)
-          }
+          },
         )
 
         val sub =
@@ -198,7 +200,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
       SPLASH_SCREEN_AWAITING_BOOT,
       SPLASH_SCREEN_NOTIFICATIONS,
-      SPLASH_SCREEN_LIBRARY_SELECTOR -> {
+      SPLASH_SCREEN_LIBRARY_SELECTOR,
+      -> {
         // No need to do anything.
       }
     }
@@ -233,7 +236,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
           } catch (e: Throwable) {
             this.logger.error("Unable to open login dialog: ", e)
           }
-        }
+        },
       )
 
     try {
@@ -241,7 +244,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         context = this,
         preferences = viewerParameters,
         book = bookRequest.book,
-        format = bookRequest.bookFormat
+        format = bookRequest.bookFormat,
       )
     } catch (e: Throwable) {
       this.openErrorForBookException(bookRequest.book, e)
@@ -298,7 +301,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
   private fun openErrorForBookException(
     book: Book,
-    e: Throwable
+    e: Throwable,
   ) {
     try {
       val services =
@@ -321,7 +324,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         message = e.message ?: e.javaClass.name,
         errorCode = "error-book-open-failed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       val error = task.finishFailure<Unit>()
 
@@ -333,8 +336,8 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
             body = "",
             subject = "[palace-error-report]",
             attributes = error.attributes.toSortedMap(),
-            taskSteps = error.steps
-          )
+            taskSteps = error.steps,
+          ),
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to open error page: ", e)

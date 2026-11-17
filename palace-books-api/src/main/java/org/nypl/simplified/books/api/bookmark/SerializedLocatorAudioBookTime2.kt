@@ -13,7 +13,7 @@ import java.security.MessageDigest
 
 data class SerializedLocatorAudioBookTime2(
   val readingOrderItem: String,
-  val readingOrderItemOffsetMilliseconds: Long
+  val readingOrderItemOffsetMilliseconds: Long,
 ) : SerializedLocator() {
   override val typeName: String
     get() = "LocatorAudioBookTime"

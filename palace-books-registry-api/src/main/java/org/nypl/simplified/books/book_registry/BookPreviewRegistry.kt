@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 
 class BookPreviewRegistry(
-  val downloadDirectory: File
+  val downloadDirectory: File,
 ) : BookPreviewRegistryType {
   private val logger =
     LoggerFactory.getLogger(BookPreviewRegistry::class.java)

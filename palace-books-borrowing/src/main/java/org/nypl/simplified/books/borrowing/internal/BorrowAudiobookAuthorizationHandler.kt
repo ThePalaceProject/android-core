@@ -17,7 +17,7 @@ import org.nypl.simplified.books.borrowing.BorrowSubtaskCredentials
 import org.slf4j.LoggerFactory
 
 class BorrowAudiobookAuthorizationHandler(
-  private val account: AccountType
+  private val account: AccountType,
 ) : PlayerAuthorizationHandlerType {
   private val logger =
     LoggerFactory.getLogger(BorrowAudiobookAuthorizationHandler::class.java)
@@ -27,21 +27,21 @@ class BorrowAudiobookAuthorizationHandler(
 
   override fun onAuthorizationIsNoLongerInvalid(
     source: PlayerManifestLink,
-    kind: PlayerDownloadRequest.Kind
+    kind: PlayerDownloadRequest.Kind,
   ) {
     // Nothing to do here.
   }
 
   override fun onAuthorizationIsInvalid(
     source: PlayerManifestLink,
-    kind: PlayerDownloadRequest.Kind
+    kind: PlayerDownloadRequest.Kind,
   ) {
     // Nothing to do here.
   }
 
   override fun onConfigureAuthorizationFor(
     source: PlayerManifestLink,
-    kind: PlayerDownloadRequest.Kind
+    kind: PlayerDownloadRequest.Kind,
   ): LSHTTPAuthorizationType? {
     this.logger.debug("Configuring authorization for {}: {}", kind, source.hrefURI)
 
@@ -59,13 +59,13 @@ class BorrowAudiobookAuthorizationHandler(
   override fun <T : Any> onRequireCustomCredentialsFor(
     providerName: String,
     kind: PlayerDownloadRequest.Kind,
-    credentialsType: Class<T>
+    credentialsType: Class<T>,
   ): T {
     this.logger.debug(
       "Custom credentials required for {}: {}, type {}",
       providerName,
       kind,
-      credentialsType
+      credentialsType,
     )
 
     if (credentialsType == OPAUsernamePassword::class.java) {
@@ -82,14 +82,14 @@ class BorrowAudiobookAuthorizationHandler(
           is Basic -> {
             OPAUsernamePassword(
               credentials.userName.value,
-              this.overdrivePasswordOf(credentials.password.value)
+              this.overdrivePasswordOf(credentials.password.value),
             )
           }
 
           is BasicToken -> {
             OPAUsernamePassword(
               credentials.userName.value,
-              this.overdrivePasswordOf(credentials.password.value)
+              this.overdrivePasswordOf(credentials.password.value),
             )
           }
 

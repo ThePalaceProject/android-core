@@ -9,6 +9,7 @@ import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.feeds.api.FeedBooksSelection
 import org.nypl.simplified.feeds.api.FeedFacet
+import org.nypl.simplified.feeds.api.FeedFacetPseudoSorting
 import org.nypl.simplified.feeds.api.FeedFacetPseudoTitleProviderType
 import org.nypl.simplified.profiles.api.ProfileUpdated
 import org.nypl.simplified.profiles.controller.api.ProfileFeedRequest
@@ -25,7 +26,7 @@ class CatalogOPDSClients(
   val profiles: ProfilesControllerType,
   val mainClient: OPDSClientType,
   val booksClient: OPDSClientType,
-  val holdsClient: OPDSClientType
+  val holdsClient: OPDSClientType,
 ) : AutoCloseable {
   private val logger =
     LoggerFactory.getLogger(CatalogOPDSClients::class.java)
@@ -115,12 +116,32 @@ class CatalogOPDSClients(
   }
 
   private fun onAccountDeleted() {
-    this.logger.debug("An account has been deleted. Clearing history.")
+    this.logger.debug("An account has been deleted. Clearing history and re-pointing clients.")
 
     UIThread.runOnUIThread {
+      /*
+       * First guarantee that no client is left holding the deleted account's feed.
+       */
       this.clearHistory(this.mainClient)
       this.clearHistory(this.booksClient)
       this.clearHistory(this.holdsClient)
+
+      /*
+       * Then proactively point every client at the current account's root feed, so that no tab
+       * is left empty or stale regardless of fragment lifecycle.
+       */
+      try {
+        val account =
+          this.profiles
+            .profileCurrent()
+            .mostRecentAccount()
+
+        this.goToRootFeedFor(CatalogPart.CATALOG, account)
+        this.goToRootFeedFor(CatalogPart.BOOKS, account)
+        this.goToRootFeedFor(CatalogPart.HOLDS, account)
+      } catch (e: Throwable) {
+        this.logger.debug("Failed to re-point clients after account deletion: ", e)
+      }
     }
   }
 
@@ -145,7 +166,7 @@ class CatalogOPDSClients(
 
   fun goToRootFeedFor(
     catalogPart: CatalogPart,
-    account: AccountType
+    account: AccountType,
   ) {
     try {
       val client = this.clientFor(catalogPart)
@@ -158,8 +179,8 @@ class CatalogOPDSClients(
               uri = account.catalogURIForAge(18),
               credentials = account.loginState.credentials,
               historyBehavior = CLEAR_HISTORY,
-              method = "GET"
-            )
+              method = "GET",
+            ),
           )
         }
 
@@ -176,12 +197,12 @@ class CatalogOPDSClients(
                       facetTitleProvider = facetTitleProvider,
                       feedSelection = FeedBooksSelection.BOOKS_FEED_LOANED,
                       filterByAccountID = account.id,
-                      sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-                      search = null
-                    )
+                      sortBy = FeedFacetPseudoSorting.SortBy.SORT_BY_TITLE,
+                      search = null,
+                    ),
                   ).get()
-              }
-            )
+              },
+            ),
           )
         }
 
@@ -198,12 +219,12 @@ class CatalogOPDSClients(
                       facetTitleProvider = facetTitleProvider,
                       feedSelection = FeedBooksSelection.BOOKS_FEED_HOLDS,
                       filterByAccountID = account.id,
-                      sortBy = FeedFacet.FeedFacetPseudo.Sorting.SortBy.SORT_BY_TITLE,
-                      search = null
-                    )
+                      sortBy = FeedFacetPseudoSorting.SortBy.SORT_BY_TITLE,
+                      search = null,
+                    ),
                   ).get()
-              }
-            )
+              },
+            ),
           )
         }
       }
@@ -218,7 +239,7 @@ class CatalogOPDSClients(
   }
 
   private class CatalogFacetPseudoTitleProvider(
-    val resources: Resources
+    val resources: Resources,
   ) : FeedFacetPseudoTitleProviderType {
     override val sortByTitle: String
       get() = this.resources.getString(R.string.feedByTitle)

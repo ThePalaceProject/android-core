@@ -14,6 +14,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.api.BookIDs
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.audio.AudioBookManifestStrategiesType
 import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_registry.BookRegistryType
@@ -34,10 +35,10 @@ import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.Borro
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskException.BorrowSubtaskHaltedEarly
 import org.nypl.simplified.books.borrowing.subtasks.BorrowSubtaskFactoryType
 import org.nypl.simplified.content.api.ContentResolverType
+import org.nypl.simplified.feeds.api.FeedAcquisitionPath
+import org.nypl.simplified.feeds.api.FeedAcquisitionPathElement
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.links.Link
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSAcquisitionPath
-import org.nypl.simplified.opds.core.OPDSAcquisitionPathElement
 import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.profiles.api.ProfileType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
@@ -60,16 +61,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class BorrowTask private constructor(
   private val requirements: BorrowRequirements,
-  private val request: BorrowRequest
+  private val request: BorrowRequest,
 ) : BorrowTaskType {
   companion object : BorrowTaskFactoryType {
     override fun createBorrowTask(
       requirements: BorrowRequirements,
-      request: BorrowRequest
+      request: BorrowRequest,
     ): BorrowTaskType =
       BorrowTask(
         requirements = requirements,
-        request = request
+        request = request,
       )
   }
 
@@ -80,7 +81,7 @@ class BorrowTask private constructor(
     AtomicBoolean(false)
 
   private val bookId by lazy {
-    BookIDs.newFromOPDSEntry(this.request.opdsAcquisitionFeedEntry)
+    FeedBookIDConversions.toBookID(this.request.opdsAcquisitionFeedEntry.bookID)
   }
 
   private val bookIdBrief by lazy {
@@ -94,22 +95,22 @@ class BorrowTask private constructor(
   private class BorrowFailedNoNetwork : Exception("No network!")
 
   private class BorrowFailedHandled(
-    exception: Throwable?
+    exception: Throwable?,
   ) : Exception(exception)
 
   private fun debug(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
 
   private fun error(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
 
   private fun warn(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
 
   override fun execute(): TaskResult<*> {
@@ -134,7 +135,7 @@ class BorrowTask private constructor(
         message = this.messageOrName(e),
         errorCode = unexpectedException,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.taskRecorder.finishFailure<Unit>()
     }
@@ -145,8 +146,8 @@ class BorrowTask private constructor(
       this.requirements.bookRegistry.update(
         BookWithStatus(
           book = bookWithStatus.book,
-          status = BookStatus.RequestingDownload(bookID)
-        )
+          status = BookStatus.RequestingDownload(bookID),
+        ),
       )
     }
   }
@@ -178,7 +179,7 @@ class BorrowTask private constructor(
         cover = null,
         thumbnail = null,
         entry = start.opdsAcquisitionFeedEntry,
-        formats = listOf()
+        formats = listOf(),
       )
 
     val profile = this.requirements.profiles.currentProfile()
@@ -195,8 +196,8 @@ class BorrowTask private constructor(
 
   private fun executeSubtasksForPath(
     book: Book,
-    path: OPDSAcquisitionPath,
-    samlDownloadContext: SAMLDownloadContext?
+    path: FeedAcquisitionPath,
+    samlDownloadContext: SAMLDownloadContext?,
   ) {
     val currentProfile =
       this.requirements.profiles.currentProfile()
@@ -217,7 +218,7 @@ class BorrowTask private constructor(
         cancelled = this.cancelled,
         clock = this.requirements.clock,
         contentResolver = this.requirements.contentResolver,
-        currentOPDSAcquisitionPathElement = path.elements.first(),
+        currentFeedAcquisitionPathElement = path.elements.first(),
         httpClient = this.requirements.httpClient,
         lcpService = this.requirements.lcpService,
         logger = this.logger,
@@ -229,14 +230,16 @@ class BorrowTask private constructor(
         temporaryDirectory = this.requirements.temporaryDirectory,
       )
 
-    when (this.requirements.httpClient.networkAccess
-      .canUseNetwork()) {
+    when (
+      this.requirements.httpClient.networkAccess
+        .canUseNetwork()
+    ) {
       NETWORK_UNAVAILABLE -> {
         this.taskRecorder.currentStepFailed(
           message = "The network is currently unavailable.",
           errorCode = "error-no-network",
           exception = null,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         this.publishBookFailure(book)
         throw BorrowFailedNoNetwork()
@@ -247,7 +250,7 @@ class BorrowTask private constructor(
           message = "The current network settings do not allow downloads when Wi-Fi is unavailable.",
           errorCode = "error-no-permitted-network",
           exception = null,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         this.publishBookFailure(book)
         throw BorrowFailedNoNetwork()
@@ -265,9 +268,9 @@ class BorrowTask private constructor(
         }
 
         val pathElement = context.opdsAcquisitionPath.elements[0]
-        context.currentOPDSAcquisitionPathElement = pathElement
+        context.currentFeedAcquisitionPathElement = pathElement
 
-        val queue: MutableList<OPDSAcquisitionPathElement> =
+        val queue: MutableList<FeedAcquisitionPathElement> =
           context.opdsAcquisitionPath.elements.toMutableList()
         queue.removeAt(0)
         context.opdsAcquisitionPath = context.opdsAcquisitionPath.copy(elements = queue.toList())
@@ -278,7 +281,7 @@ class BorrowTask private constructor(
             context = context,
             pathElement = pathElement,
             book = book,
-            remaining = queue.toList().map(OPDSAcquisitionPathElement::mimeType)
+            remaining = queue.toList().map(FeedAcquisitionPathElement::mimeType),
           )
         this.subtaskExecute(subtaskFactory, context, book)
       } catch (e: BorrowSubtaskHaltedEarly) {
@@ -298,7 +301,7 @@ class BorrowTask private constructor(
   private fun subtaskExecute(
     subtaskFactory: BorrowSubtaskFactoryType,
     context: BorrowContext,
-    book: Book
+    book: Book,
   ) {
     val name = subtaskFactory.name
     val step = this.taskRecorder.beginNewStep("Executing subtask '$name'...")
@@ -322,7 +325,7 @@ class BorrowTask private constructor(
               message = "Subtask '$name' raised an unexpected exception",
               exception = e,
               errorCode = subtaskFailed,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
           throw e
         }
@@ -341,7 +344,7 @@ class BorrowTask private constructor(
           message = "Subtask '$name' raised an unexpected exception",
           exception = e,
           errorCode = subtaskFailed,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
@@ -354,9 +357,9 @@ class BorrowTask private constructor(
 
   private fun subtaskFindForPathElement(
     context: BorrowContext,
-    pathElement: OPDSAcquisitionPathElement,
+    pathElement: FeedAcquisitionPathElement,
     book: Book,
-    remaining: List<MIMEType>
+    remaining: List<MIMEType>,
   ): BorrowSubtaskFactoryType {
     this.taskRecorder.beginNewStep("Finding subtask for acquisition path element ${pathElement.mimeType}...")
     val subtaskFactory =
@@ -364,13 +367,13 @@ class BorrowTask private constructor(
         mimeType = pathElement.mimeType,
         target = context.currentURI(),
         account = context.account,
-        remainingTypes = remaining
+        remainingTypes = remaining,
       )
     if (subtaskFactory == null) {
       this.taskRecorder.currentStepFailed(
         message = "We don't know how to handle this kind of acquisition.",
         errorCode = noSubtaskAvailable,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(null)
@@ -386,7 +389,7 @@ class BorrowTask private constructor(
 
   private fun createBookDatabaseEntry(
     book: Book,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook,
   ): Book {
     this.taskRecorder.beginNewStep("Setting up a book database entry...")
 
@@ -402,7 +405,7 @@ class BorrowTask private constructor(
         message = "Could not set up the book database entry.",
         errorCode = bookDatabaseFailed,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(e)
@@ -415,7 +418,7 @@ class BorrowTask private constructor(
 
   private fun findAccount(
     profile: ProfileReadableType,
-    book: Book
+    book: Book,
   ): AccountType {
     this.taskRecorder.beginNewStep("Locating account ${book.account.uuid} in the profile...")
     this.taskRecorder.addAttribute("Account ID", book.account.uuid.toString())
@@ -429,7 +432,7 @@ class BorrowTask private constructor(
           message = "An unexpected exception was raised.",
           errorCode = accountsDatabaseException,
           exception = e,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
 
         this.publishBookFailure(book)
@@ -447,8 +450,8 @@ class BorrowTask private constructor(
 
   private fun pickAcquisitionPath(
     book: Book,
-    entry: OPDSAcquisitionFeedEntry
-  ): OPDSAcquisitionPath {
+    entry: FeedEntryBook,
+  ): FeedAcquisitionPath {
     this.taskRecorder.beginNewStep("Planning the borrow operation…")
 
     val path =
@@ -457,7 +460,7 @@ class BorrowTask private constructor(
       this.taskRecorder.currentStepFailed(
         message = "No supported acquisitions.",
         errorCode = noSupportedAcquisitions,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishBookFailure(book)
       throw BorrowFailedHandled(null)
@@ -472,8 +475,8 @@ class BorrowTask private constructor(
     this.requirements.bookRegistry.update(
       BookWithStatus(
         book,
-        BookStatus.FailedLoan(book.id, failure)
-      )
+        BookStatus.FailedLoan(book.id, failure),
+      ),
     )
   }
 
@@ -488,13 +491,13 @@ class BorrowTask private constructor(
     override val httpClient: LSHTTPClientType,
     override val taskRecorder: TaskRecorderType,
     @Volatile
-    override var opdsAcquisitionPath: OPDSAcquisitionPath,
+    override var opdsAcquisitionPath: FeedAcquisitionPath,
     override val samlDownloadContext: SAMLDownloadContext? = null,
     bookInitial: Book,
     private val bookRegistry: BookRegistryType,
     private val logger: Logger,
     private val temporaryDirectory: File,
-    var currentOPDSAcquisitionPathElement: OPDSAcquisitionPathElement,
+    var currentFeedAcquisitionPathElement: FeedAcquisitionPathElement,
     override val adobeExecutor: AdobeAdeptExecutorType?,
     override val boundlessService: BoundlessServiceType?,
     override val lcpService: LcpService?,
@@ -502,7 +505,7 @@ class BorrowTask private constructor(
     private val cacheDirectory: File,
     private val cancelled: AtomicBoolean,
     override val audiobookAuthorizationHandler: BorrowAudiobookAuthorizationHandler,
-    override val profile: ProfileType
+    override val profile: ProfileType,
   ) : BorrowContextType {
     override fun cacheDirectory(): File = this.cacheDirectory
 
@@ -523,8 +526,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.DownloadWaitingForExternalAuthentication(
           id = this.bookCurrent.id,
-          downloadURI = this.currentURICheck()
-        )
+          downloadURI = this.currentURICheck(),
+        ),
       )
     }
 
@@ -532,7 +535,7 @@ class BorrowTask private constructor(
       message: String,
       receivedSize: Long?,
       expectedSize: Long?,
-      bytesPerSecond: Long?
+      bytesPerSecond: Long?,
     ) {
       this.logDebug("downloading: {} {} {}", expectedSize, receivedSize, bytesPerSecond)
 
@@ -541,8 +544,8 @@ class BorrowTask private constructor(
           id = this.bookCurrent.id,
           currentTotalBytes = receivedSize,
           expectedTotalBytes = expectedSize,
-          detailMessage = message
-        )
+          detailMessage = message,
+        ),
       )
     }
 
@@ -558,8 +561,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.RequestingLoan(
           id = this.bookCurrent.id,
-          detailMessage = message
-        )
+          detailMessage = message,
+        ),
       )
     }
 
@@ -567,8 +570,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedLoan(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -576,19 +579,19 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.ReachedLoanLimit(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
-    override fun chooseNewAcquisitionPath(entry: OPDSAcquisitionFeedEntry): Link {
+    override fun chooseNewAcquisitionPath(entry: FeedEntryBook): Link {
       val path = this.borrowTask.pickAcquisitionPath(this.bookCurrent, entry)
       this.logDebug("Selected a new acquisition path.")
       check(path.elements.isNotEmpty()) { "Selected acquisition path cannot be empty!" }
       this.logDebug(
         "Path now starts with {} (type {})",
         path.elements[0].target,
-        path.elements[0].mimeType
+        path.elements[0].mimeType,
       )
       this.opdsAcquisitionPath = path
       this.currentRemainingOPDSPathElements = this.opdsAcquisitionPath.elements
@@ -602,8 +605,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedDownloadBadCredentials(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -611,8 +614,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedLoanBadCredentials(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -635,8 +638,8 @@ class BorrowTask private constructor(
       this.bookPublishStatus(
         BookStatus.FailedDownload(
           id = this.bookCurrent.id,
-          result = this.taskRecorder.finishFailure()
-        )
+          result = this.taskRecorder.finishFailure(),
+        ),
       )
     }
 
@@ -644,7 +647,11 @@ class BorrowTask private constructor(
       null
 
     override fun currentURI(): Link? {
-      return this.currentURIField ?: return this.currentAcquisitionPathElement.target
+      val currentURI = this.currentURIField
+      if (currentURI == null) {
+        return this.currentAcquisitionPathElement.target
+      }
+      return currentURI
     }
 
     override fun receivedNewURI(uri: Link) {
@@ -652,25 +659,25 @@ class BorrowTask private constructor(
       this.currentURIField = uri
     }
 
-    override val currentAcquisitionPathElement: OPDSAcquisitionPathElement
-      get() = this.currentOPDSAcquisitionPathElement
+    override val currentAcquisitionPathElement: FeedAcquisitionPathElement
+      get() = this.currentFeedAcquisitionPathElement
 
     private val bookIdBrief =
       bookInitial.id.brief()
 
     override fun logDebug(
       message: String,
-      vararg arguments: Any?
+      vararg arguments: Any?,
     ) = this.logger.debug("[{}] $message", this.bookIdBrief, *arguments)
 
     override fun logError(
       message: String,
-      vararg arguments: Any?
+      vararg arguments: Any?,
     ) = this.logger.error("[{}] $message", this.bookIdBrief, *arguments)
 
     override fun logWarn(
       message: String,
-      vararg arguments: Any?
+      vararg arguments: Any?,
     ) = this.logger.warn("[{}] $message", this.bookIdBrief, *arguments)
 
     override fun temporaryFile(extension: String): File {
@@ -686,6 +693,8 @@ class BorrowTask private constructor(
       throw IOException("Could not create a temporary file within 100 attempts!")
     }
 
-    override fun opdsAcquisitionPathRemaining(): List<OPDSAcquisitionPathElement> = this.currentRemainingOPDSPathElements
+    override fun opdsAcquisitionPathRemaining(): List<FeedAcquisitionPathElement> {
+      return this.currentRemainingOPDSPathElements
+    }
   }
 }

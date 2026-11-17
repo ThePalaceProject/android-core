@@ -6,6 +6,8 @@ import org.nypl.simplified.books.api.Book
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.formats.api.StandardFormatNames
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.nypl.simplified.viewer.spi.ViewerProviderType
 import org.slf4j.LoggerFactory
@@ -21,11 +23,12 @@ class PdfViewerProvider : ViewerProviderType {
   override fun canSupport(
     preferences: ViewerParameters,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
   ): Boolean =
     when (format) {
       is BookFormat.BookFormatEPUB,
-      is BookFormat.BookFormatAudioBook -> {
+      is BookFormat.BookFormatAudioBook,
+      -> {
         logger.debug("the PDF viewer can only open PDF files!")
         false
       }
@@ -42,12 +45,12 @@ class PdfViewerProvider : ViewerProviderType {
     parameters: ViewerParameters,
     book: Book,
     format: BookFormat,
-    accountProviderId: URI
+    accountProviderId: URI,
   ) {
     val formatPDF =
       format as BookFormat.BookFormatPDF
     val entry =
-      FeedEntry.FeedEntryOPDS(book.account, book.entry)
+      book.entry
 
     PdfReaderActivity.startActivity(
       context = activity,
@@ -58,8 +61,8 @@ class PdfViewerProvider : ViewerProviderType {
           pdfFile = formatPDF.file!!,
           id = book.id,
           drmInfo = formatPDF.drmInformation,
-          entry = entry
-        )
+          entry = entry,
+        ),
     )
   }
 }

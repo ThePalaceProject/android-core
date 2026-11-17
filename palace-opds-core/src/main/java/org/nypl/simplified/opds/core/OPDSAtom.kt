@@ -12,7 +12,9 @@ object OPDSAtom {
   @Throws(OPDSParseException::class)
   fun findID(ee: Element): String =
     getFirstChildElementTextWithName(
-      ee, OPDSFeedConstants.ATOM_URI, "id"
+      ee,
+      OPDSFeedConstants.ATOM_URI,
+      "id",
     )
 
   @JvmStatic
@@ -20,7 +22,9 @@ object OPDSAtom {
   fun findPublished(e: Element): DateTime? {
     val eOpt: Element? =
       getFirstChildElementWithNameOptional(
-        e, OPDSFeedConstants.DUBLIN_CORE_TERMS_URI, "issued"
+        e,
+        OPDSFeedConstants.DUBLIN_CORE_TERMS_URI,
+        "issued",
       )
 
     return eOpt?.let { er ->
@@ -34,7 +38,9 @@ object OPDSAtom {
   @Throws(OPDSParseException::class)
   fun findTitle(e: Element): String =
     getFirstChildElementTextWithName(
-      e, OPDSFeedConstants.ATOM_URI, "title"
+      e,
+      OPDSFeedConstants.ATOM_URI,
+      "title",
     )
 
   @JvmStatic

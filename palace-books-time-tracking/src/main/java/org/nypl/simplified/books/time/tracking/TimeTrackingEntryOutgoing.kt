@@ -46,7 +46,7 @@ data class TimeTrackingEntryOutgoing(
             accountID = entry.accountID,
             bookID = entry.bookID,
             libraryID = entry.libraryID,
-            targetURI = entry.targetURI
+            targetURI = entry.targetURI,
           )
         var existing = results[key]
         existing = existing?.plus(entry) ?: listOf(entry)
@@ -72,8 +72,8 @@ data class TimeTrackingEntryOutgoing(
           TimeTrackingEntry(
             id = p.getProperty("ID"),
             duringMinute = p.getProperty("Minute"),
-            secondsPlayed = p.getProperty("Seconds").toInt()
-          )
+            secondsPlayed = p.getProperty("Seconds").toInt(),
+          ),
       )
   }
 }

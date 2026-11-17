@@ -40,7 +40,7 @@ interface ServiceDirectoryType {
           this.append("No service implementation is available\n")
           this.append("  Service: ${serviceClass.canonicalName}\n")
           this.append("Note that this might indicate a circular dependency between services!\n")
-        }
+        },
       )
     }
     return services

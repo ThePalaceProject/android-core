@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.librarysimplified.ui.R
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle.MAIN_GROUPED_FEED_LANE
 import org.nypl.simplified.ui.catalog.CatalogFeedWithGroupsLaneViewHolder.LaneStyle.RELATED_BOOKS_LANE
@@ -37,7 +38,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
      * different padding and different text sizes.
      */
 
-    RELATED_BOOKS_LANE
+    RELATED_BOOKS_LANE,
   }
 
   private val titleContainer =
@@ -61,13 +62,15 @@ class CatalogFeedWithGroupsLaneViewHolder(
       this.setHasFixedSize(true)
       this.layoutManager =
         LinearLayoutManager(
-          this.context, LinearLayoutManager.HORIZONTAL, false
+          this.context,
+          LinearLayoutManager.HORIZONTAL,
+          false,
         )
 
       this.addItemDecoration(
         SpaceItemDecoration(
-          this.resources.getDimensionPixelSize(R.dimen.catalogFeedCoversSpace)
-        )
+          this.resources.getDimensionPixelSize(R.dimen.catalogFeedCoversSpace),
+        ),
       )
     }
   }
@@ -83,7 +86,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
           val newTitleLayout =
             LinearLayout.LayoutParams(
               LinearLayout.LayoutParams.MATCH_PARENT,
-              LinearLayout.LayoutParams.WRAP_CONTENT
+              LinearLayout.LayoutParams.WRAP_CONTENT,
             )
 
           val marginH = this.screenSize.dpToPixels(32).toInt()
@@ -99,7 +102,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
             marginH,
             0,
             marginH,
-            0
+            0,
           )
         }
       }
@@ -131,7 +134,7 @@ class CatalogFeedWithGroupsLaneViewHolder(
         callbacks = this.callbacks,
       )
 
-    catalogLaneAdapter.submitList(group.groupEntries.filterIsInstance<FeedEntry.FeedEntryOPDS>())
+    catalogLaneAdapter.submitList(group.groupEntries.filterIsInstance<FeedEntryBook>())
     this.scrollView.adapter = catalogLaneAdapter
   }
 

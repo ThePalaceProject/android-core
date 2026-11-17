@@ -2,7 +2,7 @@ package org.nypl.simplified.books.book_database.api
 
 import one.irradia.mime.api.MIMEType
 import one.irradia.mime.vanilla.MIMEParser
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 
 /**
  * Information about the supported book formats.
@@ -27,17 +27,17 @@ object BookFormats {
   private val GENERIC_AUDIO_BOOKS =
     mimesOf(
       "application/audiobook+json",
-      "audio/mpeg"
+      "audio/mpeg",
     )
 
   private val LCP_AUDIO_BOOKS =
     mimesOf(
-      "application/audiobook+lcp"
+      "application/audiobook+lcp",
     )
 
   private val OVERDRIVE_AUDIO_BOOKS =
     mimesOf(
-      "application/vnd.overdrive.circulation.api+json;profile=audiobook"
+      "application/vnd.overdrive.circulation.api+json;profile=audiobook",
     )
 
   private val AUDIO_BOOK_MIME_TYPES =
@@ -45,25 +45,25 @@ object BookFormats {
       FINDAWAY_AUDIO_BOOKS,
       GENERIC_AUDIO_BOOKS,
       LCP_AUDIO_BOOKS,
-      OVERDRIVE_AUDIO_BOOKS
+      OVERDRIVE_AUDIO_BOOKS,
     )
 
   private val EPUB_MIME_TYPES =
     mimesOf(
       "application/epub+zip",
-      "application/vnd.librarysimplified.axisnow+json"
+      "application/vnd.librarysimplified.axisnow+json",
     )
 
   private val PDF_MIME_TYPES =
     mimesOf(
-      "application/pdf"
+      "application/pdf",
     )
 
   private val SUPPORTED_BOOK_MIME_TYPES =
     unionOf(
       EPUB_MIME_TYPES,
       AUDIO_BOOK_MIME_TYPES,
-      PDF_MIME_TYPES
+      PDF_MIME_TYPES,
     )
 
   /**
@@ -111,10 +111,9 @@ object BookFormats {
   private val formats = BookFormatDefinition.values()
 
   /**
-   * @return The probable format of the book in the given OPDS entry
+   * @return The probable format of the book in the given feed entry
    */
-
-  fun inferFormat(entry: OPDSAcquisitionFeedEntry): BookFormatDefinition? {
+  fun inferFormat(entry: FeedEntryBook): BookFormatDefinition? {
     for (acquisition in entry.acquisitions) {
       for (format in formats) {
         val available = acquisition.availableFinalContentTypes()
@@ -159,7 +158,7 @@ object BookFormats {
       override val shortName: String = "pdf"
 
       override fun supportedContentTypes(): Set<MIMEType> = pdfMimeTypes()
-    };
+    }, ;
 
     /**
      * The short name of the format

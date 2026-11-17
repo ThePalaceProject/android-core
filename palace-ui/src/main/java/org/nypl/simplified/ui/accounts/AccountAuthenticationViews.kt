@@ -25,33 +25,33 @@ import org.nypl.simplified.ui.accounts.view_bindings.ViewsForSAML20
 
 class AccountAuthenticationViews(
   private val viewGroup: ViewGroup,
-  onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit
+  onUsernamePasswordChangeListener: (AccountUsername, AccountPassword) -> Unit,
 ) {
   private val basic: ViewsForBasic =
     ViewsForBasic.bind(
       viewGroup = this.viewGroup.findViewById(R.id.authBasic),
-      onUsernamePasswordChangeListener = onUsernamePasswordChangeListener
+      onUsernamePasswordChangeListener = onUsernamePasswordChangeListener,
     )
 
   private val basicToken: ViewsForBasicToken =
     ViewsForBasicToken.bind(
       viewGroup = this.viewGroup.findViewById(R.id.authBasicToken),
-      onUsernamePasswordChangeListener = onUsernamePasswordChangeListener
+      onUsernamePasswordChangeListener = onUsernamePasswordChangeListener,
     )
 
   private val anonymous: ViewsForAnonymous =
     ViewsForAnonymous.bind(
-      this.viewGroup.findViewById(R.id.authAnon)
+      this.viewGroup.findViewById(R.id.authAnon),
     )
 
   private val saml20: ViewsForSAML20 =
     ViewsForSAML20.bind(
-      this.viewGroup.findViewById(R.id.authSAML)
+      this.viewGroup.findViewById(R.id.authSAML),
     )
 
   private val oidc: ViewsForOIDC =
     ViewsForOIDC.bind(
-      this.viewGroup.findViewById(R.id.authOIDC)
+      this.viewGroup.findViewById(R.id.authOIDC),
     )
 
   private val viewGroups =
@@ -60,7 +60,7 @@ class AccountAuthenticationViews(
       this.basicToken,
       this.anonymous,
       this.saml20,
-      this.oidc
+      this.oidc,
     )
 
   /**
@@ -126,7 +126,7 @@ class AccountAuthenticationViews(
   fun setResetPasswordLabelStatus(
     status: AccountLoginButtonStatus,
     isVisible: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
   ) {
     this.viewGroups.forEach {
       it.setResetPasswordLabelStatus(status, isVisible, onClick)
@@ -170,21 +170,21 @@ class AccountAuthenticationViews(
 
   fun setBasicUserAndPass(
     user: String,
-    password: String
+    password: String,
   ) {
     this.basic.setUserAndPass(
       user = user,
-      password = password
+      password = password,
     )
   }
 
   fun setBasicTokenUserAndPass(
     user: String,
-    password: String
+    password: String,
   ) {
     this.basicToken.setUserAndPass(
       user = user,
-      password = password
+      password = password,
     )
   }
 
@@ -205,7 +205,8 @@ class AccountAuthenticationViews(
 
       is OpenIDConnect,
       Anonymous,
-      is SAML2_0 -> {
+      is SAML2_0,
+      -> {
         true
       }
     }

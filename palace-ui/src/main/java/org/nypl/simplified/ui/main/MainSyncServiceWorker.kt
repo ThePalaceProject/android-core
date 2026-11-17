@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 
 class MainSyncServiceWorker(
   context: Context,
-  params: WorkerParameters
+  params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
   companion object {
     private val logger =
@@ -26,7 +26,7 @@ class MainSyncServiceWorker(
         .serviceDirectoryFuture()
         .addListener(
           this::runTask,
-          MoreExecutors.directExecutor()
+          MoreExecutors.directExecutor(),
         )
     } catch (e: Throwable) {
       logger.debug("Book syncing failed: ", e)

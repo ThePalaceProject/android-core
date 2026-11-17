@@ -80,7 +80,8 @@ interface AccountType : AccountReadableType {
       is AccountLoginState.AccountLoggingInWaitingForExternalAuthentication,
       is AccountLoginState.AccountLoginFailed,
       is AccountLoginState.AccountLogoutFailed,
-      is AccountLoginState.AccountNotLoggedIn -> {
+      is AccountLoginState.AccountNotLoggedIn,
+      -> {
         Unit
       }
     }

@@ -11,12 +11,12 @@ import java.time.ZoneOffset
 internal object DBAccountProviders {
   fun forceUTC(description: AccountProvider): AccountProvider =
     description.copy(
-      updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC)
+      updated = description.updated.withOffsetSameInstant(ZoneOffset.UTC),
     )
 
   fun parseFromResult(
     transaction: DBTransactionType,
-    resultSet: ResultSet
+    resultSet: ResultSet,
   ): AccountProvider =
     when (val result = resultSet.getString("ap_data_format")) {
       FORMAT_ACCOUNT_PROVIDER_JSON -> {

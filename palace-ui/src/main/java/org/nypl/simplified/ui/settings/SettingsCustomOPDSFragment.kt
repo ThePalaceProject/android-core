@@ -52,12 +52,13 @@ class SettingsCustomOPDSFragment :
       override fun fragment(): SettingsCustomOPDSFragment = SettingsCustomOPDSFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> = ScreenSettingsCustomOPDS()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsCustomOPDSFragment> =
+      ScreenSettingsCustomOPDS()
   }
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -88,12 +89,12 @@ class SettingsCustomOPDSFragment :
     this.subscriptions.add(
       SettingsCustomOPDSModel.taskRunningUI.subscribe { _, status ->
         this.onTaskRunningChanged(status)
-      }
+      },
     )
     this.subscriptions.add(
       SettingsCustomOPDSModel.taskUI.subscribe { _, status ->
         this.onTaskMessages(status)
-      }
+      },
     )
 
     this.toolbarBack.setOnClickListener {
@@ -104,7 +105,7 @@ class SettingsCustomOPDSFragment :
       SettingsCustomOPDSModel.createCustomOPDSFeed(
         this.feedURL.text
           .trim()
-          .toString()
+          .toString(),
       )
     }
   }
@@ -166,7 +167,7 @@ class SettingsCustomOPDSFragment :
       s: CharSequence?,
       start: Int,
       count: Int,
-      after: Int
+      after: Int,
     ) {
     }
 
@@ -174,7 +175,7 @@ class SettingsCustomOPDSFragment :
       s: CharSequence?,
       start: Int,
       before: Int,
-      count: Int
+      count: Int,
     ) {
       this@SettingsCustomOPDSFragment.create.isEnabled =
         this@SettingsCustomOPDSFragment.isValidURI()

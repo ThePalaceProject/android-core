@@ -20,5 +20,5 @@ data class SerializedBookmarkFallbackValues(
    * The book's title as it appeared in an OPDS feed.
    */
 
-  val bookTitle: String
+  val bookTitle: String,
 )

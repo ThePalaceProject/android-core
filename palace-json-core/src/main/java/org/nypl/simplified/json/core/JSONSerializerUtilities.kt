@@ -25,7 +25,7 @@ object JSONSerializerUtilities {
   @Throws(IOException::class)
   fun serialize(
     d: ObjectNode,
-    os: OutputStream
+    os: OutputStream,
   ) {
     this.objectMapper
       .writerWithDefaultPrettyPrinter()

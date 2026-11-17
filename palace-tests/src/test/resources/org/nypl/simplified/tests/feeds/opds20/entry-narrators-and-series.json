@@ -1,0 +1,28 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:1010101010",
+        "title": "Audiobook",
+        "narrator": [
+          {"name": "Narrator One"}
+        ],
+        "belongsTo": {
+          "series": {
+            "name": "Dune",
+            "position": 1.0,
+            "links": [
+              {"href": "https://example.com/series/dune", "rel": "self"}
+            ]
+          }
+        }
+      },
+      "links": []
+    }
+  ]
+}

@@ -15,13 +15,13 @@ import java.security.MessageDigest
  */
 
 class BookCoverBadgeTransform(
-  private val badge: BookCoverBadge?
+  private val badge: BookCoverBadge?,
 ) : BitmapTransformation() {
   override fun transform(
     pool: BitmapPool,
     source: Bitmap,
     outWidth: Int,
-    outHeight: Int
+    outHeight: Int,
   ): Bitmap {
     if (this.badge == null) {
       return source.copy(source.config ?: Bitmap.Config.ARGB_8888, true)
@@ -45,7 +45,7 @@ class BookCoverBadgeTransform(
       targetRect.exactCenterX(),
       targetRect.exactCenterY(),
       targetRect.width() / 2.0f,
-      backgroundPaint
+      backgroundPaint,
     )
 
     // Badge icon drawn over the circle

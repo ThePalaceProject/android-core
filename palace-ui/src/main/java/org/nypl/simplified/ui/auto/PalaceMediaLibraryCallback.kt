@@ -36,7 +36,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
   override fun onGetLibraryRoot(
     session: MediaLibraryService.MediaLibrarySession,
     browser: MediaSession.ControllerInfo,
-    params: MediaLibraryService.LibraryParams?
+    params: MediaLibraryService.LibraryParams?,
   ): ListenableFuture<LibraryResult<MediaItem>> {
     this.logger.debug("onGetLibraryRoot")
 
@@ -51,7 +51,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
   override fun onGetItem(
     session: MediaLibraryService.MediaLibrarySession,
     browser: MediaSession.ControllerInfo,
-    mediaId: String
+    mediaId: String,
   ): ListenableFuture<LibraryResult<MediaItem>> {
     this.logger.debug("onGetItem: {}", mediaId)
     return super.onGetItem(session, browser, mediaId)
@@ -61,7 +61,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     session: MediaLibraryService.MediaLibrarySession,
     browser: MediaSession.ControllerInfo,
     parentId: String,
-    params: MediaLibraryService.LibraryParams?
+    params: MediaLibraryService.LibraryParams?,
   ): ListenableFuture<LibraryResult<Void>> {
     this.logger.debug("onSubscribe: {}", parentId)
     return super.onSubscribe(session, browser, parentId, params)
@@ -70,7 +70,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
   override fun onUnsubscribe(
     session: MediaLibraryService.MediaLibrarySession,
     browser: MediaSession.ControllerInfo,
-    parentId: String
+    parentId: String,
   ): ListenableFuture<LibraryResult<Void>> {
     this.logger.debug("onUnsubscribe: {}", parentId)
     return super.onUnsubscribe(session, browser, parentId)
@@ -80,7 +80,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     session: MediaLibraryService.MediaLibrarySession,
     browser: MediaSession.ControllerInfo,
     query: String,
-    params: MediaLibraryService.LibraryParams?
+    params: MediaLibraryService.LibraryParams?,
   ): ListenableFuture<LibraryResult<Void>> {
     this.logger.debug("onSearch: {}", query)
     return super.onSearch(session, browser, query, params)
@@ -92,7 +92,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     query: String,
     page: Int,
     pageSize: Int,
-    params: MediaLibraryService.LibraryParams?
+    params: MediaLibraryService.LibraryParams?,
   ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
     this.logger.debug("onGetSearchResult: {} {} {}", query, page, pageSize)
     return super.onGetSearchResult(session, browser, query, page, pageSize, params)
@@ -100,7 +100,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
 
   override fun onConnect(
     session: MediaSession,
-    controller: MediaSession.ControllerInfo
+    controller: MediaSession.ControllerInfo,
   ): MediaSession.ConnectionResult {
     this.logger.debug("onConnect")
     return super.onConnect(session, controller)
@@ -108,7 +108,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
 
   override fun onPostConnect(
     session: MediaSession,
-    controller: MediaSession.ControllerInfo
+    controller: MediaSession.ControllerInfo,
   ) {
     this.logger.debug("onPostConnect")
     super.onPostConnect(session, controller)
@@ -116,7 +116,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
 
   override fun onDisconnected(
     session: MediaSession,
-    controller: MediaSession.ControllerInfo
+    controller: MediaSession.ControllerInfo,
   ) {
     this.logger.debug("onDisconnected")
     super.onDisconnected(session, controller)
@@ -126,7 +126,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
   override fun onPlayerCommandRequest(
     session: MediaSession,
     controller: MediaSession.ControllerInfo,
-    playerCommand: Int
+    playerCommand: Int,
   ): Int {
     this.logger.debug("onPlayerCommandRequest: {}", playerCommand)
     return super.onPlayerCommandRequest(session, controller, playerCommand)
@@ -136,7 +136,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     session: MediaSession,
     controller: MediaSession.ControllerInfo,
     mediaId: String,
-    rating: Rating
+    rating: Rating,
   ): ListenableFuture<SessionResult> {
     this.logger.debug("onSetRating: {} {}", mediaId, rating)
     return super.onSetRating(session, controller, mediaId, rating)
@@ -145,7 +145,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
   override fun onSetRating(
     session: MediaSession,
     controller: MediaSession.ControllerInfo,
-    rating: Rating
+    rating: Rating,
   ): ListenableFuture<SessionResult> {
     this.logger.debug("onSetRating: {}", rating)
     return super.onSetRating(session, controller, rating)
@@ -155,7 +155,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     session: MediaSession,
     controller: MediaSession.ControllerInfo,
     customCommand: SessionCommand,
-    args: Bundle
+    args: Bundle,
   ): ListenableFuture<SessionResult> {
     this.logger.debug("onCustomCommand: {}", customCommand)
     return super.onCustomCommand(session, controller, customCommand, args)
@@ -164,7 +164,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
   override fun onAddMediaItems(
     mediaSession: MediaSession,
     controller: MediaSession.ControllerInfo,
-    mediaItems: List<MediaItem>
+    mediaItems: List<MediaItem>,
   ): ListenableFuture<List<MediaItem>> {
     this.logger.debug("onAddMediaItems")
     return super.onAddMediaItems(mediaSession, controller, mediaItems)
@@ -172,7 +172,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
 
   override fun onPlaybackResumption(
     mediaSession: MediaSession,
-    controller: MediaSession.ControllerInfo
+    controller: MediaSession.ControllerInfo,
   ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
     this.logger.debug("onPlaybackResumption")
     return super.onPlaybackResumption(mediaSession, controller)
@@ -181,7 +181,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
   override fun onMediaButtonEvent(
     session: MediaSession,
     controllerInfo: MediaSession.ControllerInfo,
-    intent: Intent
+    intent: Intent,
   ): Boolean {
     this.logger.debug("onMediaButtonEvent")
     return super.onMediaButtonEvent(session, controllerInfo, intent)
@@ -189,7 +189,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
 
   private fun onGetLibraryRootWithServices(
     services: ServiceDirectoryType,
-    params: MediaLibraryService.LibraryParams?
+    params: MediaLibraryService.LibraryParams?,
   ): LibraryResult<MediaItem> {
     this.logger.debug("onGetLibraryRootWithServices")
 
@@ -217,7 +217,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     parentId: String,
     page: Int,
     pageSize: Int,
-    params: MediaLibraryService.LibraryParams?
+    params: MediaLibraryService.LibraryParams?,
   ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
     this.logger.debug("onGetChildren {} (page {}, pageSize {})", parentId, page, pageSize)
 
@@ -234,13 +234,13 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     parentId: String,
     page: Int,
     pageSize: Int,
-    params: MediaLibraryService.LibraryParams?
+    params: MediaLibraryService.LibraryParams?,
   ): LibraryResult<ImmutableList<MediaItem>> {
     this.logger.debug(
       "onGetChildrenWithServices {} (page {}, pageSize {})",
       parentId,
       page,
-      pageSize
+      pageSize,
     )
 
     val books =
@@ -254,7 +254,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
       if (bookWithStatus.status !is BookStatus.Loaned.LoanedDownloaded) {
         this.logger.debug(
           "onGetChildrenWithServices: Book '{}' is not downloaded",
-          book.entry.title
+          book.entry.title,
         )
         continue
       }
@@ -264,7 +264,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
         this.logger.debug(
           "onGetChildrenWithServices: Book '{}' is not an audiobook ({})",
           book.entry.title,
-          format
+          format,
         )
         continue
       }
@@ -302,12 +302,12 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     controller: MediaSession.ControllerInfo,
     mediaItems: List<MediaItem>,
     startIndex: Int,
-    startPositionMs: Long
+    startPositionMs: Long,
   ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
     this.logger.debug(
       "onSetMediaItems: startIndex {} startPositionMs: {}",
       startIndex,
-      startPositionMs
+      startPositionMs,
     )
 
     for (item in mediaItems) {
@@ -326,7 +326,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     services: ServiceDirectoryType,
     mediaItems: List<MediaItem>,
     startIndex: Int,
-    startPositionMs: Long
+    startPositionMs: Long,
   ): MediaSession.MediaItemsWithStartPosition {
     this.logger.debug("onSetMediaItemsWithServices: starting")
 
@@ -348,8 +348,8 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
       MainBackgroundBookOpenRequests.BookOpenRequest(
         book = book,
         bookFormat = format,
-        playerID = playerID
-      )
+        playerID = playerID,
+      ),
     )
 
     /*
@@ -386,13 +386,13 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
     return MediaSession.MediaItemsWithStartPosition(
       mediaItems,
       startIndex,
-      startPositionMs
+      startPositionMs,
     )
   }
 
   private fun setCover(
     book: Book,
-    metadataBuilder: MediaMetadata.Builder
+    metadataBuilder: MediaMetadata.Builder,
   ) {
     val coverFile = book.cover
     if (coverFile != null) {
@@ -417,7 +417,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
 
   private fun compareMediaItems(
     x: MediaItem,
-    y: MediaItem
+    y: MediaItem,
   ): Int {
     val xTitle = x.mediaMetadata.title!!.toString()
     val yTitle = y.mediaMetadata.title!!.toString()

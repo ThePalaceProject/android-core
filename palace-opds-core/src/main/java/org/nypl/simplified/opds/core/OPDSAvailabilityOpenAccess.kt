@@ -13,7 +13,7 @@ data class OPDSAvailabilityOpenAccess(
    * @return The revocation link, if any
    */
 
-  val revoke: URI?
+  val revoke: URI?,
 ) : OPDSAvailabilityType {
   override fun toString(): String {
     val sb = StringBuilder("OPDSAvailabilityOpenAccess{")
@@ -32,6 +32,7 @@ data class OPDSAvailabilityOpenAccess(
      */
 
     @JvmStatic
-    operator fun get(revoke: URI?): OPDSAvailabilityOpenAccess = OPDSAvailabilityOpenAccess(endDate = null, revoke = revoke)
+    operator fun get(revoke: URI?): OPDSAvailabilityOpenAccess =
+      OPDSAvailabilityOpenAccess(endDate = null, revoke = revoke)
   }
 }

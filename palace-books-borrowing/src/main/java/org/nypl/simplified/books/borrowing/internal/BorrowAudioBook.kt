@@ -42,7 +42,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean {
       for (audioType in StandardFormatNames.allAudioBooks) {
         if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, audioType)) {
@@ -59,7 +59,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
       "Requesting download...",
       receivedSize = 0L,
       expectedSize = 100L,
-      bytesPerSecond = 0L
+      bytesPerSecond = 0L,
     )
 
     return try {
@@ -80,7 +80,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
 
   private data class DownloadedManifest(
     val file: File,
-    val sourceURI: URI
+    val sourceURI: URI,
   )
 
   /**
@@ -88,7 +88,10 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
    */
 
   private fun isOverdrive(currentLink: Link): Boolean {
-    val type = currentLink.type ?: return false
+    val type = currentLink.type
+    if (type == null) {
+      return false
+    }
 
     return BookFormats
       .audioBookOverdriveMimeTypes()
@@ -98,7 +101,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
 
   private fun runStrategy(
     context: BorrowContextType,
-    currentURI: URI
+    currentURI: URI,
   ): DownloadedManifest {
     context.taskRecorder.beginNewStep("Executing audio book manifest strategy...")
 
@@ -115,7 +118,8 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
 
           null,
           is AccountAuthenticationCredentials.OpenIDConnect,
-          is AccountAuthenticationCredentials.SAML2_0 -> {
+          is AccountAuthenticationCredentials.SAML2_0,
+          -> {
             null
           }
         }
@@ -134,7 +138,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
           palaceID = PlayerPalaceID(context.bookCurrent.entry.id),
           services = context.services,
           target = AudioBookLink.Manifest(currentURI),
-        )
+        ),
       )
 
     val subscription =
@@ -143,7 +147,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
           message = message,
           receivedSize = 50L,
           expectedSize = 100L,
-          bytesPerSecond = 0L
+          bytesPerSecond = 0L,
         )
       }
 
@@ -159,7 +163,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
           outputFile.writeBytes(result.result.fulfilled.data)
           DownloadedManifest(
             file = outputFile,
-            sourceURI = currentURI
+            sourceURI = currentURI,
           )
         }
 
@@ -169,7 +173,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
             message = "Strategy failed.",
             errorCode = audioStrategyFailed,
             exception = exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           context.taskRecorder.addAll(result.steps)
           context.taskRecorder.addAttributes(result.attributes)
@@ -183,7 +187,7 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
 
   private fun opaCredentialsOf(
     userName: AccountUsername,
-    password: AccountPassword
+    password: AccountPassword,
   ): OPAUsernamePassword {
     val password =
       if (password.value.isBlank()) {
@@ -193,32 +197,33 @@ class BorrowAudioBook private constructor() : BorrowSubtaskType {
       }
     return OPAUsernamePassword(
       userName = userName.value,
-      password = password
+      password = password,
     )
   }
 
   private fun saveDownloadedContent(
     context: BorrowContextType,
-    data: DownloadedManifest
+    data: DownloadedManifest,
   ) {
     context.taskRecorder.beginNewStep("Saving book...")
     val formatHandle =
       context.bookDatabaseEntry.findFormatHandleForContentType(
-        contentType = context.currentAcquisitionPathElement.mimeType
+        contentType = context.currentAcquisitionPathElement.mimeType,
       )
 
     return when (formatHandle) {
       is BookDatabaseEntryFormatHandleAudioBook -> {
         formatHandle.copyInManifestAndURI(
           data = data.file.readBytes(),
-          manifestURI = data.sourceURI
+          manifestURI = data.sourceURI,
         )
         context.bookDownloadSucceeded()
       }
 
       is BookDatabaseEntryFormatHandlePDF,
       is BookDatabaseEntryFormatHandleEPUB,
-      null -> {
+      null,
+      -> {
         throw UnreachableCodeException()
       }
     }

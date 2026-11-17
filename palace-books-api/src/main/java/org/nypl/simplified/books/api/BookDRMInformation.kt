@@ -39,7 +39,7 @@ sealed class BookDRMInformation : Serializable {
      * The rights information. This is only present if the book has been fulfilled.
      */
 
-    val rights: Pair<File, AdobeAdeptLoan>?
+    val rights: Pair<File, AdobeAdeptLoan>?,
   ) : BookDRMInformation() {
     override fun playerCredentials(): PlayerBookCredentialsType = PlayerBookCredentialsNone
 
@@ -60,7 +60,7 @@ sealed class BookDRMInformation : Serializable {
      * The bytes of the LCP license.
      */
 
-    val licenseBytes: ByteArray?
+    val licenseBytes: ByteArray?,
   ) : BookDRMInformation() {
     override fun playerCredentials(): PlayerBookCredentialsType =
       if (this.hashedPassphrase != null) {
@@ -77,7 +77,7 @@ sealed class BookDRMInformation : Serializable {
      * The license file. This is only present if an attempt has been made to fulfill the book.
      */
 
-    val license: File?
+    val license: File?,
   ) : BookDRMInformation() {
     override fun playerCredentials(): PlayerBookCredentialsType = PlayerBookCredentialsNone
 

@@ -8,13 +8,13 @@ import java.io.InputStream
 
 class SimplifiedAssetDataFetcher(
   private val context: Context,
-  private val path: String
+  private val path: String,
 ) : DataFetcher<InputStream> {
   private var stream: InputStream? = null
 
   override fun loadData(
     priority: Priority,
-    callback: DataFetcher.DataCallback<in InputStream>
+    callback: DataFetcher.DataCallback<in InputStream>,
   ) {
     try {
       stream = context.assets.open(path)

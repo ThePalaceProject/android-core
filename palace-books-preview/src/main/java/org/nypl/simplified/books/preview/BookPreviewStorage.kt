@@ -7,7 +7,7 @@ import org.nypl.simplified.files.FileUtilities
 import java.io.File
 
 data class BookPreviewStorage(
-  val directory: File
+  val directory: File,
 ) {
   private val bookPreviewFile: File =
     File(directory, "book-preview.epub")
@@ -20,7 +20,7 @@ data class BookPreviewStorage(
 
   fun saveBookPreview(
     file: File,
-    onBookSuccessfullySaved: (File) -> Unit
+    onBookSuccessfullySaved: (File) -> Unit,
   ) {
     if (file.isDirectory) {
       DirectoryUtilities.directoryCopy(file, bookPreviewFile)
@@ -34,7 +34,7 @@ data class BookPreviewStorage(
   fun saveAudiobookPreview(
     file: File,
     mimeType: MIMEType,
-    onBookSuccessfullySaved: (File) -> Unit
+    onBookSuccessfullySaved: (File) -> Unit,
   ) {
     val previewFile =
       when (mimeType) {

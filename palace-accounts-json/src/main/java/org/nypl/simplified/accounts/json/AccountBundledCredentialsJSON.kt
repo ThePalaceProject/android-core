@@ -55,7 +55,8 @@ object AccountBundledCredentialsJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(node: JsonNode): AccountBundledCredentialsType = deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
+  fun deserializeFromJSON(node: JsonNode): AccountBundledCredentialsType =
+    deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
 
   /**
    * Deserialize bundled credentials from the given JSON.
@@ -70,7 +71,7 @@ object AccountBundledCredentialsJSON {
   @Throws(IOException::class)
   fun deserializeFromStream(
     mapper: ObjectMapper,
-    stream: InputStream
+    stream: InputStream,
   ): AccountBundledCredentialsType = deserializeFromJSON(mapper.readTree(stream))
 
   /**
@@ -83,7 +84,7 @@ object AccountBundledCredentialsJSON {
 
   fun serializeToJSON(
     mapper: ObjectMapper,
-    credentials: AccountBundledCredentialsType
+    credentials: AccountBundledCredentialsType,
   ): ObjectNode {
     val nodeRoot = mapper.createObjectNode()
     val nodeByProvider = mapper.createObjectNode()
@@ -110,7 +111,7 @@ object AccountBundledCredentialsJSON {
   @Throws(JsonProcessingException::class)
   fun serializeToBytes(
     mapper: ObjectMapper,
-    credentials: AccountBundledCredentialsType
+    credentials: AccountBundledCredentialsType,
   ): ByteArray = mapper.writeValueAsBytes(serializeToJSON(mapper, credentials))
 
   /**
@@ -128,13 +129,13 @@ object AccountBundledCredentialsJSON {
   fun serializeToStream(
     mapper: ObjectMapper,
     credentials: AccountBundledCredentialsType,
-    stream: OutputStream
+    stream: OutputStream,
   ) {
     mapper.writeValue(stream, serializeToJSON(mapper, credentials))
   }
 
   data class BundledCredentials internal constructor(
-    val credentialsByProvider: Map<URI, AccountAuthenticationCredentials>
+    val credentialsByProvider: Map<URI, AccountAuthenticationCredentials>,
   ) : AccountBundledCredentialsType {
     override fun bundledCredentials(): Map<URI, AccountAuthenticationCredentials> = credentialsByProvider
 

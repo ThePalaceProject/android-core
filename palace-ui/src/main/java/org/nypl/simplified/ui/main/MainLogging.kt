@@ -13,7 +13,6 @@ import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy
 import ch.qos.logback.core.util.FileSize
 import ch.qos.logback.core.util.StatusPrinter
 import org.librarysimplified.ui.BuildConfig
-import org.nypl.simplified.crashlytics.api.CrashlyticsLoggingAppender
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -42,24 +41,13 @@ object MainLogging {
   }
 
   /**
-   * Configure the Crashlytics appender.
-   */
-
-  private fun configureCrashlyticsAppender(loggerContext: LoggerContext): Appender<ILoggingEvent> =
-    CrashlyticsLoggingAppender().apply {
-      this.context = loggerContext
-      this.name = "CRASHLYTICS"
-      this.start()
-    }
-
-  /**
    * Configure a file based logging appender.
    */
 
   fun configureFileAppender(
     loggerContext: LoggerContext,
     cacheDirectory: File,
-    filename: String
+    filename: String,
   ): Appender<ILoggingEvent> {
     val encoder =
       PatternLayoutEncoder().apply {
@@ -115,7 +103,7 @@ object MainLogging {
 
   private fun logbackOf(
     name: String,
-    process: (Logger) -> Unit
+    process: (Logger) -> Unit,
   ) {
     (LoggerFactory.getLogger(name) as Logger).apply {
       process(this)
@@ -124,7 +112,7 @@ object MainLogging {
 
   private fun logbackLevel(
     name: String,
-    level: Level
+    level: Level,
   ) {
     logbackOf(name) {
       it.level = level
@@ -141,6 +129,7 @@ object MainLogging {
     logbackLevel("org.nypl.simplified.files.FileLocking", Level.ERROR)
     logbackLevel("org.nypl.simplified.notifications.NotificationsService", Level.DEBUG)
     logbackLevel("org.sqlite.core.NativeDB", Level.ERROR)
+    logbackLevel("org.thepalaceproject.palace.images.ImageLoader2", Level.ERROR)
   }
 
   fun configure(cacheDirectory: File) {
@@ -169,7 +158,6 @@ object MainLogging {
     root.apply {
       this.addAppender(configureFileAppender(loggerContext, cacheDirectory, "log.txt"))
       this.addAppender(configureLogcatAppender(loggerContext))
-      this.addAppender(configureCrashlyticsAppender(loggerContext))
     }
 
     configureLoggingPolicy()

@@ -21,7 +21,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.services.api.Services
 import org.nypl.drm.core.ContentProtectionProvider
 import org.nypl.simplified.accounts.api.AccountID
@@ -35,12 +34,14 @@ import org.nypl.simplified.books.api.bookmark.BookmarkKind
 import org.nypl.simplified.books.api.bookmark.SerializedBookmarks
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.net.ServerSocket
 import java.util.ServiceLoader
@@ -49,26 +50,15 @@ import java.util.concurrent.Executors
 
 class PdfReaderActivity : AppCompatActivity() {
   companion object {
-    private const val PARAMS_ID = "org.nypl.simplified.viewer.pdf.pdfjs.PdfReaderActivity.params"
-
     /**
      * Factory method to start a [PdfReaderActivity]
      */
     fun startActivity(
       context: Activity,
-      parameters: PdfReaderParameters
+      parameters: PdfReaderParameters,
     ) {
-      val bundle =
-        Bundle().apply {
-          this.putSerializable(this@Companion.PARAMS_ID, parameters)
-        }
-
-      val intent =
-        Intent(context, PdfReaderActivity::class.java).apply {
-          this.putExtras(bundle)
-        }
-
-      context.startActivity(intent)
+      PdfReaderModel.parameters = parameters
+      context.startActivity(Intent(context, PdfReaderActivity::class.java))
     }
   }
 
@@ -98,7 +88,7 @@ class PdfReaderActivity : AppCompatActivity() {
   private lateinit var accountId: AccountID
   private lateinit var bookFormat: BookFormat.BookFormatPDF
   private lateinit var bookID: BookID
-  private lateinit var feedEntry: FeedEntry.FeedEntryOPDS
+  private lateinit var feedEntry: FeedEntryBook
   private lateinit var loadingBar: ProgressBar
   private lateinit var pdfReaderContainer: FrameLayout
   private lateinit var root: View
@@ -113,7 +103,13 @@ class PdfReaderActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val params = this.intent?.getSerializableExtra(PARAMS_ID) as PdfReaderParameters
+    val paramsMaybe = PdfReaderModel.parameters
+    if (paramsMaybe == null) {
+      this.log.warn("PdfReaderActivity lacks parameters!")
+      this.finish()
+      return
+    }
+    val params = paramsMaybe
 
     this.setContentView(R.layout.pdfjs_reader)
     this.createToolbar(params.documentTitle)
@@ -123,25 +119,33 @@ class PdfReaderActivity : AppCompatActivity() {
     this.feedEntry = params.entry
     this.bookID = params.id
 
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, this.accountId.uuid.toString())
-    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.bookID.value())
-    MDC.put(MDCKeys.BOOK_TITLE, this.feedEntry.feedEntry.title)
-    MDC.put(MDCKeys.BOOK_ID, this.feedEntry.feedEntry.id)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.feedEntry.feedEntry.publisher)
-    MDC.put(MDCKeys.BOOK_FORMAT, "application/pdf")
-    MDC.remove(MDCKeys.BOOK_DRM)
-
     try {
       this.account =
         this.profilesController
           .profileCurrent()
           .account(this.accountId)
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
-        this.account.provider.id
-          .toString()
-      )
     } catch (e: Exception) {
       this.log.debug("Unable to locate account: ", e)
+      val diagnostics =
+        this.services.requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.PDF_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "accountNotFound"),
+            Pair("AccountInternalID", this.accountId.uuid.toString()),
+            Pair("BookID", this.feedEntry.id),
+            Pair("BookInternalID", this.bookID.value()),
+            Pair("BookTitle", this.feedEntry.title),
+            Pair(
+              "BookPublisher",
+              this.feedEntry.publisher
+                .orEmpty(),
+            ),
+            Pair("BookDRM", params.drmInfo.kind.name),
+          ),
+        throwable = e,
+      )
       this.finish()
       return
     }
@@ -154,6 +158,31 @@ class PdfReaderActivity : AppCompatActivity() {
           .findFormat(BookFormat.BookFormatPDF::class.java)!!
     } catch (e: Throwable) {
       this.log.debug("Unable to locate book format: ", e)
+      val diagnostics =
+        this.services.requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.PDF_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "formatNotFound"),
+            Pair("AccountInternalID", this.accountId.uuid.toString()),
+            Pair(
+              "AccountProviderID",
+              this.account.provider.id
+                .toString(),
+            ),
+            Pair("BookID", this.feedEntry.id),
+            Pair("BookInternalID", this.bookID.value()),
+            Pair("BookTitle", this.feedEntry.title),
+            Pair(
+              "BookPublisher",
+              this.feedEntry.publisher
+                .orEmpty(),
+            ),
+            Pair("BookDRM", params.drmInfo.kind.name),
+          ),
+        throwable = e,
+      )
       this.finish()
       return
     }
@@ -164,7 +193,7 @@ class PdfReaderActivity : AppCompatActivity() {
     this.backgroundThread?.execute {
       this.restoreSavedPosition(
         params = params,
-        isSavedInstanceStateNull = savedInstanceState == null
+        isSavedInstanceStateNull = savedInstanceState == null,
       )
     }
 
@@ -173,13 +202,13 @@ class PdfReaderActivity : AppCompatActivity() {
 
     this.onBackPressedDispatcher.addCallback(
       this,
-      this.backCallback
+      this.backCallback,
     )
   }
 
   private fun completeReaderSetup(
     params: PdfReaderParameters,
-    isSavedInstanceStateNull: Boolean
+    isSavedInstanceStateNull: Boolean,
   ) {
     this.loadingBar.visibility = View.GONE
 
@@ -191,13 +220,13 @@ class PdfReaderActivity : AppCompatActivity() {
 
   private fun restoreSavedPosition(
     params: PdfReaderParameters,
-    isSavedInstanceStateNull: Boolean
+    isSavedInstanceStateNull: Boolean,
   ) {
     val bookmarks =
       PdfReaderBookmarks.loadBookmarks(
         bookmarkService = this.bookmarkService,
         accountID = this.accountId,
-        bookID = this.bookID
+        bookID = this.bookID,
       )
 
     val lastReadBookmark =
@@ -217,7 +246,7 @@ class PdfReaderActivity : AppCompatActivity() {
       } finally {
         this.completeReaderSetup(
           params = params,
-          isSavedInstanceStateNull = isSavedInstanceStateNull
+          isSavedInstanceStateNull = isSavedInstanceStateNull,
         )
       }
     }
@@ -269,7 +298,7 @@ class PdfReaderActivity : AppCompatActivity() {
           this@PdfReaderActivity.onReaderPageClick()
         }
       },
-      "PDFListener"
+      "PDFListener",
     )
 
     /*
@@ -279,7 +308,8 @@ class PdfReaderActivity : AppCompatActivity() {
     when (this.bookFormat.drmInformation) {
       is BookDRMInformation.ACS,
       is BookDRMInformation.Boundless,
-      is BookDRMInformation.LCP -> {
+      is BookDRMInformation.LCP,
+      -> {
         this.webView.isLongClickable = false
         this.webView.setOnLongClickListener {
           true
@@ -297,7 +327,7 @@ class PdfReaderActivity : AppCompatActivity() {
 
   private fun createPdfServer(
     drmInfo: BookDRMInformation,
-    pdfFile: File
+    pdfFile: File,
   ) {
     val providers =
       ServiceLoader
@@ -319,7 +349,7 @@ class PdfReaderActivity : AppCompatActivity() {
         isLCPManualPassphraseEnabled = profile.preferences().isLCPManualPassphraseEnabled,
         onLCPDialogDismissed = {
           this.finish()
-        }
+        },
       )
 
     // Create an immediately-closed socket to get a free port number.
@@ -334,16 +364,44 @@ class PdfReaderActivity : AppCompatActivity() {
               context = this@PdfReaderActivity.application,
               drmInfo = drmInfo,
               pdfFile = pdfFile,
-              port = ephemeralSocket.localPort
+              port = ephemeralSocket.localPort,
             )
         } catch (exception: Exception) {
+          val diagnostics =
+            this@PdfReaderActivity.services.requireService(DiagnosticsServiceType::class.java)
+          diagnostics.report(
+            code = DiagnosticCodes.PDF_BOOK_OPEN_FAILED,
+            data =
+              mapOf(
+                Pair("Reason", "pdfServerCreateFailed"),
+                Pair("AccountInternalID", this@PdfReaderActivity.accountId.uuid.toString()),
+                Pair(
+                  "AccountProviderID",
+                  this@PdfReaderActivity
+                    .account.provider.id
+                    .toString(),
+                ),
+                Pair("BookID", this@PdfReaderActivity.feedEntry.id),
+                Pair("BookInternalID", this@PdfReaderActivity.bookID.value()),
+                Pair("BookTitle", this@PdfReaderActivity.feedEntry.title),
+                Pair(
+                  "BookPublisher",
+                  this@PdfReaderActivity
+                    .feedEntry
+                    .publisher
+                    .orEmpty(),
+                ),
+                Pair("BookDRM", drmInfo.kind.name),
+              ),
+            throwable = exception,
+          )
           this@PdfReaderActivity.showErrorWithRunnable(
             context = this@PdfReaderActivity,
             title = exception.message ?: "",
             failure = exception,
             execute = {
               this@PdfReaderActivity.finish()
-            }
+            },
           )
         }
       }
@@ -355,7 +413,7 @@ class PdfReaderActivity : AppCompatActivity() {
         it.start()
 
         this@PdfReaderActivity.webView.loadUrl(
-          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this@PdfReaderActivity.documentPageIndex}"
+          "http://localhost:${it.port}/assets/pdf-viewer/viewer.html?file=%2Fbook.pdf#page=${this@PdfReaderActivity.documentPageIndex}",
         )
       }
     }
@@ -471,19 +529,19 @@ class PdfReaderActivity : AppCompatActivity() {
         bookChapterProgress = 0.0,
         bookChapterTitle = "",
         bookProgress = 0.0,
-        bookTitle = this.feedEntry.feedEntry.title,
+        bookTitle = this.feedEntry.title,
         deviceID = PdfReaderDevices.deviceId(this.profilesController, this.bookID),
         kind = BookmarkKind.BookmarkLastReadLocation,
         location = SerializedLocatorPage1(pageIndex),
-        opdsId = this.feedEntry.feedEntry.id,
+        opdsId = this.feedEntry.id,
         time = DateTime.now(),
-        uri = null
+        uri = null,
       )
 
     this.bookmarkService.bookmarkCreate(
       accountID = this.accountId,
       bookmark = bookmark,
-      ignoreRemoteFailures = true
+      ignoreRemoteFailures = true,
     )
   }
 
@@ -491,7 +549,7 @@ class PdfReaderActivity : AppCompatActivity() {
     context: Context,
     title: String,
     failure: Exception,
-    execute: () -> Unit
+    execute: () -> Unit,
   ) {
     this.log.error("error: {}: ", title, failure)
 

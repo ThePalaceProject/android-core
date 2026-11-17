@@ -19,7 +19,7 @@ object MainLCPService {
     val assetRetriever =
       AssetRetriever(
         contentResolver = context.contentResolver,
-        httpClient = DefaultHttpClient()
+        httpClient = DefaultHttpClient(),
       )
 
     return LcpService(

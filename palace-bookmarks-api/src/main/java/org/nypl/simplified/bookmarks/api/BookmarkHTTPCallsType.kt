@@ -18,7 +18,7 @@ interface BookmarkHTTPCallsType {
   fun bookmarksGet(
     account: AccountType,
     annotationsURI: URI,
-    credentials: AccountAuthenticationCredentials
+    credentials: AccountAuthenticationCredentials,
   ): List<BookmarkAnnotation>
 
   /**
@@ -34,7 +34,7 @@ interface BookmarkHTTPCallsType {
     account: AccountType,
     annotationsURI: URI,
     credentials: AccountAuthenticationCredentials,
-    bookmark: BookmarkAnnotation
+    bookmark: BookmarkAnnotation,
   ): URI?
 
   /**
@@ -49,6 +49,6 @@ interface BookmarkHTTPCallsType {
   fun bookmarkDelete(
     account: AccountType,
     bookmarkURI: URI,
-    credentials: AccountAuthenticationCredentials
+    credentials: AccountAuthenticationCredentials,
   ): Boolean
 }

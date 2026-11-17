@@ -13,6 +13,6 @@ sealed class BorrowSubtaskCredentials {
 
   data class UseBearerToken(
     val refreshURI: URI,
-    val token: String
+    val token: String,
   ) : BorrowSubtaskCredentials()
 }

@@ -15,6 +15,7 @@ import org.nypl.simplified.books.api.bookmark.SerializedLocatorHrefProgression20
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorLegacyCFI
 import org.nypl.simplified.books.api.bookmark.SerializedLocatorPage1
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import org.readium.r2.shared.publication.Href
 import org.slf4j.LoggerFactory
 
@@ -33,7 +34,7 @@ object Reader2Bookmarks {
   fun loadBookmarks(
     bookmarkService: BookmarkServiceUsableType,
     accountID: AccountID,
-    bookID: BookID
+    bookID: BookID,
   ): List<SR2Bookmark> {
     val bookmarksAll =
       bookmarkService.bookmarks.get()
@@ -58,9 +59,9 @@ object Reader2Bookmarks {
    */
 
   fun fromSR2Bookmark(
-    bookEntry: FeedEntry.FeedEntryOPDS,
+    bookEntry: FeedEntryBook,
     deviceId: String,
-    source: SR2Bookmark
+    source: SR2Bookmark,
   ): SerializedBookmark {
     val chapterHref =
       source.locator.chapterHref.toString()
@@ -88,11 +89,11 @@ object Reader2Bookmarks {
       bookChapterProgress = chapterProgress,
       bookChapterTitle = source.title,
       bookProgress = source.bookProgress ?: 0.0,
-      bookTitle = bookEntry.feedEntry.title,
+      bookTitle = bookEntry.title,
       deviceID = deviceId,
       kind = kind,
       location = location,
-      opdsId = bookEntry.feedEntry.id,
+      opdsId = bookEntry.id,
       time = source.date,
       uri = source.uri,
     )
@@ -107,7 +108,8 @@ object Reader2Bookmarks {
       is SerializedLocatorAudioBookTime1,
       is SerializedLocatorAudioBookTime2,
       is SerializedLocatorLegacyCFI,
-      is SerializedLocatorPage1 -> {
+      is SerializedLocatorPage1,
+      -> {
         // None of these locator formats are suitable for EPUBs in R2
         null
       }
@@ -131,10 +133,10 @@ object Reader2Bookmarks {
             locator =
               SR2Locator.SR2LocatorPercent.create(
                 chapterHref = href,
-                chapterProgress = location.chapterProgress
+                chapterProgress = location.chapterProgress,
               ),
             bookProgress = source.bookProgress,
-            uri = source.uri
+            uri = source.uri,
           )
         } else {
           null

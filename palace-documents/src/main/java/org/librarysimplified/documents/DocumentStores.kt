@@ -19,13 +19,13 @@ object DocumentStores {
     assetManager: AssetManager,
     http: LSHTTPClientType,
     baseDirectory: File,
-    configuration: DocumentConfigurationServiceType
+    configuration: DocumentConfigurationServiceType,
   ): DocumentStoreType =
     DocumentStore.create(
       assetManager = assetManager,
       http = http,
       baseDirectory = baseDirectory,
-      configuration = configuration
+      configuration = configuration,
     )
 
   /**

@@ -36,7 +36,7 @@ object BatteryModel {
         val packageName =
           context.packageName
         this.batteryOptimizerEnabledSrc.set(
-          !powerManager.isIgnoringBatteryOptimizations(packageName)
+          !powerManager.isIgnoringBatteryOptimizations(packageName),
         )
       }
     }

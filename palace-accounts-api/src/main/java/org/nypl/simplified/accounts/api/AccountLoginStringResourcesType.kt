@@ -65,7 +65,7 @@ interface AccountLoginStringResourcesType {
 
   fun loginServerError(
     status: Int,
-    message: String
+    message: String,
   ): String
 
   /**

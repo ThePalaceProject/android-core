@@ -1,0 +1,21 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:2222222222",
+        "title": "Multi Author Book",
+        "author": [
+          {"name": "Author One"},
+          {"name": "Author Two"},
+          {"name": "Author Three"}
+        ]
+      },
+      "links": []
+    }
+  ]
+}

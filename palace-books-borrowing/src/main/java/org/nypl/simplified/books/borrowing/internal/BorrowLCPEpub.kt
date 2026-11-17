@@ -46,7 +46,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean =
       if (MIMECompatibility.isCompatibleStrictWithoutAttributes(type, lcpLicenseFiles)) {
         val next = remaining.firstOrNull()
@@ -79,7 +79,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
   private fun fulfill(
     context: BorrowContextType,
     licenseBytes: ByteArray,
-    passphrase: String
+    passphrase: String,
   ) {
     context.taskRecorder.beginNewStep("Fulfilling book...")
     context.checkCancelled()
@@ -103,7 +103,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
           link
             ?.url()
             ?.toString()
-            ?: throw IOException("Unparseable license link ($link)")
+            ?: throw IOException("Unparseable license link ($link)"),
         )
 
       val downloadRequest =
@@ -113,7 +113,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
           outputFile = temporaryFile,
           requestModifier = { properties ->
             properties.copy(
-              authorization = null
+              authorization = null,
             )
           },
           expectedTypes =
@@ -122,8 +122,8 @@ class BorrowLCPEpub : BorrowSubtaskType {
               // Sometimes fulfillment servers will set the content type to generic zip or octet
               // stream, so these are acceptable too.
               StandardFormatNames.genericZIPFiles,
-              MIMECompatibility.applicationOctetStream
-            )
+              MIMECompatibility.applicationOctetStream,
+            ),
         )
 
       when (val result = LSHTTPDownloads.download(downloadRequest)) {
@@ -134,7 +134,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
         is DownloadFailedServer -> {
           throw BorrowHTTP.onDownloadFailedServer(
             context = context,
-            result = result
+            result = result,
           )
         }
 
@@ -160,7 +160,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
         message = "LCP fulfillment error: ${e.message}",
         errorCode = BorrowErrorCodes.lcpFulfillmentFailed,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     } finally {
@@ -183,7 +183,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
   private fun installLicense(
     context: BorrowContextType,
     bookFile: File,
-    licenseBytes: ByteArray
+    licenseBytes: ByteArray,
   ) {
     context.taskRecorder.beginNewStep("Installing license...")
 
@@ -196,7 +196,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
           context.taskRecorder.currentStepFailed(
             message = "Unparseable LCP license.",
             errorCode = "errorLCPLicense",
-            extraMessages = fetchAllR2ErrorMessages(r)
+            extraMessages = fetchAllR2ErrorMessages(r),
           )
           context.taskRecorder.addAttribute("Parse Error", r.value.message)
           context.bookDownloadFailed()
@@ -216,7 +216,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
     context: BorrowContextType,
     bookFile: File,
     passphrase: String,
-    licenseBytes: ByteArray
+    licenseBytes: ByteArray,
   ) {
     context.taskRecorder.beginNewStep("Saving fulfilled book...")
 
@@ -232,7 +232,8 @@ class BorrowLCPEpub : BorrowSubtaskType {
       }
 
       is BookDatabaseEntryFormatHandleAudioBook,
-      is BookDatabaseEntryFormatHandlePDF -> {
+      is BookDatabaseEntryFormatHandlePDF,
+      -> {
         throw UnreachableCodeException()
       }
     }
@@ -251,7 +252,7 @@ class BorrowLCPEpub : BorrowSubtaskType {
       context.taskRecorder.currentStepFailed(
         message = "No format handle available for ${eventualType.fullType}",
         errorCode = BorrowErrorCodes.noFormatHandle,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw BorrowSubtaskFailed()
     }

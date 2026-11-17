@@ -37,7 +37,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
     node.put("properties", serializeProperties(a.properties))
     node.set<JsonNode?>(
       "indirect_acquisitions",
-      serializeIndirectAcquisitions(a.indirectAcquisitions)
+      serializeIndirectAcquisitions(a.indirectAcquisitions),
     )
     return node
   }
@@ -99,7 +99,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
     node.put("type", indirect.type.fullType)
     node.set<JsonNode?>(
       "indirect_acquisitions",
-      serializeIndirectAcquisitions(indirect.indirectAcquisitions)
+      serializeIndirectAcquisitions(indirect.indirectAcquisitions),
     )
     node.put("properties", serializeProperties(indirect.properties))
     return node
@@ -359,7 +359,7 @@ class OPDSJSONSerializer private constructor() : OPDSJSONSerializerType {
   @Throws(IOException::class)
   override fun serializeToStream(
     d: ObjectNode,
-    os: OutputStream
+    os: OutputStream,
   ) {
     serialize(d, os)
   }

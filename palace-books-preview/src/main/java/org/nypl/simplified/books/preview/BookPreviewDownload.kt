@@ -1,7 +1,7 @@
 package org.nypl.simplified.books.preview
 
 class BookPreviewDownload(
-  private val parameters: BookPreviewParameters
+  private val parameters: BookPreviewParameters,
 ) {
   fun execute() {
     parameters.taskRecorder.beginNewStep("Downloading directly...")
@@ -9,11 +9,11 @@ class BookPreviewDownload(
       "Requesting download...",
       0,
       null,
-      0
+      0,
     )
 
     BookPreviewHttp().download(
-      parameters = parameters
+      parameters = parameters,
     )
   }
 }

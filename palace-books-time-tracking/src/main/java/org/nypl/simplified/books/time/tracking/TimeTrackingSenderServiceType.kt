@@ -17,6 +17,6 @@ interface TimeTrackingSenderServiceType : AutoCloseable {
 
   fun awaitWrite(
     timeout: Long,
-    unit: TimeUnit
+    unit: TimeUnit,
   )
 }

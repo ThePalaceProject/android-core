@@ -101,6 +101,6 @@ interface OPDSJSONSerializerType {
   @Throws(IOException::class)
   fun serializeToStream(
     d: ObjectNode,
-    os: OutputStream
+    os: OutputStream,
   )
 }

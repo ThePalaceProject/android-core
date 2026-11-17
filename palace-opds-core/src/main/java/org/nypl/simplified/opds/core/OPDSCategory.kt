@@ -19,7 +19,7 @@ data class OPDSCategory(
   /**
    * The label.
    */
-  val label: String?
+  val label: String?,
 ) : Serializable {
   /**
    * The label, or if one is not defined, the term.

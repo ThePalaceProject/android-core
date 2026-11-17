@@ -10,13 +10,13 @@ import org.librarysimplified.ui.R
  */
 
 class CatalogButtons(
-  private val context: Context
+  private val context: Context,
 ) {
   @UiThread
   fun setAsReadButton(
     button: Button,
     title: String,
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
   ): Button {
     button.setText(R.string.catalogRead)
     button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRead, title)
@@ -28,7 +28,7 @@ class CatalogButtons(
   fun setAsListenButton(
     button: Button,
     title: String,
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
   ): Button {
     button.setText(R.string.catalogListen)
     button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookListen, title)
@@ -40,7 +40,7 @@ class CatalogButtons(
   fun setAsBorrowButton(
     button: Button,
     title: String,
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
   ): Button {
     button.setText(R.string.catalogGet)
     button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookBorrow, title)
@@ -52,7 +52,7 @@ class CatalogButtons(
   fun setAsDownloadButton(
     button: Button,
     title: String,
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
   ): Button {
     button.setText(R.string.catalogDownload)
     button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookDownload, title)
@@ -64,7 +64,7 @@ class CatalogButtons(
   fun setAsRevokeHoldButton(
     button: Button,
     title: String,
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
   ): Button {
     button.setText(R.string.catalogManageHold)
     button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookManageHold, title)
@@ -76,7 +76,7 @@ class CatalogButtons(
   fun setAsRevokeLoanButton(
     button: Button,
     title: String,
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
   ): Button {
     button.setText(R.string.catalogReturn)
     button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookRevokeLoan, title)
@@ -88,7 +88,7 @@ class CatalogButtons(
   fun setAsReserveButton(
     button: Button,
     title: String,
-    onClick: (Button) -> Unit
+    onClick: (Button) -> Unit,
   ): Button {
     button.setText(R.string.catalogPlaceHold)
     button.contentDescription = this.context.getString(R.string.catalogAccessibilityBookPlaceHold, title)

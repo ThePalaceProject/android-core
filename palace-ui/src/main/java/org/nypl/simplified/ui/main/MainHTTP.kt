@@ -31,7 +31,7 @@ object MainHTTP {
         // Otherwise, the default of 1 minute would be sufficient. In the future we might want to
         // allow per-request timeouts.
         timeout = Pair(15L, TimeUnit.MINUTES),
-        networkAccess = networkAccess
+        networkAccess = networkAccess,
       )
 
     return LSHTTPClients().create(context, configuration)

@@ -21,12 +21,12 @@ class AccessibilityService private constructor(
       context: Context,
       bookRegistry: BookRegistryReadableType,
       strings: AccessibilityStringsType = AccessibilityStrings(context.resources),
-      events: AccessibilityEventsType = AccessibilityEvents(context)
+      events: AccessibilityEventsType = AccessibilityEvents(context),
     ): AccessibilityServiceType =
       AccessibilityService(
         bookRegistry = bookRegistry,
         strings = strings,
-        events = events
+        events = events,
       )
   }
 
@@ -35,7 +35,7 @@ class AccessibilityService private constructor(
 
   private val subscriptions =
     CompositeDisposable(
-      bookRegistry.bookEvents().subscribe(this::onBookEvent)
+      bookRegistry.bookEvents().subscribe(this::onBookEvent),
     )
 
   override val spokenFeedbackEnabled: Boolean
@@ -47,14 +47,20 @@ class AccessibilityService private constructor(
 
   private fun <C : BookStatus> previousStatusIsNot(
     event: BookStatusEvent,
-    statusClass: Class<C>
+    statusClass: Class<C>,
   ): Boolean {
-    val statusPrevious = event.statusPrevious ?: return false
+    val statusPrevious = event.statusPrevious
+    if (statusPrevious == null) {
+      return false
+    }
     return statusPrevious::class.java != statusClass
   }
 
   private fun onBookEvent(event: BookStatusEvent) {
-    val book = this.bookRegistry.bookOrNull(event.bookId)?.book ?: return
+    val book = this.bookRegistry.bookOrNull(event.bookId)?.book
+    if (book == null) {
+      return
+    }
 
     return when (event.statusNow) {
       is BookStatus.Loaned.LoanedDownloaded -> {
@@ -82,7 +88,8 @@ class AccessibilityService private constructor(
       }
 
       is BookStatus.Holdable,
-      is BookStatus.Loanable -> {
+      is BookStatus.Loanable,
+      -> {
         val notHoldable = this.previousStatusIsNot(event, BookStatus.Holdable::class.java)
         val notLoanable = this.previousStatusIsNot(event, BookStatus.Loanable::class.java)
         if (notHoldable && notLoanable) {
@@ -155,7 +162,8 @@ class AccessibilityService private constructor(
       is BookStatus.RequestingDownload,
       is BookStatus.DownloadWaitingForExternalAuthentication,
       is BookStatus.DownloadExternalAuthenticationInProgress,
-      is BookStatus.Revoked -> {
+      is BookStatus.Revoked,
+      -> {
       }
 
       null -> {

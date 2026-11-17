@@ -18,6 +18,6 @@ interface TimeTrackingMergeServiceType : AutoCloseable {
 
   fun awaitTick(
     timeout: Long,
-    unit: TimeUnit
+    unit: TimeUnit,
   )
 }

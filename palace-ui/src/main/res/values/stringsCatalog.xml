@@ -3,6 +3,7 @@
 <resources>
     <string name="catalogAccessibilitySeriesLink">"%1$s". Click to see all entries in the series.</string>
     <string name="catalogAccessibilityFeedLoading">List of books is currently loading.</string>
+    <string name="catalogAccessibilitySearchResultsCount">Results found: %1$d</string>
     <string name="catalogAccessibilitySearchButtonClose">Close Search Button</string>
     <string name="catalogAccessibilityAccountSelection">Account Selection Button</string>
     <string name="catalogAccessibilityBookBorrow">Borrow Button. Click this button to borrow "%1$s".</string>
@@ -120,4 +121,7 @@
     <string name="announcementOK">OK</string>
 
     <string name="registryFailure">An error occurred whilst retrieving the libraries.\nThe list of libraries below might be incomplete.</string>
+
+    <string name="wiproMigrationDownloadAgainCellular">To continue reading, this book needs to be downloaded again. You can download it now using cellular data, or connect to Wi-Fi and try again.</string>
+    <string name="wiproMigrationDownloadAgainNoNetwork">This book needs to be downloaded again before you can continue reading. Connect to Wi-Fi or cellular data, then try again.</string>
 </resources>

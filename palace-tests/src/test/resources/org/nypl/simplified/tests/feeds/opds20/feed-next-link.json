@@ -1,0 +1,13 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [],
+  "links": [
+    {
+      "href": "https://example.com/feed.json?page=2",
+      "rel": "next"
+    }
+  ]
+}

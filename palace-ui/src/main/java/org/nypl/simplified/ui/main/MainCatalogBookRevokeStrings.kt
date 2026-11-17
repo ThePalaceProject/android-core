@@ -10,7 +10,7 @@ import java.net.URI
  */
 
 class MainCatalogBookRevokeStrings(
-  private val resources: Resources
+  private val resources: Resources,
 ) : BookRevokeStringResourcesType {
   override val revokeNotRevocable: String
     get() = this.resources.getString(R.string.revokeNotRevocable)
@@ -21,12 +21,14 @@ class MainCatalogBookRevokeStrings(
   override val revokeCredentialsRequired: String
     get() = this.resources.getString(R.string.revokeCredentialsRequired)
 
-  override fun revokeFormatSpecific(type: String): String = this.resources.getString(R.string.revokeFormatSpecific, type)
+  override fun revokeFormatSpecific(type: String): String =
+    this.resources.getString(R.string.revokeFormatSpecific, type)
 
   override fun revokeServerNotifyNotRevocable(simpleName: String): String =
     this.resources.getString(R.string.revokeServerNotifyNotRevocable, simpleName)
 
-  override fun revokeServerNotifyURI(targetURI: URI): String = this.resources.getString(R.string.revokeServerNotifyURI, targetURI)
+  override fun revokeServerNotifyURI(targetURI: URI): String =
+    this.resources.getString(R.string.revokeServerNotifyURI, targetURI)
 
   override val revokeDeleteBookFailed: String
     get() = this.resources.getString(R.string.revokeDeleteBookFailed)
@@ -76,7 +78,8 @@ class MainCatalogBookRevokeStrings(
   override val revokeBookACSFailed: String
     get() = this.resources.getString(R.string.revokeBookACSFailed)
 
-  override fun revokeBookACSConnectorFailed(errorCode: String): String = this.resources.getString(R.string.revokeBookACSConnectorFailed)
+  override fun revokeBookACSConnectorFailed(errorCode: String): String =
+    this.resources.getString(R.string.revokeBookACSConnectorFailed)
 
   override val revokeACSExecuteOK: String
     get() = this.resources.getString(R.string.revokeACSExecuteOK)

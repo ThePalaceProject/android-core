@@ -34,7 +34,7 @@ class ProfileAccountResetAdobeIDTask(
   private val accountID: AccountID,
   private val http: LSHTTPClientType,
   private val profile: ProfileReadableType,
-  private val authDocumentParsers: AuthenticationDocumentParsersType
+  private val authDocumentParsers: AuthenticationDocumentParsersType,
 ) : Callable<TaskResult<*>> {
   private lateinit var account: AccountType
   private lateinit var credentials: AccountAuthenticationCredentials
@@ -47,7 +47,7 @@ class ProfileAccountResetAdobeIDTask(
 
   private fun warn(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.warn("[{}][{}] $message", this.profile.id.uuid, this.accountID, *arguments)
 
   override fun call(): TaskResult<Unit> {
@@ -77,22 +77,24 @@ class ProfileAccountResetAdobeIDTask(
           is AccountNotLoggedIn,
           is AccountLoggingIn,
           is AccountLoginFailed,
-          is AccountLoggingInWaitingForExternalAuthentication -> {
+          is AccountLoggingInWaitingForExternalAuthentication,
+          -> {
             this.warn("Account is not logged in.")
             this.steps.currentStepFailed(
               message = "Account is not logged in.",
               errorCode = "error-reset-failed-not-logged-in",
               exception = null,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
             return this.steps.finishFailure()
           }
         }
 
       this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
-      this.steps.addAttribute("AccountProviderID",
+      this.steps.addAttribute(
+        "AccountProviderID",
         this.account.provider.id
-          .toString()
+          .toString(),
       )
 
       this.steps.beginNewStep("Fetching authentication document.")
@@ -101,7 +103,7 @@ class ProfileAccountResetAdobeIDTask(
           stringResources = this.accountProviderResolutionStrings,
           authDocumentParsers = this.authDocumentParsers,
           http = this.http,
-          description = this.account.provider.toDescription()
+          description = this.account.provider.toDescription(),
         )
 
       val authDocument =
@@ -109,14 +111,14 @@ class ProfileAccountResetAdobeIDTask(
           this.steps,
           onProgress = { _, _ ->
             // Ignored
-          }
+          },
         )
       if (authDocument == null) {
         this.steps.currentStepFailed(
           message = "Failed to fetch auth document.",
           errorCode = "error-reset-failed-fetch-auth-document",
           exception = null,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         return this.steps.finishFailure()
       }
@@ -129,7 +131,7 @@ class ProfileAccountResetAdobeIDTask(
           message = "Failed to fetch Adobe reset URI.",
           errorCode = "error-reset-no-reset-uri",
           exception = null,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         return this.steps.finishFailure()
       }
@@ -151,7 +153,7 @@ class ProfileAccountResetAdobeIDTask(
             message = "Connecting to the server failed..",
             errorCode = "connectionFailed",
             exception = status.exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           this.steps.finishFailure()
         }
@@ -162,7 +164,7 @@ class ProfileAccountResetAdobeIDTask(
             message = "Server error: ${status.properties.status} ${status.properties.message}",
             errorCode = "httpError ${status.properties.status} $adobeResetURI",
             exception = null,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           this.steps.finishFailure()
         }
@@ -178,7 +180,7 @@ class ProfileAccountResetAdobeIDTask(
         message = "Unexpected exception.",
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.steps.finishFailure()
     }

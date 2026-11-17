@@ -102,6 +102,18 @@
                 android:text="Crash" />
         </TableRow>
 
+        <TableRow
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="32dp">
+
+            <Button
+                android:id="@+id/debugSendDiagnostic"
+                android:layout_span="3"
+                android:layout_weight="1.0"
+                android:text="Send Diagnostic" />
+        </TableRow>
+
     </TableLayout>
 
     <androidx.appcompat.widget.SwitchCompat

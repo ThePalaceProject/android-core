@@ -6,21 +6,21 @@ import java.security.MessageDigest
 object BookmarkDigests {
   fun addToDigest(
     digest: MessageDigest,
-    text: String
+    text: String,
   ) {
     digest.update(text.toByteArray(UTF_8))
   }
 
   fun addToDigest(
     digest: MessageDigest,
-    number: Int
+    number: Int,
   ) {
     digest.update(number.toString().toByteArray(UTF_8))
   }
 
   fun addToDigest(
     digest: MessageDigest,
-    number: Double
+    number: Double,
   ) {
     addToDigest(digest, String.format("%.6f", number))
   }

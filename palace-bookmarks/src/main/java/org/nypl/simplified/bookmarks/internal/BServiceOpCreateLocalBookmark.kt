@@ -30,15 +30,15 @@ internal class BServiceOpCreateLocalBookmark(
       this.logger.debug(
         "[{}]: locally saving bookmark {}",
         this.profile.id.uuid,
-        this.bookmark.bookmarkId.value
+        this.bookmark.bookmarkId.value,
       )
 
       this.bookmarksSource.set(
         BookmarkAttributes.addBookmark(
           this.bookmarksSource.get(),
           this.accountID,
-          this.bookmark
-        )
+          this.bookmark,
+        ),
       )
 
       val account =

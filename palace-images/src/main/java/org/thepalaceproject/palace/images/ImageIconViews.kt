@@ -8,9 +8,7 @@ import android.net.Uri
 import android.util.Base64
 import android.widget.ImageView
 import com.google.common.base.Preconditions
-
 import org.slf4j.LoggerFactory
-
 import java.io.IOException
 import java.net.URI
 
@@ -36,7 +34,7 @@ object ImageIconViews {
   fun configureIconViewFromURI(
     assets: AssetManager,
     iconView: ImageView,
-    image: URI
+    image: URI,
   ) = if ("simplified-asset" == image.scheme) {
     configureFromAsset(image, assets, iconView)
   } else {
@@ -52,7 +50,7 @@ object ImageIconViews {
   fun imageFromBase64URI(text: String): Bitmap? {
     Preconditions.checkArgument(
       text.startsWith("data:"),
-      "Base64 URI must begin with 'data:'"
+      "Base64 URI must begin with 'data:'",
     )
 
     val comma = text.indexOf(',')
@@ -67,7 +65,7 @@ object ImageIconViews {
   private fun configureFromAsset(
     image: URI,
     assets: AssetManager,
-    iconView: ImageView
+    iconView: ImageView,
   ) {
     val path = image.schemeSpecificPart
     LOG.debug("opening image asset: {}", path)

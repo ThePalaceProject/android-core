@@ -23,7 +23,7 @@ object LinkParsing {
 
   fun parseLink(
     source: URI,
-    element: JsonNode
+    element: JsonNode,
   ): ParseResult<Link> =
     try {
       val objectNode = JSONParserUtilities.checkObject("", element)
@@ -61,7 +61,7 @@ object LinkParsing {
               width = width,
               height = height,
               duration = duration,
-              bitrate = bitrate
+              bitrate = bitrate,
             )
           } else {
             Link.LinkBasic(
@@ -72,9 +72,9 @@ object LinkParsing {
               width = width,
               height = height,
               duration = duration,
-              bitrate = bitrate
+              bitrate = bitrate,
             )
-          }
+          },
       )
     } catch (e: JSONParseException) {
       this.logger.debug("error parsing link object: ", e)
@@ -85,9 +85,9 @@ object LinkParsing {
             ParseError(
               source = source,
               message = "Could not parse 'link' object: " + e.message,
-              exception = e
-            )
-          )
+              exception = e,
+            ),
+          ),
       )
     } catch (e: Exception) {
       this.logger.debug("error parsing link object: ", e)
@@ -98,9 +98,9 @@ object LinkParsing {
             ParseError(
               source = source,
               message = "Could not parse 'link' object: " + e.message,
-              exception = e
-            )
-          )
+              exception = e,
+            ),
+          ),
       )
     }
 
@@ -110,7 +110,7 @@ object LinkParsing {
 
   fun parseLinkExceptionally(
     source: URI,
-    element: JsonNode
+    element: JsonNode,
   ): Link =
     when (val result = this.parseLink(source, element)) {
       is ParseResult.Failure -> {

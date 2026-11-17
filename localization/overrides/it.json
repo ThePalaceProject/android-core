@@ -198,8 +198,11 @@
   "palace-ui/src/main/res/values/stringsSettings.xml": {
     "settingsAccessibilityAccountSelect": "Tocchi per impostare \"%1$s\" come biblioteca corrente. Tenga premuto per rimuovere.",
     "settingsAccessibilityAccountSelectCurrent": "\"%1$s\", la sua biblioteca corrente. Tenga premuto per rimuovere.",
+    "settingsAccessibilityLibrariesFound": "Biblioteche trovate: %1$d",
+    "settingsAccessibilityNoLibrariesFound": "Nessuna biblioteca trovata.",
     "settingsAccessibilitySearchButton": "Pulsante di ricerca della biblioteca",
     "settingsAccessibilitySearchButtonClose": "Chiuda il pulsante Cerca",
+    "settingsAccessibilitySearchHint": "Ricerca. I risultati si aggiornano mentre digita.",
     "settingsAccountsSummary": "Aggiunga, rimuova o configuri le biblioteche",
     "settingsAddLibrary": "+ Aggiunga biblioteca",
     "settingsCOPPADeleteBooksConfirm": "Cambiare la sua età rimuoverà tutti i libri scaricati dall'account corrente.",

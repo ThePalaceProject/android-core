@@ -20,7 +20,7 @@ object Reader2Themes {
 
   fun fromSR2(
     existing: ReaderPreferences,
-    theme: SR2Theme
+    theme: SR2Theme,
   ): ReaderPreferences =
     ReaderPreferences
       .builder()
@@ -79,7 +79,7 @@ object Reader2Themes {
       colorScheme = toSR2Color(readerPreferences.colorScheme()),
       font = toSR2Font(readerPreferences.fontFamily()),
       textSize = toSR2Size(readerPreferences.fontScale()),
-      publisherCSS = toSR2PublisherCSS(readerPreferences.publisherCSS())
+      publisherCSS = toSR2PublisherCSS(readerPreferences.publisherCSS()),
     )
 
   private fun toSR2PublisherCSS(publisherCSS: ReaderPublisherCSS): SR2PublisherCSS =

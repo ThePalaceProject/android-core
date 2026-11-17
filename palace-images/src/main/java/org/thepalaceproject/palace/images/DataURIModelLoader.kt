@@ -14,14 +14,15 @@ class DataURIModelLoader : ModelLoader<URI, Bitmap> {
     uri: URI,
     width: Int,
     height: Int,
-    options: com.bumptech.glide.load.Options
+    options: com.bumptech.glide.load.Options,
   ): ModelLoader.LoadData<Bitmap>? {
-    val bitmap =
-      ImageIconViews.imageFromBase64URI(uri.toString())
-        ?: return null
+    val bitmap = ImageIconViews.imageFromBase64URI(uri.toString())
+    if (bitmap == null) {
+      return null
+    }
     return ModelLoader.LoadData(
       ObjectKey(uri),
-      DataURIDataFetcher(bitmap)
+      DataURIDataFetcher(bitmap),
     )
   }
 

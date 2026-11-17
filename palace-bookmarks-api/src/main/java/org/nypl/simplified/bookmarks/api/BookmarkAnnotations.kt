@@ -11,19 +11,19 @@ import java.net.URI
 
 data class BookmarkAnnotationSelectorNode(
   val type: String,
-  val value: String
+  val value: String,
 )
 
 data class BookmarkAnnotationTargetNode(
   val source: String,
-  val selector: BookmarkAnnotationSelectorNode
+  val selector: BookmarkAnnotationSelectorNode,
 )
 
 data class BookmarkAnnotationBodyNode(
   val timestamp: String,
   val device: String,
   val chapterTitle: String = "",
-  val bookProgress: Float = 0.0f
+  val bookProgress: Float = 0.0f,
 )
 
 data class BookmarkAnnotation(
@@ -32,9 +32,10 @@ data class BookmarkAnnotation(
   val id: String?,
   val type: String,
   val motivation: String,
-  val target: BookmarkAnnotationTargetNode
+  val target: BookmarkAnnotationTargetNode,
 ) {
-  override fun equals(other: Any?): Boolean = this.target.selector.value == (other as BookmarkAnnotation).target.selector.value
+  override fun equals(other: Any?): Boolean =
+    this.target.selector.value == (other as BookmarkAnnotation).target.selector.value
 
   override fun hashCode(): Int =
     this.target.selector.value
@@ -47,7 +48,7 @@ data class BookmarkAnnotation(
 data class BookmarkAnnotationFirstNode(
   val items: List<BookmarkAnnotation>,
   val type: String,
-  val id: String
+  val id: String,
 )
 
 data class BookmarkAnnotationResponse(
@@ -55,7 +56,7 @@ data class BookmarkAnnotationResponse(
   val total: Int,
   val type: List<String>,
   val id: String,
-  val first: BookmarkAnnotationFirstNode
+  val first: BookmarkAnnotationFirstNode,
 )
 
 object BookmarkAnnotations {
@@ -71,7 +72,7 @@ object BookmarkAnnotations {
 
   fun fromSerializedBookmark(
     objectMapper: ObjectMapper,
-    serializedBookmark: SerializedBookmark
+    serializedBookmark: SerializedBookmark,
   ): BookmarkAnnotation {
     val timestamp =
       this.dateFormatter.print(serializedBookmark.time)
@@ -81,7 +82,7 @@ object BookmarkAnnotations {
         timestamp = timestamp,
         device = serializedBookmark.deviceID,
         chapterTitle = serializedBookmark.bookChapterTitle,
-        bookProgress = serializedBookmark.bookProgress.toFloat()
+        bookProgress = serializedBookmark.bookProgress.toFloat(),
       )
 
     val locationJSON =
@@ -90,7 +91,7 @@ object BookmarkAnnotations {
     val target =
       BookmarkAnnotationTargetNode(
         serializedBookmark.opdsId,
-        BookmarkAnnotationSelectorNode("oa:FragmentSelector", locationJSON)
+        BookmarkAnnotationSelectorNode("oa:FragmentSelector", locationJSON),
       )
 
     return BookmarkAnnotation(
@@ -99,13 +100,13 @@ object BookmarkAnnotations {
       id = serializedBookmark.uri?.toString(),
       type = "Annotation",
       motivation = serializedBookmark.kind.motivationURI,
-      target = target
+      target = target,
     )
   }
 
   fun toSerializedBookmark(
     objectMapper: ObjectMapper,
-    annotation: BookmarkAnnotation
+    annotation: BookmarkAnnotation,
   ): SerializedBookmark {
     val location =
       SerializedLocators.parseLocator(objectMapper.readTree(annotation.target.selector.value))
@@ -120,7 +121,7 @@ object BookmarkAnnotations {
       bookProgress = annotation.body.bookProgress.toDouble(),
       bookChapterProgress = 0.0,
       bookChapterTitle = annotation.body.chapterTitle,
-      bookTitle = ""
+      bookTitle = "",
     )
   }
 }

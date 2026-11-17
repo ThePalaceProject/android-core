@@ -5,7 +5,6 @@ import one.irradia.mime.api.MIMECompatibility
 import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType
 import org.librarysimplified.http.api.LSHTTPResponseStatus
-import org.librarysimplified.mdc.MDCKeys
 import org.nypl.drm.core.AdobeAdeptExecutorType
 import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationAdobeClientToken
@@ -28,12 +27,15 @@ import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookWithStatus
 import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryCorrupt
 import org.nypl.simplified.feeds.api.FeedLoaderResult
 import org.nypl.simplified.feeds.api.FeedLoaderType
 import org.nypl.simplified.links.Link
 import org.nypl.simplified.notifications.NotificationTokenHTTPCallsType
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
 import org.nypl.simplified.patron.PatronUserProfiles
 import org.nypl.simplified.patron.api.PatronDRMAdobe
 import org.nypl.simplified.patron.api.PatronUserProfileParsersType
@@ -41,7 +43,6 @@ import org.nypl.simplified.profiles.api.ProfileReadableType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.net.URI
 import java.net.URLEncoder
 import java.util.concurrent.Callable
@@ -62,16 +63,16 @@ class ProfileAccountLogoutTask(
   private val logoutStrings: AccountLogoutStringResourcesType,
   private val notificationTokenHttpCalls: NotificationTokenHTTPCallsType,
   private val patronParsers: PatronUserProfileParsersType,
-  private val profile: ProfileReadableType
+  private val profile: ProfileReadableType,
 ) : Callable<TaskResult<Unit>> {
   private class StepFailedHandled(
-    override val cause: Throwable
+    override val cause: Throwable,
   ) : Exception()
 
   init {
     Preconditions.checkState(
       this.profile.accounts().containsKey(this.account.id),
-      "Profile must contain the given account"
+      "Profile must contain the given account",
     )
   }
 
@@ -85,31 +86,21 @@ class ProfileAccountLogoutTask(
 
   private fun warn(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.warn("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   private fun debug(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.debug("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   private fun error(
     message: String,
-    vararg arguments: Any?
+    vararg arguments: Any?,
   ) = this.logger.error("[{}][{}] $message", this.profile.id.uuid, this.account.id, *arguments)
 
   override fun call(): TaskResult<Unit> {
     this.steps.beginNewStep(this.logoutStrings.logoutStarted)
-
-    MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID,
-      this.account.id.uuid
-        .toString()
-    )
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_NAME, this.account.provider.displayName)
-    MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID,
-      this.account.provider.id
-        .toString()
-    )
 
     this.credentials =
       when (val state = this.account.loginState) {
@@ -132,7 +123,8 @@ class ProfileAccountLogoutTask(
         is AccountNotLoggedIn,
         is AccountLoggingIn,
         is AccountLoginFailed,
-        is AccountLoggingInWaitingForExternalAuthentication -> {
+        is AccountLoggingInWaitingForExternalAuthentication,
+        -> {
           this.warn("attempted to sign out with account in state {}", state.javaClass.canonicalName)
           this.steps.currentStepSucceeded(this.logoutStrings.logoutNotLoggedIn)
           return this.steps.finishSuccess(Unit)
@@ -141,9 +133,10 @@ class ProfileAccountLogoutTask(
 
     return try {
       this.steps.addAttribute("AccountProviderName", this.account.provider.displayName)
-      this.steps.addAttribute("AccountProviderID",
+      this.steps.addAttribute(
+        "AccountProviderID",
         this.account.provider.id
-          .toString()
+          .toString(),
       )
 
       this.runLogoutURLIfNecessary()
@@ -158,7 +151,7 @@ class ProfileAccountLogoutTask(
         message = this.logoutStrings.logoutUnexpectedException,
         errorCode = "unexpectedException",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
 
       val failure = this.steps.finishFailure<Unit>()
@@ -175,7 +168,8 @@ class ProfileAccountLogoutTask(
       AccountProviderAuthenticationDescription.Anonymous,
       is AccountProviderAuthenticationDescription.Basic,
       is AccountProviderAuthenticationDescription.BasicToken,
-      is AccountProviderAuthenticationDescription.SAML2_0 -> {
+      is AccountProviderAuthenticationDescription.SAML2_0,
+      -> {
         this.steps.currentStepSucceeded("Not applicable.")
         return
       }
@@ -224,7 +218,7 @@ class ProfileAccountLogoutTask(
               message = "Connecting to the server failed..",
               errorCode = "connectionFailed",
               exception = status.exception,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
           }
 
@@ -234,7 +228,7 @@ class ProfileAccountLogoutTask(
               message = "Server error: ${status.properties.status} ${status.properties.message}",
               errorCode = "httpError ${status.properties.status} $targetLink",
               exception = null,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
           }
 
@@ -263,7 +257,7 @@ class ProfileAccountLogoutTask(
     this.debug("running fcm token deletion")
 
     this.notificationTokenHttpCalls.deleteFCMTokenForProfileAccount(
-      account = account
+      account = account,
     )
   }
 
@@ -275,7 +269,7 @@ class ProfileAccountLogoutTask(
           patronParsers = this.patronParsers,
           credentials = this.credentials,
           http = this.http,
-          account = this.account
+          account = this.account,
         )
       patronProfile.drm
         .filterIsInstance<PatronDRMAdobe>()
@@ -346,7 +340,7 @@ class ProfileAccountLogoutTask(
         debug = { message -> this.debug(message) },
         vendorID = adobeCredentials.vendorID,
         userID = postActivation.userID,
-        clientToken = shortClientToken
+        clientToken = shortClientToken,
       )
 
     try {
@@ -365,7 +359,7 @@ class ProfileAccountLogoutTask(
         this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated,
         "error-adobe-drm",
         ex,
-        listOf()
+        listOf(),
       )
     } catch (e: Throwable) {
       this.logger.debug("Exception raised waiting for adept future: ", e)
@@ -374,7 +368,7 @@ class ProfileAccountLogoutTask(
         this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated,
         "error-adobe-drm",
         e,
-        listOf()
+        listOf(),
       )
     }
 
@@ -389,7 +383,7 @@ class ProfileAccountLogoutTask(
         executor = adeptExecutor,
         debug = { message -> this.debug(message) },
         vendorID = adobeCredentials.vendorID,
-        userID = postActivation.userID
+        userID = postActivation.userID,
       )
 
     try {
@@ -401,7 +395,7 @@ class ProfileAccountLogoutTask(
         this.logoutStrings.logoutDeactivatingDeviceAdobeDeactivated,
         "error-adobe-drm-deletion",
         e,
-        listOf()
+        listOf(),
       )
     }
   }
@@ -425,8 +419,8 @@ class ProfileAccountLogoutTask(
         .setMethod(
           LSHTTPRequestBuilderType.Method.Delete(
             ByteArray(0),
-            MIMECompatibility.applicationOctetStream
-          )
+            MIMECompatibility.applicationOctetStream,
+          ),
         ).addHeader("Content-Type", "vnd.librarysimplified/drm-device-id-list")
         .build()
 
@@ -447,7 +441,7 @@ class ProfileAccountLogoutTask(
           message,
           errorCode = "Adobe ACS: ${ex.errorCode}",
           exception = ex,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       }
 
@@ -456,7 +450,7 @@ class ProfileAccountLogoutTask(
           message = this.logoutStrings.logoutDeactivatingDeviceAdobeFailed("UNKNOWN", ex),
           errorCode = "unexpectedException",
           exception = ex,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       }
     }
@@ -465,8 +459,8 @@ class ProfileAccountLogoutTask(
     this.account.setLoginState(
       AccountLoggingOut(
         this.credentials,
-        status ?: this.steps.currentStep()?.description ?: ""
-      )
+        status ?: this.steps.currentStep()?.description ?: "",
+      ),
     )
   }
 
@@ -488,7 +482,7 @@ class ProfileAccountLogoutTask(
           this.steps.currentStepFailed(
             message = message,
             errorCode = "noAlternateLink",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
         } else {
           val newFeedEntry = this.fetchOPDSEntry(alternate)
@@ -503,13 +497,13 @@ class ProfileAccountLogoutTask(
           message,
           errorCode = "unexpectedException",
           exception = e,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
       }
     }
   }
 
-  private fun fetchOPDSEntry(uri: URI): OPDSAcquisitionFeedEntry {
+  private fun fetchOPDSEntry(uri: URI): FeedEntryBook {
     val feedResult =
       try {
         this.feedLoader
@@ -517,7 +511,7 @@ class ProfileAccountLogoutTask(
             accountID = this.account.id,
             uri = uri,
             credentials = null,
-            method = "GET"
+            method = "GET",
           ).get()
       } catch (e: TimeoutException) {
         val message = this.logoutStrings.logoutOPDSFeedTimedOut
@@ -525,7 +519,7 @@ class ProfileAccountLogoutTask(
           message = message,
           "timedOut",
           exception = e,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw StepFailedHandled(e)
       } catch (e: ExecutionException) {
@@ -550,7 +544,7 @@ class ProfileAccountLogoutTask(
             message = message,
             errorCode = "feedLoaderFailed",
             exception = feedResult.exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           throw StepFailedHandled(feedResult.exception)
         }
@@ -563,39 +557,39 @@ class ProfileAccountLogoutTask(
         message = message,
         errorCode = "feedEmpty",
         exception = exception,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       throw StepFailedHandled(exception)
     }
 
     return when (feed) {
-      is Feed.FeedWithoutGroups -> {
-        when (val feedEntry = feed.entriesInOrder[0]) {
-          is FeedEntry.FeedEntryCorrupt -> {
+      is FeedData -> {
+        when (val feedEntry = feed.entries[0]) {
+          is FeedEntryCorrupt -> {
             val message = this.logoutStrings.logoutOPDSFeedCorrupt
             this.steps.currentStepFailed(
               message = message,
               errorCode = "feedCorrupted",
               exception = feedEntry.error,
-              extraMessages = listOf()
+              extraMessages = listOf(),
             )
             throw StepFailedHandled(feedEntry.error)
           }
 
-          is FeedEntry.FeedEntryOPDS -> {
-            feedEntry.feedEntry
+          is FeedEntryBook -> {
+            feedEntry
           }
         }
       }
 
-      is Feed.FeedWithGroups -> {
+      is FeedDataWithGroups -> {
         val message = this.logoutStrings.logoutOPDSFeedWithGroups
         val exception = Exception(message)
         this.steps.currentStepFailed(
           message = message,
           errorCode = "feedUnusable",
           exception = exception,
-          extraMessages = listOf()
+          extraMessages = listOf(),
         )
         throw StepFailedHandled(exception)
       }
@@ -620,7 +614,7 @@ class ProfileAccountLogoutTask(
       this.steps.currentStepFailed(
         message = this.logoutStrings.logoutClearingBookDatabaseFailed,
         errorCode = "unexpectedException",
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
     }
   }

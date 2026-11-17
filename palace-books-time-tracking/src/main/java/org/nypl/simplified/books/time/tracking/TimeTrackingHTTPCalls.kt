@@ -17,14 +17,14 @@ import java.net.URI
  */
 
 class TimeTrackingHTTPCalls(
-  private val http: LSHTTPClientType
+  private val http: LSHTTPClientType,
 ) : TimeTrackingHTTPCallsType {
   private val logger =
     LoggerFactory.getLogger(TimeTrackingHTTPCalls::class.java)
 
   override fun registerTimeTrackingInfo(
     request: TimeTrackingRequest,
-    account: AccountType
+    account: AccountType,
   ): TimeTrackingServerResponse {
     val credentials =
       account.loginState.credentials ?: throw(Exception("Invalid Credentials"))
@@ -35,7 +35,8 @@ class TimeTrackingHTTPCalls(
       AccountAuthenticatedHTTP.createAuthorization(credentials)
     val post =
       LSHTTPRequestBuilderType.Method.Post(
-        data, MIMEType("application", "json", mapOf())
+        data,
+        MIMEType("application", "json", mapOf()),
       )
     val httpRequest =
       this.http
@@ -50,7 +51,7 @@ class TimeTrackingHTTPCalls(
         is LSHTTPResponseStatus.Responded.OK -> {
           account.updateBasicTokenCredentials(status.getAccessToken())
           TimeTrackingJSON.deserializeResponse(
-            status.bodyStream?.readBytes() ?: ByteArray(0)
+            status.bodyStream?.readBytes() ?: ByteArray(0),
           )
         }
 
@@ -76,20 +77,20 @@ class TimeTrackingHTTPCalls(
           TimeTrackingServerResponseEntry(
             e.id,
             "Server returned a 404 value. This is a synthesized message.",
-            404
+            404,
           )
         },
       summary =
         TimeTrackingServerResponseSummary(
           failures = request.timeEntries.size,
           successes = 0,
-          total = request.timeEntries.size
-        )
+          total = request.timeEntries.size,
+        ),
     )
 
   private fun <T> logAndFail(
     uri: URI,
-    error: LSHTTPResponseStatus.Responded.Error
+    error: LSHTTPResponseStatus.Responded.Error,
   ): T {
     val problemReport = error.properties.problemReport
     if (problemReport != null) {

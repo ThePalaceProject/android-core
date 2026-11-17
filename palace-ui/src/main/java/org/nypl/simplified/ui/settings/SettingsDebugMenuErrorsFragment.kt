@@ -18,6 +18,8 @@ import org.nypl.simplified.ui.main.MainNavigation
 import org.nypl.simplified.ui.screens.ScreenDefinitionFactoryType
 import org.nypl.simplified.ui.screens.ScreenDefinitionType
 import org.nypl.simplified.viewer.api.Viewers
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 
 class SettingsDebugMenuErrorsFragment :
   Fragment(R.layout.debug_errors),
@@ -33,7 +35,8 @@ class SettingsDebugMenuErrorsFragment :
       override fun fragment(): SettingsDebugMenuErrorsFragment = SettingsDebugMenuErrorsFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuErrorsFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -46,11 +49,12 @@ class SettingsDebugMenuErrorsFragment :
   private lateinit var showErrorPage: Button
   private lateinit var sendErrorLogs: Button
   private lateinit var crash: Button
+  private lateinit var sendDiagnostic: Button
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -67,6 +71,8 @@ class SettingsDebugMenuErrorsFragment :
       view.findViewById(R.id.debugSendAnalytics)
     this.crash =
       view.findViewById(R.id.debugCrash)
+    this.sendDiagnostic =
+      view.findViewById(R.id.debugSendDiagnostic)
 
     this.sendErrorLogs.setOnClickListener {
       SettingsDebugModel.sendErrorLogs()
@@ -80,11 +86,14 @@ class SettingsDebugMenuErrorsFragment :
         .makeText(
           this.requireContext(),
           "Triggered analytics send",
-          Toast.LENGTH_SHORT
+          Toast.LENGTH_SHORT,
         ).show()
     }
     this.crash.setOnClickListener {
       throw DebugCrashedDeliberately()
+    }
+    this.sendDiagnostic.setOnClickListener {
+      this.sendDiagnostic()
     }
 
     this.makeNextBookFail =
@@ -105,7 +114,7 @@ class SettingsDebugMenuErrorsFragment :
       SettingsDebugModel.appVersion()
     val attributes =
       sortedMapOf(
-        Pair("Version", appVersion)
+        Pair("Version", appVersion),
       )
 
     val taskSteps =
@@ -114,8 +123,8 @@ class SettingsDebugMenuErrorsFragment :
     taskSteps.add(
       TaskStep(
         "Opening error page.",
-        TaskStepResolution.TaskStepSucceeded("Error page successfully opened.")
-      )
+        TaskStepResolution.TaskStepSucceeded("Error page successfully opened."),
+      ),
     )
 
     val supportEmail =
@@ -132,8 +141,29 @@ class SettingsDebugMenuErrorsFragment :
           body = "",
           subject = "[palace-error-report] $appVersion",
           attributes = attributes,
-          taskSteps = taskSteps
-        )
+          taskSteps = taskSteps,
+        ),
     )
+  }
+
+  private fun sendDiagnostic() {
+    val diagnostics =
+      Services
+        .serviceDirectory()
+        .requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.USER_PRESSED_DEBUG_DIAGNOSTIC_BUTTON,
+      data =
+        mapOf(
+          Pair("Source", "debugMenu"),
+        ),
+      throwable = null,
+    )
+    Toast
+      .makeText(
+        this.requireContext(),
+        "Reported diagnostic event",
+        Toast.LENGTH_SHORT,
+      ).show()
   }
 }

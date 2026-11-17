@@ -179,6 +179,7 @@
     "settingsAccessibilityAccountSelect": "Toque para establecer \"%1$s\" como biblioteca actual. Mantenga pulsado para quitar.",
     "settingsAccessibilityAccountSelectCurrent": "\"%1$s\", su biblioteca actual. Mantenga pulsado para quitar.",
     "settingsAccessibilitySearchButtonClose": "Cierre el botón de búsqueda",
+    "settingsAccessibilitySearchHint": "Buscar. Los resultados se actualizan mientras escribe.",
     "settingsAudiobooksSkipForwards": "Saltar hacia adelante",
     "settingsCOPPADeleteBooksConfirm": "Cambiar su edad eliminará todos los libros descargados de la cuenta actual.",
     "settingsCardCreatorLabel": "¿No tiene una tarjeta de biblioteca?",

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 
 class ProfileDataLoadTask(
   private val profile: ProfileType,
-  private val bookRegistry: BookRegistryType
+  private val bookRegistry: BookRegistryType,
 ) : Runnable {
   private val logger = LoggerFactory.getLogger(ProfileDataLoadTask::class.java)
 

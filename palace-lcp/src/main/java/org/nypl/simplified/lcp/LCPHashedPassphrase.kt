@@ -14,7 +14,8 @@ object LCPHashedPassphrase {
    */
 
   @JvmStatic
-  fun isBase64Encoded(hashedPassphrase: String): Boolean = hashedPassphrase.length != 64 || hashedPassphrase.contains(Regex("[^0-9a-fA-F]"))
+  fun isBase64Encoded(hashedPassphrase: String): Boolean =
+    hashedPassphrase.length != 64 || hashedPassphrase.contains(Regex("[^0-9a-fA-F]"))
 
   /**
    * Base-64 encode a hashed passphrase, using the algorithm described in the LCP spec:

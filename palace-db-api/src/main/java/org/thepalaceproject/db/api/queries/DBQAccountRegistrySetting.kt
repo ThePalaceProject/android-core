@@ -7,6 +7,6 @@ sealed interface DBQAccountRegistrySetting {
 
   data class TimeSetting(
     override val name: String,
-    val value: OffsetDateTime
+    val value: OffsetDateTime,
   ) : DBQAccountRegistrySetting
 }

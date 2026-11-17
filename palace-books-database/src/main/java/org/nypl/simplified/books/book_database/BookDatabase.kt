@@ -10,12 +10,11 @@ import org.nypl.simplified.books.book_database.api.BookDatabaseEntryType
 import org.nypl.simplified.books.book_database.api.BookDatabaseException
 import org.nypl.simplified.books.book_database.api.BookDatabaseType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedEntryParserType
+import org.nypl.simplified.feeds.api.FeedEntrySerializerType
 import org.nypl.simplified.files.DirectoryUtilities
 import org.nypl.simplified.files.FileUtilities
-import org.nypl.simplified.json.core.JSONSerializerUtilities
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
-import org.nypl.simplified.opds.core.OPDSJSONParserType
-import org.nypl.simplified.opds.core.OPDSJSONSerializerType
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
@@ -33,7 +32,7 @@ class BookDatabase private constructor(
   private val owner: AccountID,
   private val directory: File,
   private val maps: BookMaps,
-  private val serializer: OPDSJSONSerializerType,
+  private val serializer: FeedEntrySerializerType,
   private val formats: BookFormatSupportType,
   private val httpClient: LSHTTPClientType,
 ) : BookDatabaseType {
@@ -99,7 +98,7 @@ class BookDatabase private constructor(
   @Throws(BookDatabaseException::class)
   override fun createOrUpdate(
     id: BookID,
-    entry: OPDSAcquisitionFeedEntry
+    entry: FeedEntryBook,
   ): BookDatabaseEntryType {
     synchronized(this.maps.mapsLock) {
       if (this.maps.contains(id)) {
@@ -120,7 +119,7 @@ class BookDatabase private constructor(
         FileUtilities.fileWriteUTF8Atomically(
           fileMeta,
           fileMetaTmp,
-          JSONSerializerUtilities.serializeToString(this.serializer.serializeFeedEntry(entry))
+          this.serializer.serializeEntry(entry),
         )
 
         val book =
@@ -130,7 +129,7 @@ class BookDatabase private constructor(
             cover = cover,
             thumbnail = thumb,
             entry = entry,
-            formats = listOf()
+            formats = listOf(),
           )
 
         val dbEntry =
@@ -156,7 +155,8 @@ class BookDatabase private constructor(
   override fun entry(id: BookID): BookDatabaseEntryType {
     synchronized(this.maps.mapsLock) {
       return this.maps.entries[id] ?: throw BookDatabaseException(
-        "Nonexistent book entry: " + id.value(), emptyList()
+        "Nonexistent book entry: " + id.value(),
+        emptyList(),
       )
     }
   }
@@ -167,8 +167,8 @@ class BookDatabase private constructor(
     @Throws(BookDatabaseException::class)
     fun open(
       context: Application,
-      parser: OPDSJSONParserType,
-      serializer: OPDSJSONSerializerType,
+      parser: FeedEntryParserType,
+      serializer: FeedEntrySerializerType,
       formats: BookFormatSupportType,
       owner: AccountID,
       directory: File,
@@ -187,13 +187,14 @@ class BookDatabase private constructor(
         directory = directory,
         maps = maps,
         errors = errors,
-        httpClient = httpClient
+        httpClient = httpClient,
       )
 
       if (errors.isNotEmpty()) {
         errors.forEach { exception -> LOG.debug("error opening book database: ", exception) }
         throw BookDatabaseException(
-          "One or more errors occurred whilst trying to open a book database.", errors
+          "One or more errors occurred whilst trying to open a book database.",
+          errors,
         )
       }
 
@@ -204,14 +205,14 @@ class BookDatabase private constructor(
         maps = maps,
         serializer = serializer,
         formats = formats,
-        httpClient = httpClient
+        httpClient = httpClient,
       )
     }
 
     private fun openAllBooks(
       context: Application,
-      parser: OPDSJSONParserType,
-      serializer: OPDSJSONSerializerType,
+      parser: FeedEntryParserType,
+      serializer: FeedEntrySerializerType,
       formats: BookFormatSupportType,
       account: AccountID,
       directory: File,
@@ -243,7 +244,7 @@ class BookDatabase private constructor(
               maps = maps,
               errors = errors,
               name = bookID,
-              httpClient = httpClient
+              httpClient = httpClient,
             ) ?: continue
           maps.addEntry(entry)
         }
@@ -252,8 +253,8 @@ class BookDatabase private constructor(
 
     private fun openOneEntry(
       context: Application,
-      parser: OPDSJSONParserType,
-      serializer: OPDSJSONSerializerType,
+      parser: FeedEntryParserType,
+      serializer: FeedEntrySerializerType,
       formats: BookFormatSupportType,
       accountID: AccountID,
       directory: File,
@@ -271,9 +272,9 @@ class BookDatabase private constructor(
 
         val bookId = BookID.create(name)
         val fileMeta = File(directory, "meta.json")
-        val entry: OPDSAcquisitionFeedEntry =
+        val entry: FeedEntryBook =
           FileInputStream(fileMeta).use { stream ->
-            parser.parseAcquisitionFeedEntryFromStream(stream)
+            parser.parseEntry(accountID, stream)
           }
 
         val cover = fileOrNull(directory, BookDatabaseEntry.COVER_FILENAME)
@@ -286,7 +287,7 @@ class BookDatabase private constructor(
             cover = cover,
             thumbnail = thumb,
             entry = entry,
-            formats = listOf()
+            formats = listOf(),
           )
 
         return BookDatabaseEntry(
@@ -296,7 +297,7 @@ class BookDatabase private constructor(
           formats = formats,
           bookRef = book,
           onDelete = Runnable { maps.delete(bookId) },
-          httpClient = httpClient
+          httpClient = httpClient,
         )
       } catch (e: IOException) {
         errors.add(e)
@@ -310,7 +311,7 @@ class BookDatabase private constructor(
 
 private fun fileOrNull(
   bookDir: File,
-  filename: String
+  filename: String,
 ) = File(bookDir, filename)
   .run {
     if (isFile) this else null

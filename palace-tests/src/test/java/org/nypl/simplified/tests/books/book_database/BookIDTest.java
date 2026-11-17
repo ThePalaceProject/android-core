@@ -25,7 +25,7 @@ public final class BookIDTest {
         Objects.requireNonNull(DateTime.now()),
         OPDSAvailabilityOpenAccess.get(null));
     final OPDSAcquisitionFeedEntry e = eb.build();
-    final BookID b = BookIDs.newFromOPDSEntry(e);
+    final BookID b = BookIDs.newFromText(e.getId());
     System.out.println("book: " + b);
     Assertions.assertEquals(
       "7a99601f479c30f66f0949c51bbed2adac0e12eb79ad1319db638e16604400bf",

@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 
 class AccountProviderDescriptionListAdapter(
   private val imageLoader: ImageLoader2Type,
-  private val onItemClicked: (AccountProviderDescription) -> Unit
+  private val onItemClicked: (AccountProviderDescription) -> Unit,
 ) : ListAdapter<AccountProviderDescription?, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
   companion object {
     private const val VIEW_TYPE_ACCOUNT = 0
@@ -32,12 +32,12 @@ class AccountProviderDescriptionListAdapter(
       object : DiffUtil.ItemCallback<AccountProviderDescription?>() {
         override fun areItemsTheSame(
           oldItem: AccountProviderDescription,
-          newItem: AccountProviderDescription
+          newItem: AccountProviderDescription,
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
           oldItem: AccountProviderDescription,
-          newItem: AccountProviderDescription
+          newItem: AccountProviderDescription,
         ): Boolean = oldItem.title == newItem.title && oldItem.logoURI == newItem.logoURI
       }
   }
@@ -57,7 +57,7 @@ class AccountProviderDescriptionListAdapter(
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): RecyclerView.ViewHolder {
     val inflater = LayoutInflater.from(parent.context)
 
@@ -69,7 +69,7 @@ class AccountProviderDescriptionListAdapter(
       AccountItemViewHolder(
         item,
         this.imageLoader,
-        this.onItemClicked
+        this.onItemClicked,
       )
     } else {
       val gap = inflater.inflate(R.layout.account_list_gap, parent, false)
@@ -79,10 +79,12 @@ class AccountProviderDescriptionListAdapter(
 
   override fun onBindViewHolder(
     holder: RecyclerView.ViewHolder,
-    position: Int
+    position: Int,
   ) {
     val item = getItem(position)
-    item ?: return
+    if (item == null) {
+      return
+    }
     (holder as? AccountItemViewHolder)?.bind(item)
   }
 }

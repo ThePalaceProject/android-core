@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class BookDRMInformationHandleACS(
   private val directory: File,
   format: BookFormats.BookFormatDefinition,
-  private val onUpdate: () -> Unit
+  private val onUpdate: () -> Unit,
 ) : BookDRMInformationHandle.ACSHandle(),
   BookDRMInformationHandleBase {
   private val objectMapper = ObjectMapper()
@@ -39,7 +39,7 @@ class BookDRMInformationHandleACS(
       listOf(
         nameRights(format),
         nameACSM(format),
-        nameMetaJSON(format)
+        nameMetaJSON(format),
       )
 
     fun deleteFiles(directory: File) {
@@ -50,7 +50,7 @@ class BookDRMInformationHandleACS(
     BookDRMInformationHandles.writeDRMInfo(
       directory = this.directory,
       format = format,
-      kind = BookDRMKind.ACS
+      kind = BookDRMKind.ACS,
     )
   }
 
@@ -73,24 +73,24 @@ class BookDRMInformationHandleACS(
       this.loadInitial(
         fileAdobeRights = this.fileAdobeRights,
         fileAdobeACSM = this.fileAdobeACSM,
-        fileAdobeMeta = this.fileAdobeMeta
+        fileAdobeMeta = this.fileAdobeMeta,
       )
     }
 
   private fun loadInitial(
     fileAdobeRights: File,
     fileAdobeACSM: File,
-    fileAdobeMeta: File
+    fileAdobeMeta: File,
   ): BookDRMInformation.ACS =
     BookDRMInformation.ACS(
       acsmFile = if (fileAdobeACSM.isFile) fileAdobeACSM else null,
-      rights = this.loadAdobeRightsInformationIfPresent(fileAdobeRights, fileAdobeMeta)
+      rights = this.loadAdobeRightsInformationIfPresent(fileAdobeRights, fileAdobeMeta),
     )
 
   @Throws(IOException::class)
   private fun loadAdobeRightsInformationIfPresent(
     fileAdobeRights: File,
-    fileAdobeMeta: File
+    fileAdobeMeta: File,
   ): Pair<File, AdobeAdeptLoan>? =
     if (fileAdobeRights.isFile) {
       this.loadAdobeRightsInformation(fileAdobeRights, fileAdobeMeta)
@@ -101,7 +101,7 @@ class BookDRMInformationHandleACS(
   @Throws(IOException::class)
   private fun loadAdobeRightsInformation(
     fileAdobeRights: File,
-    fileAdobeMeta: File
+    fileAdobeMeta: File,
   ): Pair<File, AdobeAdeptLoan>? {
     val serialized = fileAdobeRights.readBytes()
     val jn = this.objectMapper.readTree(fileAdobeMeta)
@@ -128,7 +128,7 @@ class BookDRMInformationHandleACS(
           FileUtilities.fileWriteBytesAtomically(
             this.fileAdobeACSM,
             this.fileAdobeACSMTmp,
-            FileUtilities.fileReadBytes(acsm)
+            FileUtilities.fileReadBytes(acsm),
           )
           this.infoRef = this.infoRef.copy(acsmFile = this.fileAdobeACSM)
           this.infoRef
@@ -154,7 +154,7 @@ class BookDRMInformationHandleACS(
           FileUtilities.fileWriteBytesAtomically(
             this.fileAdobeRights,
             this.fileAdobeRightsTmp,
-            loan.serialized
+            loan.serialized,
           )
 
           val o = this.objectMapper.createObjectNode()
@@ -166,7 +166,7 @@ class BookDRMInformationHandleACS(
             FileUtilities.fileWriteUTF8Atomically(
               this.fileAdobeMeta,
               this.fileAdobeMetaTmp,
-              stream.toString("UTF-8")
+              stream.toString("UTF-8"),
             )
           }
 

@@ -8,5 +8,5 @@ package org.nypl.simplified.bookmarks.api
 enum class BookmarkSyncEnableResult {
   SYNC_ENABLE_NOT_SUPPORTED,
   SYNC_ENABLED,
-  SYNC_DISABLED
+  SYNC_DISABLED,
 }

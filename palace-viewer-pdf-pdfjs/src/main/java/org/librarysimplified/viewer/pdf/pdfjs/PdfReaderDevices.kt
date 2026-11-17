@@ -10,7 +10,7 @@ object PdfReaderDevices {
 
   fun deviceId(
     profilesController: ProfilesControllerType,
-    bookID: BookID
+    bookID: BookID,
   ): String {
     val account = profilesController.profileAccountForBook(bookID)
     val state = account.loginState

@@ -1,0 +1,33 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:7272727272",
+        "title": "Available Loan Book"
+      },
+      "links": [
+        {
+          "href": "https://example.com/download/epub",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition",
+          "properties": {
+            "availability": {
+              "state": "available",
+              "since": "2024-01-02T14:46:46.889Z",
+              "until": "2024-02-01T14:46:46.889Z"
+            }
+          }
+        },
+        {
+          "href": "https://example.com/loans/2/revoke",
+          "rel": "http://librarysimplified.org/terms/rel/revoke"
+        }
+      ]
+    }
+  ]
+}

@@ -18,7 +18,7 @@ class PalaceBuildConfigurationService : BuildConfigurationServiceType {
   override val featuredLibrariesIdsList: List<String>
     get() =
       listOf(
-        "urn:uuid:6b849570-070f-43b4-9dcc-7ebb4bca292e" // Palace Bookshelf
+        "urn:uuid:6b849570-070f-43b4-9dcc-7ebb4bca292e", // Palace Bookshelf
       )
   override val showDebugBookDetailStatus: Boolean
     get() = false

@@ -16,7 +16,7 @@ object Links {
           height = link.height,
           width = link.width,
           duration = link.duration?.toDouble(),
-          bitrate = link.bitrate?.toDouble()
+          bitrate = link.bitrate?.toDouble(),
         )
       }
 
@@ -29,7 +29,7 @@ object Links {
           height = link.height,
           width = link.width,
           duration = link.duration?.toDouble(),
-          bitrate = link.bitrate?.toDouble()
+          bitrate = link.bitrate?.toDouble(),
         )
       }
     }

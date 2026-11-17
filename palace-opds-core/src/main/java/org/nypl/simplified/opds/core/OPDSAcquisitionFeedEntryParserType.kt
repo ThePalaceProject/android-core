@@ -19,7 +19,7 @@ interface OPDSAcquisitionFeedEntryParserType {
   @Throws(OPDSParseException::class)
   fun parseEntry(
     source: URI,
-    element: Element
+    element: Element,
   ): OPDSAcquisitionFeedEntry
 
   /**
@@ -33,6 +33,6 @@ interface OPDSAcquisitionFeedEntryParserType {
   @Throws(OPDSParseException::class)
   fun parseEntryStream(
     source: URI,
-    stream: InputStream
+    stream: InputStream,
   ): OPDSAcquisitionFeedEntry
 }

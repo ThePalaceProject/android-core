@@ -50,7 +50,7 @@ object AccountAuthenticationCredentialsJSON20200604 : AccountAuthenticationCrede
       authenticationDescription = JSONParserUtilities.getStringOrNull(obj, "authenticationDescription"),
       annotationsURI = null,
       deviceRegistrationURI = null,
-      patronAuthorization = null
+      patronAuthorization = null,
     )
   }
 }

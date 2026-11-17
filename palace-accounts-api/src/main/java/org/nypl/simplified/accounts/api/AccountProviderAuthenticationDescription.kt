@@ -94,7 +94,7 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      * This server does not expect this input to be provided at all, and the client should not collect it.
      */
 
-    NO_INPUT
+    NO_INPUT,
   }
 
   /**
@@ -142,7 +142,7 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      * The URI of the authentication logo.
      */
 
-    val logoURI: URI?
+    val logoURI: URI?,
   ) : AccountProviderAuthenticationDescription() {
     override val isLoginPossible: Boolean =
       true
@@ -153,7 +153,7 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
     init {
       Preconditions.checkArgument(
         this.barcodeFormat?.all { c -> c.isUpperCase() || c.isWhitespace() } ?: true,
-        "Barcode format ${this.barcodeFormat} must be uppercase"
+        "Barcode format ${this.barcodeFormat} must be uppercase",
       )
     }
   }
@@ -208,7 +208,7 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      * The authentication URI.
      */
 
-    val authenticationURI: URI
+    val authenticationURI: URI,
   ) : AccountProviderAuthenticationDescription() {
     override val isLoginPossible: Boolean =
       true
@@ -219,7 +219,7 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
     init {
       Preconditions.checkArgument(
         this.barcodeFormat?.all { c -> c.isUpperCase() || c.isWhitespace() } ?: true,
-        "Barcode format ${this.barcodeFormat} must be uppercase"
+        "Barcode format ${this.barcodeFormat} must be uppercase",
       )
     }
   }
@@ -252,7 +252,7 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      * The URI of the authentication logo.
      */
 
-    val logoURI: URI?
+    val logoURI: URI?,
   ) : AccountProviderAuthenticationDescription() {
     override val isLoginPossible: Boolean =
       true
@@ -281,7 +281,7 @@ sealed class AccountProviderAuthenticationDescription : Serializable {
      * The explicit logout link.
      */
 
-    val logout: Link?
+    val logout: Link?,
   ) : AccountProviderAuthenticationDescription() {
     override val isLoginPossible: Boolean =
       true

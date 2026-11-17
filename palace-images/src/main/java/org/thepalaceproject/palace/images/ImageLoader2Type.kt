@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import org.nypl.simplified.accounts.api.AccountProviderDescription
 import org.nypl.simplified.feeds.api.FeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 
@@ -47,7 +48,7 @@ interface ImageLoader2Type {
       context = iconView.context,
       account = account,
       defaultIcon = defaultIcon,
-      iconView = iconView
+      iconView = iconView,
     )
 
   /**
@@ -63,10 +64,10 @@ interface ImageLoader2Type {
    */
 
   fun loadThumbnailInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     width: Int,
-    height: Int
+    height: Int,
   ): CompletableFuture<Unit>
 
   /**
@@ -83,11 +84,35 @@ interface ImageLoader2Type {
    */
 
   fun loadCoverInto(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     imageView: ImageView,
     hasBadge: Boolean,
     width: Int,
-    height: Int
+    height: Int,
+  ): CompletableFuture<Unit>
+
+  /**
+   * Load a blurred average of the cover based on `entry` into the image view
+   * `imageView`. The image is reduced with bilinear filtering and stretched to
+   * fill the view, and carries no badge or other decoration. Used for the
+   * book-detail background.
+   *
+   * Must only be called from the UI thread.
+   *
+   * @param entry The feed entry
+   * @param imageView The image view
+   * @param width Use 0 as desired dimension to resize keeping aspect ratio.
+   * @param height Use 0 as desired dimension to resize keeping aspect ratio.
+   * @param onColorLoaded The callback invoked with the representative ARGB color of the blurred
+   * cover, on the main thread
+   */
+
+  fun loadCoverBackgroundInto(
+    entry: FeedEntryBook,
+    imageView: ImageView,
+    width: Int,
+    height: Int,
+    onColorLoaded: (Int) -> Unit,
   ): CompletableFuture<Unit>
 
   /**
@@ -102,9 +127,9 @@ interface ImageLoader2Type {
    */
 
   fun loadCoverAsBitmap(
-    entry: FeedEntry.FeedEntryOPDS,
+    entry: FeedEntryBook,
     onBitmapLoaded: (Bitmap) -> Unit,
-    @DrawableRes defaultResource: Int
+    @DrawableRes defaultResource: Int,
   ): CompletableFuture<Unit>
 
   /**
@@ -121,6 +146,6 @@ interface ImageLoader2Type {
   fun loadCoverAsBitmap(
     source: URI,
     onBitmapLoaded: (Bitmap) -> Unit,
-    @DrawableRes defaultResource: Int
+    @DrawableRes defaultResource: Int,
   ): CompletableFuture<Unit>
 }

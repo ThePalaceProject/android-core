@@ -8,7 +8,7 @@ import java.util.UUID
  */
 
 data class AccountID(
-  val uuid: UUID
+  val uuid: UUID,
 ) : Serializable,
   Comparable<AccountID> {
   override fun compareTo(other: AccountID): Int = this.uuid.compareTo(other.uuid)

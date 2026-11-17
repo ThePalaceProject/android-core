@@ -2,6 +2,7 @@ package org.nypl.simplified.books.book_registry
 
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID
 import org.slf4j.LoggerFactory
 import java.util.Collections
@@ -10,7 +11,7 @@ import java.util.SortedMap
 import java.util.concurrent.ConcurrentSkipListMap
 
 class BookRegistry private constructor(
-  private val books: ConcurrentSkipListMap<BookID, BookWithStatus>
+  private val books: ConcurrentSkipListMap<BookID, BookWithStatus>,
 ) : BookRegistryType {
   private val logger =
     LoggerFactory.getLogger(BookRegistry::class.java)
@@ -42,7 +43,7 @@ class BookRegistry private constructor(
 
   private fun publishUpdateEvent(
     oldStatus: BookWithStatus?,
-    newStatus: BookWithStatus
+    newStatus: BookWithStatus,
   ) {
     if (newStatus.status == oldStatus?.status) {
       return
@@ -52,13 +53,13 @@ class BookRegistry private constructor(
       if (oldStatus == null) {
         BookStatusEvent.BookStatusEventAdded(
           bookId = newStatus.book.id,
-          statusNow = newStatus.status
+          statusNow = newStatus.status,
         )
       } else {
         BookStatusEvent.BookStatusEventChanged(
           bookId = oldStatus.book.id,
           statusPrevious = oldStatus.status,
-          statusNow = newStatus.status
+          statusNow = newStatus.status,
         )
       }
 
@@ -98,11 +99,28 @@ class BookRegistry private constructor(
     }
   }
 
+  override fun clearForAccount(account: AccountID) {
+    val toRemove =
+      this.books
+        .entries
+        .filter { it.value.book.account == account }
+
+    for (entry in toRemove) {
+      this.observable.onNext(
+        BookStatusEvent.BookStatusEventRemoved(entry.key, entry.value.status),
+      )
+    }
+
+    for (entry in toRemove) {
+      this.books.remove(entry.key)
+    }
+  }
+
   override fun updateHolds(numberOfHolds: Int) {
     this.bookHoldsUpdate.onNext(
       BookHoldsUpdateEvent(
-        numberOfHolds = numberOfHolds
-      )
+        numberOfHolds = numberOfHolds,
+      ),
     )
   }
 

@@ -21,5 +21,5 @@ data class OPDSGroup(
   /**
    * The entries within the group.
    */
-  val entries: List<OPDSAcquisitionFeedEntry>
+  val entries: List<OPDSAcquisitionFeedEntry>,
 )

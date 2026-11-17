@@ -3,7 +3,7 @@ package org.nypl.simplified.books.api
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookFormat.BookFormatAudioBook
 import org.nypl.simplified.books.api.BookFormat.BookFormatEPUB
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntry
+import org.nypl.simplified.feeds.api.FeedEntryBook
 import java.io.File
 
 /**
@@ -37,12 +37,12 @@ data class Book(
    * @return The acquisition feed entry
    */
 
-  val entry: OPDSAcquisitionFeedEntry,
+  val entry: FeedEntryBook,
   /**
    * The available formats.
    */
 
-  val formats: List<BookFormat>
+  val formats: List<BookFormat>,
 ) {
   /**
    * If any format is downloaded, then the book as a whole is currently considered to be downloaded
@@ -55,7 +55,8 @@ data class Book(
    * @return The format of the given type, if one is present
    */
 
-  fun <T : BookFormat> findFormat(clazz: Class<T>): T? = this.formats.find { format -> clazz.isAssignableFrom(format.javaClass) } as T?
+  fun <T : BookFormat> findFormat(clazz: Class<T>): T? =
+    this.formats.find { format -> clazz.isAssignableFrom(format.javaClass) } as T?
 
   /**
    * @return The "preferred" format for the given type, if any

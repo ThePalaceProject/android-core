@@ -15,11 +15,11 @@ import org.nypl.simplified.taskrecorder.api.TaskStepResolution
  */
 
 class ErrorPageStepsListAdapter(
-  private val steps: List<TaskStep>
+  private val steps: List<TaskStep>,
 ) : RecyclerView.Adapter<ErrorPageStepsListAdapter.ViewHolder>() {
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): ViewHolder {
     val inflater =
       LayoutInflater.from(parent.context)
@@ -33,7 +33,7 @@ class ErrorPageStepsListAdapter(
 
   override fun onBindViewHolder(
     holder: ViewHolder,
-    position: Int
+    position: Int,
   ) {
     val step = this.steps[position]
 
@@ -59,7 +59,7 @@ class ErrorPageStepsListAdapter(
   }
 
   inner class ViewHolder(
-    parent: View
+    parent: View,
   ) : RecyclerView.ViewHolder(parent) {
     val icon =
       parent.findViewById<ImageView>(R.id.errorItemIcon)

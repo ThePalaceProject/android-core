@@ -35,11 +35,11 @@ class BorrowBearerToken : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean =
       MIMECompatibility.isCompatibleStrictWithoutAttributes(
         type,
-        StandardFormatNames.simplifiedBearerToken
+        StandardFormatNames.simplifiedBearerToken,
       )
   }
 
@@ -57,7 +57,7 @@ class BorrowBearerToken : BorrowSubtaskType {
           context.taskRecorder.currentStepFailed(
             message = "Cannot handle templated links for bearer tokens.",
             errorCode = "error-templated",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           context.bookDownloadFailed()
         }
@@ -70,7 +70,7 @@ class BorrowBearerToken : BorrowSubtaskType {
 
   private fun executeLinkBasic(
     context: BorrowContextType,
-    currentURI: Link.LinkBasic
+    currentURI: Link.LinkBasic,
   ) {
     val credentials =
       context.account.loginState.credentials
@@ -83,7 +83,7 @@ class BorrowBearerToken : BorrowSubtaskType {
           LSHTTPRefreshTokenProperties(
             userName = credentials.userName.value,
             password = credentials.password.value,
-            refreshURI = credentials.authenticationTokenInfo.authURI
+            refreshURI = credentials.authenticationTokenInfo.authURI,
           )
         }
 
@@ -109,7 +109,7 @@ class BorrowBearerToken : BorrowSubtaskType {
         context.httpClient,
         target = currentURI.href,
         refreshTokenProperties = refreshTokenProperties,
-        authorization = auth
+        authorization = auth,
       )
 
     return when (tokenResult) {
@@ -126,7 +126,7 @@ class BorrowBearerToken : BorrowSubtaskType {
   private fun handleNegotiationFailure(
     context: BorrowContextType,
     currentURI: Link.LinkBasic,
-    tokenResult: LSSimplifiedBearerTokenNegotiation.NegotiationFailed
+    tokenResult: LSSimplifiedBearerTokenNegotiation.NegotiationFailed,
   ) {
     val properties = tokenResult.response?.properties
     val statusCode = properties?.status ?: 600
@@ -140,7 +140,7 @@ class BorrowBearerToken : BorrowSubtaskType {
       message = "HTTP request failed: ${currentURI.href} $statusCode $message",
       errorCode = httpRequestFailed,
       exception = null,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
 
     throw if (statusCode == 401) {
@@ -162,7 +162,7 @@ class BorrowBearerToken : BorrowSubtaskType {
   private fun handleNegotiationSuccess(
     context: BorrowContextType,
     currentURI: Link.LinkBasic,
-    tokenResult: LSSimplifiedBearerTokenNegotiation.NegotiationSucceeded
+    tokenResult: LSSimplifiedBearerTokenNegotiation.NegotiationSucceeded,
   ) {
     val refreshToken = tokenResult.refreshToken
     if (refreshToken != null) {
@@ -172,8 +172,8 @@ class BorrowBearerToken : BorrowSubtaskType {
     context.setNextSubtaskCredentials(
       BorrowSubtaskCredentials.UseBearerToken(
         refreshURI = currentURI.href,
-        token = bearerToken.accessToken
-      )
+        token = bearerToken.accessToken,
+      ),
     )
     context.receivedNewURI(Link.LinkBasic(bearerToken.location))
   }

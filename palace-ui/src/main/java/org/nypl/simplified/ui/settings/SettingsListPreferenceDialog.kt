@@ -16,7 +16,7 @@ object SettingsListPreferenceDialog {
     entries: Array<String>,
     values: Array<String>,
     initialValue: String,
-    onSelected: (String) -> Unit
+    onSelected: (String) -> Unit,
   ) {
     UIThread.checkIsUIThread()
 

@@ -9,7 +9,7 @@ import java.io.InputStream
 import java.net.URI
 
 class SimplifiedAssetModelLoader(
-  private val context: Context
+  private val context: Context,
 ) : ModelLoader<URI, InputStream> {
   override fun handles(uri: URI): Boolean = uri.scheme == "simplified-asset"
 
@@ -17,17 +17,18 @@ class SimplifiedAssetModelLoader(
     uri: URI,
     width: Int,
     height: Int,
-    options: com.bumptech.glide.load.Options
+    options: com.bumptech.glide.load.Options,
   ): ModelLoader.LoadData<InputStream> =
     ModelLoader.LoadData(
       ObjectKey(uri),
-      SimplifiedAssetDataFetcher(context, uri.schemeSpecificPart)
+      SimplifiedAssetDataFetcher(context, uri.schemeSpecificPart),
     )
 
   class Factory(
-    private val context: Context
+    private val context: Context,
   ) : ModelLoaderFactory<URI, InputStream> {
-    override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<URI, InputStream> = SimplifiedAssetModelLoader(context)
+    override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<URI, InputStream> =
+      SimplifiedAssetModelLoader(context)
 
     override fun teardown() {
       // No resources to clean up.

@@ -14,6 +14,6 @@ sealed class AccountSAML20Event {
    */
 
   data class OpenErrorPage(
-    val parameters: ErrorPageParameters
+    val parameters: ErrorPageParameters,
   ) : AccountSAML20Event()
 }

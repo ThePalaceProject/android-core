@@ -57,6 +57,6 @@ sealed class BookStatusEvent : BookEvent() {
   data class BookStatusEventChanged(
     override val bookId: BookID,
     override val statusPrevious: BookStatus?,
-    override val statusNow: BookStatus
+    override val statusNow: BookStatus,
   ) : BookStatusEvent()
 }

@@ -37,7 +37,7 @@ internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptio
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: DBQAccountProviderDescriptionListType.Parameters
+    parameters: DBQAccountProviderDescriptionListType.Parameters,
   ): List<AccountProviderDescription> {
     val startingId = parameters.startingId
     return if (startingId != null) {
@@ -64,7 +64,7 @@ internal object DBQAccountProviderDescriptionList : DBQAccountProviderDescriptio
 
   private fun parseResults(
     transaction: DBTransactionType,
-    resultSet: ResultSet
+    resultSet: ResultSet,
   ): List<AccountProviderDescription> {
     val data = mutableListOf<AccountProviderDescription>()
     val timeThen = System.nanoTime()

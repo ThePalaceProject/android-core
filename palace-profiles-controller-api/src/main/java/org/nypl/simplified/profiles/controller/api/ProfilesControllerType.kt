@@ -10,6 +10,7 @@ import org.nypl.simplified.accounts.database.api.AccountType
 import org.nypl.simplified.accounts.database.api.AccountsDatabaseNonexistentException
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.feeds.api.Feed
+import org.nypl.simplified.feeds.api.FeedData
 import org.nypl.simplified.profiles.api.ProfileDescription
 import org.nypl.simplified.profiles.api.ProfileEvent
 import org.nypl.simplified.profiles.api.ProfileID
@@ -152,7 +153,7 @@ interface ProfilesControllerType {
    * @see .profileAnonymousEnabled
    */
 
-  fun profileFeed(request: ProfileFeedRequest): FluentFuture<Feed.FeedWithoutGroups>
+  fun profileFeed(request: ProfileFeedRequest): FluentFuture<FeedData>
 
   /**
    * Return the account that owns the given book ID in the current profile, or assume that the

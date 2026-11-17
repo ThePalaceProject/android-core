@@ -12,6 +12,6 @@ interface AccountProviderDescriptionSerializersType : SerializersType<AccountPro
   override fun createSerializer(
     uri: URI,
     stream: OutputStream,
-    document: AccountProviderDescription
+    document: AccountProviderDescription,
   ): AccountProviderDescriptionSerializerType
 }

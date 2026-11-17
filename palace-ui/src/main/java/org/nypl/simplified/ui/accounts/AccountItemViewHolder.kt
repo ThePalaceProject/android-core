@@ -15,7 +15,7 @@ import org.nypl.simplified.ui.images.ImageLoader2Type
 class AccountItemViewHolder(
   val itemView: View,
   private val imageLoader: ImageLoader2Type,
-  private val onItemClicked: (AccountProviderDescription) -> Unit
+  private val onItemClicked: (AccountProviderDescription) -> Unit,
 ) : RecyclerView.ViewHolder(itemView) {
   private val accountIcon: ImageView =
     itemView.findViewById(R.id.accountIcon)
@@ -47,7 +47,7 @@ class AccountItemViewHolder(
     this.imageLoader.loadAccountLogoIntoView(
       account = item,
       defaultIcon = R.drawable.account_default,
-      iconView = this.accountIcon
+      iconView = this.accountIcon,
     )
 
     this.accountItem = item

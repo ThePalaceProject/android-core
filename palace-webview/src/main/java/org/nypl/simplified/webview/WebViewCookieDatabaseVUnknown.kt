@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase
  */
 
 class WebViewCookieDatabaseVUnknown internal constructor(
-  private val db: SQLiteDatabase
+  private val db: SQLiteDatabase,
 ) : WebViewCookieDatabase(db) {
   override fun getAll(): List<WebViewCookieType> {
     val result = mutableListOf<Cookie>()
@@ -30,7 +30,7 @@ class WebViewCookieDatabaseVUnknown internal constructor(
         null,
         null,
         null,
-        null
+        null,
       ).use { cursor ->
         while (cursor.moveToNext()) {
           result.add(
@@ -39,7 +39,7 @@ class WebViewCookieDatabaseVUnknown internal constructor(
               name = cursor.getString(1),
               value = cursor.getString(2),
               path = cursor.getString(3),
-            )
+            ),
           )
         }
       }

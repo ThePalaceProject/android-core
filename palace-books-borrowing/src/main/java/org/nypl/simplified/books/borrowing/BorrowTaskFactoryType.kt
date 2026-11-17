@@ -11,6 +11,6 @@ interface BorrowTaskFactoryType {
 
   fun createBorrowTask(
     requirements: BorrowRequirements,
-    request: BorrowRequest
+    request: BorrowRequest,
   ): BorrowTaskType
 }

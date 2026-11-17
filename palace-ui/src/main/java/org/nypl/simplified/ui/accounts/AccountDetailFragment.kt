@@ -134,13 +134,13 @@ class AccountDetailFragment :
 
   data class AccountDetailScreenParameters(
     val account: AccountType,
-    val showLoginReason: AccountDetailModel.PleaseLoginReason?
+    val showLoginReason: AccountDetailModel.PleaseLoginReason?,
   )
 
   companion object :
     ScreenDefinitionFactoryType<AccountDetailScreenParameters, AccountDetailFragment> {
     private class ScreenAccountDetail(
-      private val parameters: AccountDetailScreenParameters
+      private val parameters: AccountDetailScreenParameters,
     ) : ScreenDefinitionType<AccountDetailScreenParameters, AccountDetailFragment> {
       override fun setup() {
         AccountDetailModel.account = this.parameters.account
@@ -154,13 +154,13 @@ class AccountDetailFragment :
     }
 
     override fun createScreenDefinition(
-      p: AccountDetailScreenParameters
+      p: AccountDetailScreenParameters,
     ): ScreenDefinitionType<AccountDetailScreenParameters, AccountDetailFragment> = ScreenAccountDetail(p)
   }
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -180,7 +180,7 @@ class AccountDetailFragment :
     this.authenticationViews =
       AccountAuthenticationViews(
         viewGroup = this.authentication,
-        onUsernamePasswordChangeListener = this::onBasicUserPasswordChanged
+        onUsernamePasswordChangeListener = this::onBasicUserPasswordChanged,
       )
 
     this.authenticationAlternatives =
@@ -235,7 +235,8 @@ class AccountDetailFragment :
     val ignored =
       when (val reason = AccountDetailModel.showPleaseLoginReason) {
         AccountDetailModel.PleaseLoginReasonExpired,
-        AccountDetailModel.PleaseLoginReasonGeneric -> {
+        AccountDetailModel.PleaseLoginReasonGeneric,
+        -> {
           this.loginTitle.visibility = View.VISIBLE
           this.loginTitleText.text = resources.getString(reason.stringResource())
         }
@@ -254,14 +255,14 @@ class AccountDetailFragment :
 
   private fun onBasicUserPasswordChanged(
     username: AccountUsername,
-    password: AccountPassword
+    password: AccountPassword,
   ) {
     AccountDetailModel.usernamePasswordEntries[AccountDetailModel.account.id] =
       AccountDetailModel.UsernamePasswordAttempt(username, password)
 
     this.setLoginLogoutButtonStatus(
       loginStatus = this.determineLoginIsSatisfied(),
-      logoutStatus = AsButtonGone
+      logoutStatus = AsButtonGone,
     )
   }
 
@@ -313,7 +314,7 @@ class AccountDetailFragment :
       context = this.requireContext(),
       account = AccountDetailModel.account.provider.toDescription(),
       defaultIcon = R.drawable.account_default,
-      iconView = this.accountIcon
+      iconView = this.accountIcon,
     )
 
     /*
@@ -360,20 +361,21 @@ class AccountDetailFragment :
         is AccountProviderAuthenticationDescription.Basic -> {
           this.authenticationViews.setBasicUserAndPass(
             user = usernamePassword.username.value,
-            password = usernamePassword.password.value
+            password = usernamePassword.password.value,
           )
         }
 
         is AccountProviderAuthenticationDescription.BasicToken -> {
           this.authenticationViews.setBasicTokenUserAndPass(
             user = usernamePassword.username.value,
-            password = usernamePassword.password.value
+            password = usernamePassword.password.value,
           )
         }
 
         is AccountProviderAuthenticationDescription.OpenIDConnect,
         AccountProviderAuthenticationDescription.Anonymous,
-        is AccountProviderAuthenticationDescription.SAML2_0 -> {
+        is AccountProviderAuthenticationDescription.SAML2_0,
+        -> {
           // Nothing to do.
         }
       }
@@ -476,15 +478,15 @@ class AccountDetailFragment :
     AccountDetailModel.tryLogin(
       ProfileAccountLoginRequest.SAML20Initiate(
         accountId = AccountDetailModel.account.id,
-        description = authenticationDescription
-      )
+        description = authenticationDescription,
+      ),
     )
 
     AccountSAML20Model.startAuthenticationProcess(
       application = MainApplication.application,
       accountID = AccountDetailModel.account.id,
       authenticationDescription = authenticationDescription,
-      webViewDataDirectory = this.webViewDataDir
+      webViewDataDirectory = this.webViewDataDir,
     )
 
     try {
@@ -503,15 +505,15 @@ class AccountDetailFragment :
       AccountOIDCModel.start(
         activity = this.requireActivity(),
         accountEvents = this.accountEvents,
-        account = account
+        account = account,
       )
 
       AccountDetailModel.tryLogin(
         ProfileAccountLoginRequest.OIDCInitiate(
           accountId = account.id,
           description = authenticationDescription,
-          redirectURI = AccountOIDC.oidcCallbackLoginURI(account.id)
-        )
+          redirectURI = AccountOIDC.oidcCallbackLoginURI(account.id),
+        ),
       )
     } catch (e: Throwable) {
       this.logger.error("Error launching activity: ", e)
@@ -529,7 +531,7 @@ class AccountDetailFragment :
         accountId = AccountDetailModel.account.id,
         description = description,
         password = accountPassword,
-        username = accountUsername
+        username = accountUsername,
       )
 
     AccountDetailModel.tryLogin(request)
@@ -546,7 +548,7 @@ class AccountDetailFragment :
         accountId = AccountDetailModel.account.id,
         description = description,
         password = accountPassword,
-        username = accountUsername
+        username = accountUsername,
       )
 
     AccountDetailModel.tryLogin(request)
@@ -593,8 +595,8 @@ class AccountDetailFragment :
         MainNavigation.Settings.openDocument(
           SettingsDocumentViewerModel.DocumentTarget(
             title = this.getString(R.string.accountEULA),
-            url = eula.toString()
-          )
+            url = eula.toString(),
+          ),
         )
       }
     } else {
@@ -608,8 +610,8 @@ class AccountDetailFragment :
         MainNavigation.Settings.openDocument(
           SettingsDocumentViewerModel.DocumentTarget(
             title = this.getString(R.string.accountPrivacyPolicy),
-            url = privacyPolicy.toString()
-          )
+            url = privacyPolicy.toString(),
+          ),
         )
       }
     } else {
@@ -623,8 +625,8 @@ class AccountDetailFragment :
         MainNavigation.Settings.openDocument(
           SettingsDocumentViewerModel.DocumentTarget(
             title = this.getString(R.string.accountLicenses),
-            url = licenses.toString()
-          )
+            url = licenses.toString(),
+          ),
         )
       }
     } else {
@@ -674,7 +676,7 @@ class AccountDetailFragment :
                 this.formLock(FormLockState.LOGGING_OUT)
                 AccountDetailModel.tryLogout(this.requireActivity())
               }
-            }
+            },
         )
 
         this.formUnlock()
@@ -689,7 +691,7 @@ class AccountDetailFragment :
               this.formLock(FormLockState.LOGGING_IN)
               this.tryLogin()
             },
-          logoutStatus = AsButtonGone
+          logoutStatus = AsButtonGone,
         )
         this.formUnlock()
       }
@@ -704,7 +706,7 @@ class AccountDetailFragment :
         // XXX: Allow cancellation when Adobe DRM goes away.
         this.setLoginLogoutButtonStatus(
           loginStatus = AsCancelButtonDisabled,
-          logoutStatus = AsButtonGone
+          logoutStatus = AsButtonGone,
         )
       }
 
@@ -721,7 +723,8 @@ class AccountDetailFragment :
               when (val desc = loginState.description) {
                 AccountProviderAuthenticationDescription.Anonymous,
                 is AccountProviderAuthenticationDescription.Basic,
-                is AccountProviderAuthenticationDescription.BasicToken -> {
+                is AccountProviderAuthenticationDescription.BasicToken,
+                -> {
                   throw UnreachableCodeException()
                 }
 
@@ -729,8 +732,8 @@ class AccountDetailFragment :
                   AccountDetailModel.tryLogin(
                     ProfileAccountLoginRequest.SAML20Cancel(
                       accountId = account.id,
-                      description = desc
-                    )
+                      description = desc,
+                    ),
                   )
                 }
 
@@ -738,13 +741,13 @@ class AccountDetailFragment :
                   AccountDetailModel.tryLogin(
                     ProfileAccountLoginRequest.OIDCCancel(
                       accountId = account.id,
-                      description = desc
-                    )
+                      description = desc,
+                    ),
                   )
                 }
               }
             },
-          logoutStatus = AsButtonGone
+          logoutStatus = AsButtonGone,
         )
       }
 
@@ -764,7 +767,7 @@ class AccountDetailFragment :
               this.formLock(FormLockState.LOGGING_IN)
               this.tryLogin()
             },
-          logoutStatus = AsButtonGone
+          logoutStatus = AsButtonGone,
         )
 
         this.loginButtonErrorDetails.visibility = View.VISIBLE
@@ -772,7 +775,7 @@ class AccountDetailFragment :
           AccountDetailModel.openErrorPage(
             activity = this.requireActivity(),
             attributes = loginState.taskResult.attributes.toSortedMap(),
-            taskSteps = loginState.taskResult.steps
+            taskSteps = loginState.taskResult.steps,
           )
         }
         this.authenticationAlternativesShow()
@@ -783,19 +786,20 @@ class AccountDetailFragment :
           is AccountAuthenticationCredentials.Basic -> {
             this.authenticationViews.setBasicUserAndPass(
               user = creds.userName.value,
-              password = creds.password.value
+              password = creds.password.value,
             )
           }
 
           is AccountAuthenticationCredentials.BasicToken -> {
             this.authenticationViews.setBasicTokenUserAndPass(
               user = creds.userName.value,
-              password = creds.password.value
+              password = creds.password.value,
             )
           }
 
           is AccountAuthenticationCredentials.OpenIDConnect,
-          is AccountAuthenticationCredentials.SAML2_0 -> {
+          is AccountAuthenticationCredentials.SAML2_0,
+          -> {
             // Nothing
           }
         }
@@ -812,7 +816,7 @@ class AccountDetailFragment :
                 this.formLock(FormLockState.LOGGING_OUT)
                 AccountDetailModel.tryLogout(this.requireActivity())
               }
-            }
+            },
         )
         this.authenticationAlternativesHide()
       }
@@ -822,19 +826,20 @@ class AccountDetailFragment :
           is AccountAuthenticationCredentials.Basic -> {
             this.authenticationViews.setBasicUserAndPass(
               user = creds.userName.value,
-              password = creds.password.value
+              password = creds.password.value,
             )
           }
 
           is AccountAuthenticationCredentials.BasicToken -> {
             this.authenticationViews.setBasicTokenUserAndPass(
               user = creds.userName.value,
-              password = creds.password.value
+              password = creds.password.value,
             )
           }
 
           is AccountAuthenticationCredentials.OpenIDConnect,
-          is AccountAuthenticationCredentials.SAML2_0 -> {
+          is AccountAuthenticationCredentials.SAML2_0,
+          -> {
             // No UI
           }
         }
@@ -847,7 +852,7 @@ class AccountDetailFragment :
 
         this.setLoginLogoutButtonStatus(
           loginStatus = AccountLoginButtonStatus.AsButtonGone,
-          logoutStatus = AsLogoutButtonDisabled
+          logoutStatus = AsLogoutButtonDisabled,
         )
       }
 
@@ -856,19 +861,20 @@ class AccountDetailFragment :
           is AccountAuthenticationCredentials.Basic -> {
             this.authenticationViews.setBasicUserAndPass(
               user = creds.userName.value,
-              password = creds.password.value
+              password = creds.password.value,
             )
           }
 
           is AccountAuthenticationCredentials.BasicToken -> {
             this.authenticationViews.setBasicTokenUserAndPass(
               user = creds.userName.value,
-              password = creds.password.value
+              password = creds.password.value,
             )
           }
 
           is AccountAuthenticationCredentials.OpenIDConnect,
-          is AccountAuthenticationCredentials.SAML2_0 -> {
+          is AccountAuthenticationCredentials.SAML2_0,
+          -> {
             // No UI
           }
         }
@@ -890,7 +896,7 @@ class AccountDetailFragment :
                 this.formLock(FormLockState.LOGGING_OUT)
                 AccountDetailModel.tryLogout(this.requireActivity())
               }
-            }
+            },
         )
 
         this.loginButtonErrorDetails.visibility = View.VISIBLE
@@ -898,7 +904,7 @@ class AccountDetailFragment :
           AccountDetailModel.openErrorPage(
             activity = this.requireActivity(),
             attributes = loginState.taskResult.attributes.toSortedMap(),
-            taskSteps = loginState.taskResult.steps
+            taskSteps = loginState.taskResult.steps,
           )
         }
       }
@@ -913,7 +919,7 @@ class AccountDetailFragment :
       MaterialAlertDialogBuilder(context)
         .setTitle(R.string.accountLogout)
         .setMessage(
-          context.getString(R.string.logoutConfirm)
+          context.getString(R.string.logoutConfirm),
         ).setNegativeButton(R.string.accountCancel) { dialog, _ ->
           dialog.dismiss()
         }.setPositiveButton(R.string.accountLogout) { dialog, _ ->
@@ -927,7 +933,8 @@ class AccountDetailFragment :
   private fun disableSyncSwitchForLoginState(loginState: AccountLoginState) =
     when (loginState) {
       is AccountLoggedInStaleCredentials,
-      is AccountLoggedIn -> {
+      is AccountLoggedIn,
+      -> {
         // Nothing required.
       }
 
@@ -936,7 +943,8 @@ class AccountDetailFragment :
       is AccountLoggingOut,
       is AccountLoginFailed,
       is AccountLogoutFailed,
-      is AccountNotLoggedIn -> {
+      is AccountNotLoggedIn,
+      -> {
         this.bookmarkSyncCheck.setOnCheckedChangeListener(null)
         this.bookmarkSyncCheck.isChecked = false
         this.bookmarkSyncCheck.isEnabled = false
@@ -949,7 +957,7 @@ class AccountDetailFragment :
 
   private fun setLoginLogoutButtonStatus(
     loginStatus: AccountLoginButtonStatus,
-    logoutStatus: AccountLogoutButtonStatus
+    logoutStatus: AccountLogoutButtonStatus,
   ) {
     this.authenticationViews.setLoginButtonStatus(loginStatus)
     this.authenticationViews.setLogoutButtonStatus(logoutStatus)
@@ -977,7 +985,7 @@ class AccountDetailFragment :
             .create()
             .show()
         }
-      }
+      },
     )
 
     return when (loginStatus) {
@@ -991,7 +999,8 @@ class AccountDetailFragment :
       }
 
       is AsCancelButtonEnabled,
-      AsCancelButtonDisabled -> {
+      AsCancelButtonDisabled,
+      -> {
         // Nothing
       }
 
@@ -1027,7 +1036,7 @@ class AccountDetailFragment :
 
   enum class FormLockState {
     LOGGING_IN,
-    LOGGING_OUT
+    LOGGING_OUT,
   }
 
   private fun formLock(state: FormLockState) {
@@ -1110,7 +1119,7 @@ class AccountDetailFragment :
           this.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
           this.data =
             Uri.fromParts("package", this@AccountDetailFragment.requireContext().packageName, null)
-        }
+        },
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to start activity: ", e)
@@ -1131,8 +1140,8 @@ class AccountDetailFragment :
               AccountCardCreatorParameters(
                 url = cardCreatorURI.toString(),
                 lat = location.latitude,
-                long = location.longitude
-              )
+                long = location.longitude,
+              ),
             )
           } else {
             this.showErrorGettingLocationDialog()

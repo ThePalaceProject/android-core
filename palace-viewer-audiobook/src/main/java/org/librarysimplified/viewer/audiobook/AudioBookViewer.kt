@@ -48,11 +48,12 @@ class AudioBookViewer : ViewerProviderType {
   override fun canSupport(
     preferences: ViewerParameters,
     book: Book,
-    format: BookFormat
+    format: BookFormat,
   ): Boolean =
     when (format) {
       is BookFormat.BookFormatEPUB,
-      is BookFormat.BookFormatPDF -> {
+      is BookFormat.BookFormatPDF,
+      -> {
         this.logger.debug("audio book viewer can only view audio books")
         false
       }
@@ -88,7 +89,7 @@ class AudioBookViewer : ViewerProviderType {
     parameters: ViewerParameters,
     book: Book,
     format: BookFormat,
-    accountProviderId: URI
+    accountProviderId: URI,
   ) {
     val services =
       Services.serviceDirectory()
@@ -135,7 +136,7 @@ class AudioBookViewer : ViewerProviderType {
       AudioBookAuthorizationHandler(
         account = account,
         book = book,
-        httpClient = httpClient
+        httpClient = httpClient,
       )
 
     this.loadAndConfigureFeedbooks(services)
@@ -261,7 +262,7 @@ class AudioBookViewer : ViewerProviderType {
             strategies
               .createStrategy(
                 context = activity.application,
-                request = manifestRequest
+                request = manifestRequest,
               ).toManifestStrategy(),
         )
 
@@ -307,7 +308,7 @@ class AudioBookViewer : ViewerProviderType {
                 source = null,
                 contentType = format.contentType,
                 authorization = null,
-                data = manifest.manifestFile.readBytes()
+                data = manifest.manifestFile.readBytes(),
               ),
             palaceID = palaceID,
             parserExtensions = parserExtensions,
@@ -332,7 +333,7 @@ class AudioBookViewer : ViewerProviderType {
           source = null,
           contentType = format.contentType,
           authorization = null,
-          data = manifest.manifestFile.readBytes()
+          data = manifest.manifestFile.readBytes(),
         ),
       palaceID = palaceID,
       parserExtensions = parserExtensions,
@@ -343,7 +344,7 @@ class AudioBookViewer : ViewerProviderType {
   private fun triggerFailure(
     activity: Activity,
     httpClient: LSHTTPClientType,
-    palaceID: PlayerPalaceID
+    palaceID: PlayerPalaceID,
   ) {
     PlayerModel.parseAndCheckManifest(
       bookCredentials = PlayerBookCredentialsNone,
@@ -355,7 +356,7 @@ class AudioBookViewer : ViewerProviderType {
           source = null,
           contentType = BookFormats.audioBookGenericMimeTypes().iterator().next(),
           authorization = null,
-          data = ByteArray(0)
+          data = ByteArray(0),
         ),
       palaceID = palaceID,
       parserExtensions = listOf(),

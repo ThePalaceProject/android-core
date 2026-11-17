@@ -18,7 +18,7 @@ sealed class AccountProviderRegistryEvent {
    */
 
   data class Updated(
-    val id: URI
+    val id: URI,
   ) : AccountProviderRegistryEvent()
 
   /**
@@ -27,6 +27,6 @@ sealed class AccountProviderRegistryEvent {
 
   data class SourceFailed(
     val clazz: Class<*>,
-    val exception: Exception
+    val exception: Exception,
   ) : AccountProviderRegistryEvent()
 }

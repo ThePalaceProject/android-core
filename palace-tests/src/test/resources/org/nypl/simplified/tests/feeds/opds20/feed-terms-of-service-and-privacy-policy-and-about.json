@@ -1,0 +1,21 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [],
+  "links": [
+    {
+      "href": "https://example.com/tos",
+      "rel": "terms-of-service"
+    },
+    {
+      "href": "https://example.com/privacy",
+      "rel": "privacy-policy"
+    },
+    {
+      "href": "https://example.com/about",
+      "rel": "about"
+    }
+  ]
+}

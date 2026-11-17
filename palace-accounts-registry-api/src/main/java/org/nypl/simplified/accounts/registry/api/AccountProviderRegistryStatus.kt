@@ -14,7 +14,7 @@ sealed class AccountProviderRegistryStatus {
    */
 
   data class Idle(
-    val lastUpdateAffected: Int
+    val lastUpdateAffected: Int,
   ) : AccountProviderRegistryStatus()
 
   /**
@@ -29,7 +29,7 @@ sealed class AccountProviderRegistryStatus {
 
   data class Refreshing(
     val kind: String,
-    val progress: Double?
+    val progress: Double?,
   ) : AccountProviderRegistryStatus() {
     val progressPercent: Double?
       get() = this.progress?.times(100.0)
@@ -40,6 +40,6 @@ sealed class AccountProviderRegistryStatus {
    */
 
   data class Failed(
-    val result: TaskResult<*>
+    val result: TaskResult<*>,
   ) : AccountProviderRegistryStatus()
 }

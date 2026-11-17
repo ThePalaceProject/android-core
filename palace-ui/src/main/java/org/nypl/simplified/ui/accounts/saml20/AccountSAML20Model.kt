@@ -92,8 +92,8 @@ object AccountSAML20Model {
         profilesController.profileAccountLogin(
           ProfileAccountLoginRequest.SAML20Cancel(
             accountId = newValue.accountID,
-            description = newValue.description
-          )
+            description = newValue.description,
+          ),
         )
       }
 
@@ -103,8 +103,8 @@ object AccountSAML20Model {
             accountId = newValue.accountID,
             accessToken = newValue.token,
             patronInfo = newValue.patronInfo,
-            cookies = newValue.cookies
-          )
+            cookies = newValue.cookies,
+          ),
         )
       }
 
@@ -127,7 +127,7 @@ object AccountSAML20Model {
     application: Application,
     accountID: AccountID,
     authenticationDescription: AccountProviderAuthenticationDescription.SAML2_0,
-    webViewDataDirectory: File
+    webViewDataDirectory: File,
   ) {
     account =
       accountID
@@ -138,7 +138,7 @@ object AccountSAML20Model {
         resources = application.resources,
         account = accountID,
         description = authenticationDescription,
-        webViewDataDir = webViewDataDirectory
+        webViewDataDir = webViewDataDirectory,
       )
 
     val view = WebView(application)

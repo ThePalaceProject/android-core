@@ -1,0 +1,29 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:6666666666",
+        "title": "Book With More Links"
+      },
+      "links": [
+        {
+          "href": "https://example.com/alternate",
+          "rel": "alternate"
+        },
+        {
+          "href": "https://example.com/analytics",
+          "rel": "http://librarysimplified.org/terms/rel/analytics/open-book"
+        },
+        {
+          "href": "https://example.com/time-tracking",
+          "rel": "http://palaceproject.io/terms/timeTracking"
+        }
+      ]
+    }
+  ]
+}

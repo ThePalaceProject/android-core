@@ -19,7 +19,7 @@ data class OPDSAvailabilityLoaned(
    */
 
   val revoke: URI?,
-  override val endDate: DateTime?
+  override val endDate: DateTime?,
 ) : OPDSAvailabilityType {
   override fun toString(): String {
     val fmt = ISODateTimeFormat.dateTime()
@@ -49,12 +49,12 @@ data class OPDSAvailabilityLoaned(
     operator fun get(
       startDate: DateTime?,
       endDate: DateTime?,
-      revoke: URI?
+      revoke: URI?,
     ): OPDSAvailabilityLoaned =
       OPDSAvailabilityLoaned(
         startDate = startDate,
         revoke = revoke,
-        endDate = endDate
+        endDate = endDate,
       )
   }
 }

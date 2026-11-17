@@ -25,8 +25,10 @@ class MainNotificationsMessagingService : FirebaseMessagingService() {
   override fun onMessageReceived(message: RemoteMessage) {
     super.onMessageReceived(message)
 
-    val notificationManager =
-      getSystemService(NOTIFICATION_SERVICE) as? NotificationManager ?: return
+    val notificationManager = getSystemService(NOTIFICATION_SERVICE) as? NotificationManager
+    if (notificationManager == null) {
+      return
+    }
     val data = message.data
 
     if (data.isEmpty()) {
@@ -42,8 +44,10 @@ class MainNotificationsMessagingService : FirebaseMessagingService() {
     val intent = Intent(this, MainActivity::class.java)
     val pendingIntent =
       PendingIntent.getActivity(
-        this, 0, intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        this,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
       )
 
     val channelId =
@@ -90,7 +94,7 @@ class MainNotificationsMessagingService : FirebaseMessagingService() {
             NotificationCompat
               .BigTextStyle()
               .setBigContentTitle(title)
-              .bigText(body)
+              .bigText(body),
           ).setContentIntent(pendingIntent)
           .setWhen(System.currentTimeMillis())
 

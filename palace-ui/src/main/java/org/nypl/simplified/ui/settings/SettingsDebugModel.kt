@@ -31,7 +31,7 @@ object SettingsDebugModel {
     AccountProviderRegistryOverride(
       hostname = "registry.palaceproject.io",
       path = "libraries/crawlable",
-      queryParameters = ""
+      queryParameters = "",
     )
 
   private val adeptActivationsBase: AttributeType<List<AdobeDRMExtensions.Activation>> =
@@ -42,7 +42,7 @@ object SettingsDebugModel {
   init {
     MainAttributes.wrapAttribute(
       this.adeptActivationsBase,
-      this.adeptActivationsUI
+      this.adeptActivationsUI,
     )
   }
 
@@ -55,7 +55,7 @@ object SettingsDebugModel {
     set(value) {
       BootFailureTesting.enableBootFailures(
         context = MainApplication.application,
-        enabled = value
+        enabled = value,
       )
     }
 
@@ -69,7 +69,7 @@ object SettingsDebugModel {
     Reports.sendReportsDefault(
       context = MainApplication.application,
       address = buildConfig.supportErrorReportEmailAddress,
-      body = ""
+      body = "",
     )
   }
 
@@ -83,8 +83,8 @@ object SettingsDebugModel {
     analytics.publishEvent(
       AnalyticsEvent.SyncRequested(
         timestamp = LocalDateTime.now(),
-        credentials = null
-      )
+        credentials = null,
+      ),
     )
   }
 
@@ -191,6 +191,27 @@ object SettingsDebugModel {
   }
 
   @UiThread
+  fun showBookCoverDebugLabels(): Boolean = this.preferences().showBookCoverDebugLabels
+
+  @UiThread
+  fun setShowBookCoverDebugLabels(show: Boolean) {
+    this.updatePreferences { it.copy(showBookCoverDebugLabels = show) }
+  }
+
+  @UiThread
+  fun preferOPDS20(): Boolean {
+    return this.preferences().preferOPDS20
+  }
+
+  @UiThread
+  fun setPreferOPDS20(prefer: Boolean) {
+    val services = Services.serviceDirectory()
+    val feedLoader = services.requireService(FeedLoaderType::class.java)
+    feedLoader.preferOPDS20 = prefer
+    this.updatePreferences { it.copy(preferOPDS20 = prefer) }
+  }
+
+  @UiThread
   fun adeptSupported(): Boolean {
     val services = Services.serviceDirectory()
     return services.optionalService(AdobeAdeptExecutorType::class.java) != null
@@ -218,7 +239,7 @@ object SettingsDebugModel {
       AdobeDRMExtensions.getDeviceActivations(
         adeptExecutor,
         { message -> this.logger.error("DRM: {}", message) },
-        { message -> this.logger.debug("DRM: {}", message) }
+        { message -> this.logger.debug("DRM: {}", message) },
       )
 
     adeptFuture.addListener(
@@ -232,7 +253,7 @@ object SettingsDebugModel {
           }
         this.adeptActivationsBase.set(activations)
       },
-      MoreExecutors.directExecutor()
+      MoreExecutors.directExecutor(),
     )
   }
 

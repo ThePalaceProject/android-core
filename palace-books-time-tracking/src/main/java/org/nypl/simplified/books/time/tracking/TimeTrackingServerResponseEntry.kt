@@ -3,7 +3,7 @@ package org.nypl.simplified.books.time.tracking
 data class TimeTrackingServerResponseEntry(
   val id: String,
   val message: String,
-  val status: Int
+  val status: Int,
 ) {
   companion object {
     private const val STATUS_SUCCESS_MIN = 200

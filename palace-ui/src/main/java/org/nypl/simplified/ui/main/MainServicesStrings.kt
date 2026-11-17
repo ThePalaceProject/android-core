@@ -5,7 +5,7 @@ import org.librarysimplified.ui.R
 import org.nypl.simplified.boot.api.BootStringResourcesType
 
 internal class MainServicesStrings(
-  private val resources: Resources
+  private val resources: Resources,
 ) : BootStringResourcesType {
   override val bootFailedGeneric: String =
     this.resources.getString(R.string.bootFailedGeneric)

@@ -98,7 +98,7 @@ class SettingsMainFragment4 :
     this.subscriptions.add(
       BatteryModel.batteryOptimizerStatus.subscribe { _, valueNew ->
         this.onBatteryOptimizerStatusChanged(valueNew)
-      }
+      },
     )
 
     val profilePrefs = profiles.profileCurrent().preferences()
@@ -165,24 +165,24 @@ class SettingsMainFragment4 :
 
   private fun onProfileEvent(
     profiles: ProfilesControllerType,
-    e: ProfileEvent
+    e: ProfileEvent,
   ) {
     if (e is ProfileUpdated) {
       this.configureDebug()
       this.configureNetwork(
         profiles = profiles,
-        profilePrefs = profiles.profileCurrent().preferences()
+        profilePrefs = profiles.profileCurrent().preferences(),
       )
       this.configureAudiobookSkip(
         profiles = profiles,
-        profilePrefs = profiles.profileCurrent().preferences()
+        profilePrefs = profiles.profileCurrent().preferences(),
       )
     }
   }
 
   private fun configureNetwork(
     profiles: ProfilesControllerType,
-    profilePrefs: ProfilePreferences
+    profilePrefs: ProfilePreferences,
   ) {
     try {
       val isOnlyWifi = profilePrefs.downloadOnlyOnWIFI
@@ -197,7 +197,7 @@ class SettingsMainFragment4 :
 
         profiles.profileUpdate { description ->
           description.copy(
-            preferences = description.preferences.copy(downloadOnlyOnWIFI = !isOnlyWifi)
+            preferences = description.preferences.copy(downloadOnlyOnWIFI = !isOnlyWifi),
           )
         }
       }
@@ -231,7 +231,7 @@ class SettingsMainFragment4 :
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -274,7 +274,7 @@ class SettingsMainFragment4 :
             MainNotifications.requestPermissions(activity)
             this.view?.postDelayed(
               { this.configureNotificationsText() },
-              5000L
+              5000L,
             )
           } else {
             MainNotifications.requestDropPermissions(activity)
@@ -305,7 +305,7 @@ class SettingsMainFragment4 :
 
   private fun configureAudiobookSkip(
     profiles: ProfilesControllerType,
-    profilePrefs: ProfilePreferences
+    profilePrefs: ProfilePreferences,
   ) {
     try {
       val entries =
@@ -325,11 +325,11 @@ class SettingsMainFragment4 :
             d.copy(
               preferences =
                 d.preferences.copy(
-                  audioBookPlaybackSkipIntervalForwardMs = ms
-                )
+                  audioBookPlaybackSkipIntervalForwardMs = ms,
+                ),
             )
           }
-        }
+        },
       )
 
       this.configureAudiobookSkipItem(
@@ -344,11 +344,11 @@ class SettingsMainFragment4 :
             d.copy(
               preferences =
                 d.preferences.copy(
-                  audioBookPlaybackSkipIntervalBackwardMs = ms
-                )
+                  audioBookPlaybackSkipIntervalBackwardMs = ms,
+                ),
             )
           }
-        }
+        },
       )
     } catch (e: Throwable) {
       this.logger.debug("configureAudiobookSkip: ", e)
@@ -360,7 +360,7 @@ class SettingsMainFragment4 :
     currentValueMs: Long,
     entries: Array<String>,
     values: Array<String>,
-    onSelected: (String) -> Unit
+    onSelected: (String) -> Unit,
   ) {
     try {
       val currentValueSeconds =
@@ -385,7 +385,7 @@ class SettingsMainFragment4 :
               view.textSummary.text = entries[newIndex]
             }
             onSelected(newValue)
-          }
+          },
         )
       }
     } catch (e: Throwable) {
@@ -427,8 +427,8 @@ class SettingsMainFragment4 :
               title =
                 this.settings2AboutPalace.textTitle.text
                   .toString(),
-              url = doc.readableURL.toExternalForm()
-            )
+              url = doc.readableURL.toExternalForm(),
+            ),
           )
         }
       } else {
@@ -454,8 +454,8 @@ class SettingsMainFragment4 :
               title =
                 this.settings2UserAgreement.textTitle.text
                   .toString(),
-              url = doc.readableURL.toExternalForm()
-            )
+              url = doc.readableURL.toExternalForm(),
+            ),
           )
         }
       } else {
@@ -481,8 +481,8 @@ class SettingsMainFragment4 :
               title =
                 this.settings2Licenses.textTitle.text
                   .toString(),
-              url = doc.readableURL.toExternalForm()
-            )
+              url = doc.readableURL.toExternalForm(),
+            ),
           )
         }
       } else {
@@ -508,8 +508,8 @@ class SettingsMainFragment4 :
               title =
                 this.settings2PrivacyPolicy.textTitle.text
                   .toString(),
-              url = doc.readableURL.toExternalForm()
-            )
+              url = doc.readableURL.toExternalForm(),
+            ),
           )
         }
       } else {

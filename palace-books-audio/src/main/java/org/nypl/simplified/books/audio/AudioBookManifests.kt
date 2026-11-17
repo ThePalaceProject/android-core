@@ -9,6 +9,6 @@ import android.app.Application
 object AudioBookManifests : AudioBookManifestStrategiesType {
   override fun createStrategy(
     context: Application,
-    request: AudioBookManifestRequest
+    request: AudioBookManifestRequest,
   ): AudioBookStrategyType = AudioBookStrategy(context, request)
 }

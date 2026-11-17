@@ -7,5 +7,5 @@ package org.nypl.simplified.ui.accounts
 class AccountCardCreatorParameters(
   val url: String,
   val lat: Double,
-  val long: Double
+  val long: Double,
 )

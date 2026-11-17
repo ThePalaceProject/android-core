@@ -24,6 +24,27 @@ class MockAdobeAdeptConnector(
   ) -> Unit = { _, _, _ ->
   }
 
+  var onActivate: (
+    client: AdobeAdeptActivationReceiverType,
+    vendor: AdobeVendorID,
+    user_name: String,
+    password: String
+  ) -> Unit = { _, _, _, _ ->
+  }
+
+  var onDeactivate: (
+    client: AdobeAdeptDeactivationReceiverType,
+    vendor: AdobeVendorID,
+    user: AdobeUserID,
+    user_name: String,
+    password: String
+  ) -> Unit = { client, _, _, _, _ ->
+    client.onDeactivationSucceeded()
+  }
+
+  var onDeleteDeviceActivation: (vendor: AdobeVendorID, user: AdobeUserID) -> Unit = { _, _ ->
+  }
+
   override fun activateDeviceToken(
     client: AdobeAdeptActivationReceiverType,
     vendor: AdobeVendorID,
@@ -39,6 +60,7 @@ class MockAdobeAdeptConnector(
     user_name: String,
     password: String
   ) {
+    this.onDeactivate.invoke(client, vendor, user, user_name, password)
   }
 
   override fun getDeviceActivations(client: AdobeAdeptActivationReceiverType) {
@@ -70,7 +92,9 @@ class MockAdobeAdeptConnector(
   }
 
   override fun deleteDeviceActivation(p0: AdobeVendorID?, p1: AdobeUserID?) {
-
+    if (p0 != null && p1 != null) {
+      this.onDeleteDeviceActivation.invoke(p0, p1)
+    }
   }
 
   override fun getResourceProvider(): AdobeAdeptResourceProviderType {
@@ -90,5 +114,6 @@ class MockAdobeAdeptConnector(
     user_name: String,
     password: String
   ) {
+    this.onActivate.invoke(client, vendor, user_name, password)
   }
 }

@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
  * Works with any horizontally or vertically oriented `LinearLayoutManager`.
  */
 class SpaceItemDecoration(
-  @Px private val size: Int
+  @Px private val size: Int,
 ) : RecyclerView.ItemDecoration() {
   override fun getItemOffsets(
     outRect: Rect,
     view: View,
     parent: RecyclerView,
-    state: RecyclerView.State
+    state: RecyclerView.State,
   ) {
     super.getItemOffsets(outRect, view, parent, state)
 

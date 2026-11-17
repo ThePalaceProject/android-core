@@ -29,7 +29,8 @@ class SettingsDebugMenuBooksFragment :
       override fun fragment(): SettingsDebugMenuBooksFragment = SettingsDebugMenuBooksFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> = ScreenSettingsDebugMenu()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, SettingsDebugMenuBooksFragment> =
+      ScreenSettingsDebugMenu()
   }
 
   override fun onBackButtonPressed(): MainBackButtonConsumerType.Result {
@@ -39,11 +40,13 @@ class SettingsDebugMenuBooksFragment :
 
   private lateinit var syncAccountsNow: Button
   private lateinit var showOnlySupportedBooks: SwitchCompat
+  private lateinit var showBookCoverDebugLabels: SwitchCompat
+  private lateinit var preferOPDS20: SwitchCompat
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -54,6 +57,10 @@ class SettingsDebugMenuBooksFragment :
 
     this.showOnlySupportedBooks =
       view.findViewById(R.id.debugBooksShowOnlySupported)
+    this.showBookCoverDebugLabels =
+      view.findViewById(R.id.debugBooksShowCoverDebugLabels)
+    this.preferOPDS20 =
+      view.findViewById(R.id.debugBooksPreferOPDS20)
     this.syncAccountsNow =
       view.findViewById(R.id.debugBooksSyncNow)
   }
@@ -65,6 +72,18 @@ class SettingsDebugMenuBooksFragment :
       SettingsDebugModel.showOnlySupportedBooks()
     this.showOnlySupportedBooks.setOnCheckedChangeListener { _, isChecked ->
       SettingsDebugModel.setShowOnlySupportedBooks(showOnlySupported = isChecked)
+    }
+
+    this.showBookCoverDebugLabels.isChecked =
+      SettingsDebugModel.showBookCoverDebugLabels()
+    this.showBookCoverDebugLabels.setOnCheckedChangeListener { _, isChecked ->
+      SettingsDebugModel.setShowBookCoverDebugLabels(show = isChecked)
+    }
+
+    this.preferOPDS20.isChecked =
+      SettingsDebugModel.preferOPDS20()
+    this.preferOPDS20.setOnCheckedChangeListener { _, isChecked ->
+      SettingsDebugModel.setPreferOPDS20(prefer = isChecked)
     }
 
     this.syncAccountsNow.setOnClickListener {

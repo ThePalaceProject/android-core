@@ -5,5 +5,5 @@ package org.nypl.simplified.accounts.api
  */
 
 data class AccountUsername(
-  val value: String
+  val value: String,
 )

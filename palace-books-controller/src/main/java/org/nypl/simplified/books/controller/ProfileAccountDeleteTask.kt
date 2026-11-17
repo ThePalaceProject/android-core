@@ -1,7 +1,6 @@
 package org.nypl.simplified.books.controller
 
 import io.reactivex.subjects.Subject
-import org.librarysimplified.mdc.MDCKeys
 import org.nypl.simplified.accounts.api.AccountEvent
 import org.nypl.simplified.accounts.api.AccountEventDeletion
 import org.nypl.simplified.accounts.api.AccountID
@@ -13,7 +12,6 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorder
 import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.taskrecorder.api.TaskStep
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import java.net.URI
 import java.util.concurrent.Callable
 
@@ -22,7 +20,7 @@ class ProfileAccountDeleteTask(
   private val accountProviderID: URI,
   private val profiles: ProfilesDatabaseType,
   private val profileEvents: Subject<ProfileEvent>,
-  private val strings: ProfileAccountDeletionStringResourcesType
+  private val strings: ProfileAccountDeletionStringResourcesType,
 ) : Callable<TaskResult<Unit>> {
   private val logger = LoggerFactory.getLogger(ProfileAccountDeleteTask::class.java)
   private val taskRecorder = TaskRecorder.create()
@@ -30,8 +28,8 @@ class ProfileAccountDeleteTask(
   private fun publishFailureEvent() =
     this.accountEvents.onNext(
       AccountEventDeletion.AccountEventDeletionFailed(
-        this.taskRecorder.finishFailure<Unit>()
-      )
+        this.taskRecorder.finishFailure<Unit>(),
+      ),
     )
 
   private fun publishProgressEvent(step: TaskStep) =
@@ -40,8 +38,9 @@ class ProfileAccountDeleteTask(
   private fun publishSuccessEvent(accountThen: AccountID) =
     this.accountEvents.onNext(
       AccountEventDeletion.AccountEventDeletionSucceeded(
-        this.strings.deletionSucceeded, accountThen
-      )
+        this.strings.deletionSucceeded,
+        accountThen,
+      ),
     )
 
   override fun call(): TaskResult<Unit> =
@@ -52,9 +51,6 @@ class ProfileAccountDeleteTask(
       val profile = this.profiles.currentProfile()
       val account = profile.deleteAccountByProvider(this.accountProviderID)
 
-      MDC.put(MDCKeys.ACCOUNT_INTERNAL_ID, account.toString())
-      MDC.put(MDCKeys.ACCOUNT_PROVIDER_ID, accountProviderID.toString())
-
       this.publishSuccessEvent(account)
       this.taskRecorder.finishSuccess(Unit)
     } catch (e: AccountsDatabaseLastAccountException) {
@@ -62,7 +58,7 @@ class ProfileAccountDeleteTask(
         message = e.message ?: e.javaClass.name,
         errorCode = "oneAccountMustExist",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()
@@ -71,7 +67,7 @@ class ProfileAccountDeleteTask(
         message = e.message ?: e.javaClass.name,
         errorCode = "deletionFailed",
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.publishFailureEvent()
       this.taskRecorder.finishFailure()

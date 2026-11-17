@@ -10,7 +10,7 @@ import org.nypl.simplified.taskrecorder.api.TaskRecorderType
 class BookPreviewHttp {
   private fun onDownloadProgressEvent(
     parameters: BookPreviewParameters,
-    event: LSHTTPDownloadState
+    event: LSHTTPDownloadState,
   ) {
     when (event) {
       is LSHTTPDownloadState.DownloadReceiving -> {
@@ -18,11 +18,11 @@ class BookPreviewHttp {
           this.createDownloadingMessage(
             expectedSize = event.expectedSize,
             currentSize = event.receivedSize,
-            perSecond = event.bytesPerSecond
+            perSecond = event.bytesPerSecond,
           ),
           event.receivedSize,
           event.expectedSize,
-          event.bytesPerSecond
+          event.bytesPerSecond,
         )
       }
 
@@ -31,7 +31,8 @@ class BookPreviewHttp {
       is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedServer,
       is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedUnacceptableMIME,
       is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadFailed.DownloadFailedExceptionally,
-      is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully -> {
+      is LSHTTPDownloadState.LSHTTPDownloadResult.DownloadCompletedSuccessfully,
+      -> {
         // do nothing
       }
     }
@@ -58,7 +59,7 @@ class BookPreviewHttp {
       isCancelled = {
         parameters.isCancelled
       },
-      clock = parameters.clock
+      clock = parameters.clock,
     )
   }
 
@@ -67,7 +68,7 @@ class BookPreviewHttp {
 
     val storage =
       BookPreviewStorage(
-        parameters.temporaryDirectory
+        parameters.temporaryDirectory,
       )
 
     when (parameters.format) {
@@ -77,7 +78,7 @@ class BookPreviewHttp {
           mimeType = parameters.mimeType,
           onBookSuccessfullySaved = {
             parameters.onPreviewFileReady(it)
-          }
+          },
         )
       }
 
@@ -86,7 +87,7 @@ class BookPreviewHttp {
           file = parameters.getTemporaryFile(),
           onBookSuccessfullySaved = {
             parameters.onPreviewFileReady(it)
-          }
+          },
         )
       }
 
@@ -99,7 +100,7 @@ class BookPreviewHttp {
   private fun createDownloadingMessage(
     expectedSize: Long?,
     currentSize: Long,
-    perSecond: Long
+    perSecond: Long,
   ): String =
     if (expectedSize == null) {
       "Downloading..."
@@ -109,7 +110,7 @@ class BookPreviewHttp {
 
   private fun handleHttpError(
     taskRecorder: TaskRecorderType,
-    result: LSHTTPDownloadState.LSHTTPDownloadResult
+    result: LSHTTPDownloadState.LSHTTPDownloadResult,
   ) {
     val status = result.responseStatus
     taskRecorder.addAttributes(status?.properties?.problemReport?.toMap() ?: emptyMap())
@@ -117,7 +118,7 @@ class BookPreviewHttp {
       message = "HTTP request failed: ${status?.properties?.originalStatus} ${status?.properties?.message}",
       errorCode = "httpRequestFailed",
       exception = null,
-      extraMessages = listOf()
+      extraMessages = listOf(),
     )
   }
 
@@ -129,7 +130,7 @@ class BookPreviewHttp {
     try {
       val downloadRequest =
         createDownloadRequest(
-          parameters = parameters
+          parameters = parameters,
         )
 
       when (val result = LSHTTPDownloads.download(downloadRequest)) {
@@ -140,7 +141,7 @@ class BookPreviewHttp {
         else -> {
           handleHttpError(
             taskRecorder = parameters.taskRecorder,
-            result = result
+            result = result,
           )
           throw Exception()
         }

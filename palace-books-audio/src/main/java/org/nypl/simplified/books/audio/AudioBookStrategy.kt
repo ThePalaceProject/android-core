@@ -47,7 +47,7 @@ import java.net.URI
 
 class AudioBookStrategy(
   private val context: Application,
-  private val request: AudioBookManifestRequest
+  private val request: AudioBookManifestRequest,
 ) : AudioBookStrategyType {
   private val logger =
     LoggerFactory.getLogger(AudioBookStrategy::class.java)
@@ -75,13 +75,13 @@ class AudioBookStrategy(
         message = message,
         errorCode = message,
         exception = e,
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       this.taskRecorder.finishFailure()
     }
 
   private class AsManifestFulfillment(
-    val owner: AudioBookStrategy
+    val owner: AudioBookStrategy,
   ) : ManifestFulfillmentStrategyType {
     private val eventSubject: PublishSubject<ManifestFulfillmentEvent> =
       PublishSubject.create()
@@ -103,8 +103,8 @@ class AudioBookStrategy(
                 r.steps
                   .filter { s -> s.resolution is TaskStepResolution.TaskStepFailed }
                   .map { s -> s.resolution.message },
-              serverData = null
-            )
+              serverData = null,
+            ),
           )
         }
 
@@ -124,7 +124,7 @@ class AudioBookStrategy(
       this.taskRecorder.currentStepFailed(
         message = "No network is available, and no fallback data is available",
         errorCode = "errorNoFallback",
-        extraMessages = listOf()
+        extraMessages = listOf(),
       )
       return this.taskRecorder.finishFailure()
     }
@@ -134,7 +134,7 @@ class AudioBookStrategy(
       source = data.source,
       licenseBytes = null,
       authorization = data.authorization,
-      manifestBytes = data.data
+      manifestBytes = data.data,
     )
   }
 
@@ -156,7 +156,7 @@ class AudioBookStrategy(
         this.taskRecorder.currentStepFailed(
           message = result.failure.message,
           errorCode = "errorDownloadFailed",
-          extraMessages = result.failure.extraMessages
+          extraMessages = result.failure.extraMessages,
         )
         this.taskRecorder.finishFailure()
       }
@@ -167,7 +167,7 @@ class AudioBookStrategy(
           source = target.target,
           licenseBytes = null,
           authorization = result.result.authorization,
-          manifestBytes = result.result.data
+          manifestBytes = result.result.data,
         )
       }
     }
@@ -179,7 +179,7 @@ class AudioBookStrategy(
     val authorization =
       this.request.authorizationHandler.onConfigureAuthorizationFor(
         PlayerManifestLink.LinkBasic(target.target),
-        PlayerDownloadRequest.Kind.MANIFEST
+        PlayerDownloadRequest.Kind.MANIFEST,
       )
 
     val httpRequest =
@@ -199,7 +199,7 @@ class AudioBookStrategy(
           onEvent = { event ->
             this.logger.debug("Download event: {}", event)
           },
-          isCancelled = { false }
+          isCancelled = { false },
         )
 
       return when (val result = LSHTTPDownloads.download(downloadRequest)) {
@@ -213,7 +213,7 @@ class AudioBookStrategy(
               this.taskRecorder.currentStepFailed(
                 message = licenseResult.failure.message,
                 errorCode = "errorLicenseParse",
-                extraMessages = licenseResult.failure.extraMessages
+                extraMessages = licenseResult.failure.extraMessages,
               )
               this.recordProblemReport(licenseResult.failure.serverData?.problemReport)
               this.taskRecorder.finishFailure()
@@ -223,7 +223,7 @@ class AudioBookStrategy(
               this.taskRecorder.currentStepSucceeded("License parsed.")
               this.fulfillManifestFromLicense(
                 licenseBytes = licenseBytes,
-                license = licenseResult.result.license
+                license = licenseResult.result.license,
               )
             }
           }
@@ -233,7 +233,7 @@ class AudioBookStrategy(
           this.taskRecorder.currentStepFailed(
             message = "Download cancelled.",
             errorCode = "cancelled",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           this.recordProblemReport(result.responseStatus?.properties?.problemReport)
           this.taskRecorder.finishFailure()
@@ -244,7 +244,7 @@ class AudioBookStrategy(
             message = "Request failed.",
             errorCode = "errorException",
             result.exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           this.recordProblemReport(result.responseStatus?.properties?.problemReport)
           this.taskRecorder.finishFailure()
@@ -254,7 +254,7 @@ class AudioBookStrategy(
           this.taskRecorder.currentStepFailed(
             message = "Request failed.",
             errorCode = "errorRequest",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           this.recordProblemReport(result.responseStatus.properties.problemReport)
           this.taskRecorder.finishFailure()
@@ -264,7 +264,7 @@ class AudioBookStrategy(
           this.taskRecorder.currentStepFailed(
             message = "Server returned unexpected MIME type.",
             errorCode = "errorMime",
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
           this.recordProblemReport(result.responseStatus.properties?.problemReport)
           this.taskRecorder.finishFailure()
@@ -283,26 +283,27 @@ class AudioBookStrategy(
 
   private fun fulfillManifestFromLicense(
     licenseBytes: ByteArray,
-    license: LicenseDocument
+    license: LicenseDocument,
   ): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Retrieving manifest via LCP license.")
 
-    return when (val result =
-      LCPDownloads.downloadManifestFromPublication(
-        context = this.context,
-        authorizationHandler = request.authorizationHandler,
-        license = license,
-        receiver = { event ->
-          this.logger.debug("Downloading manifest event: {}", event)
-        }
-      )
+    return when (
+      val result =
+        LCPDownloads.downloadManifestFromPublication(
+          context = this.context,
+          authorizationHandler = request.authorizationHandler,
+          license = license,
+          receiver = { event ->
+            this.logger.debug("Downloading manifest event: {}", event)
+          },
+        )
     ) {
       is PlayerResult.Failure -> {
         this.recordProblemReport(result.failure.serverData?.problemReport)
         this.taskRecorder.currentStepFailed(
           message = result.failure.message,
           errorCode = "httpRequestFailed",
-          extraMessages = result.failure.extraMessages
+          extraMessages = result.failure.extraMessages,
         )
         this.taskRecorder.finishFailure()
       }
@@ -313,7 +314,7 @@ class AudioBookStrategy(
           source = result.result.source,
           licenseBytes = licenseBytes,
           authorization = result.result.authorization,
-          manifestBytes = result.result.data
+          manifestBytes = result.result.data,
         )
       }
     }
@@ -327,15 +328,16 @@ class AudioBookStrategy(
     source: URI?,
     authorization: LSHTTPAuthorizationType?,
     licenseBytes: ByteArray?,
-    manifestBytes: ByteArray
+    manifestBytes: ByteArray,
   ): TaskResult<AudioBookManifestData> {
     this.taskRecorder.beginNewStep("Parsing manifest.")
-    return when (val result =
-      this.request.manifestParsers.parse(
-        uri = source ?: URI.create("urn:unavailable"),
-        input = ManifestUnparsed(this.request.palaceID, manifestBytes),
-        extensions = this.request.extensions
-      )
+    return when (
+      val result =
+        this.request.manifestParsers.parse(
+          uri = source ?: URI.create("urn:unavailable"),
+          input = ManifestUnparsed(this.request.palaceID, manifestBytes),
+          extensions = this.request.extensions,
+        )
     ) {
       is ParseResult.Failure -> {
         this.taskRecorder.currentStepFailed(
@@ -344,7 +346,7 @@ class AudioBookStrategy(
           extraMessages =
             this
               .formatParseWarnings(result.warnings)
-              .plus(this.formatParseErrors(result.errors))
+              .plus(this.formatParseErrors(result.errors)),
         )
         return this.taskRecorder.finishFailure()
       }
@@ -360,9 +362,9 @@ class AudioBookStrategy(
                 source = source,
                 contentType = MIMEType("text", "json", mapOf()),
                 authorization = authorization,
-                data = manifestBytes
-              )
-          )
+                data = manifestBytes,
+              ),
+          ),
         )
       }
     }
@@ -412,7 +414,7 @@ class AudioBookStrategy(
           checks = this.request.licenseChecks,
           httpClient = this.request.httpClient,
           manifest = manifest,
-        )
+        ),
       )
 
     val checkSubscription =
@@ -438,12 +440,12 @@ class AudioBookStrategy(
 
       val secretService =
         this.request.services.optionalService(
-          AudioBookOverdriveSecretServiceType::class.java
+          AudioBookOverdriveSecretServiceType::class.java,
         ) ?: throw UnsupportedOperationException("No Overdrive secret service is available")
 
       val strategies =
         this.request.strategyRegistry.findStrategy(
-          OPAManifestFulfillmentStrategyProviderType::class.java
+          OPAManifestFulfillmentStrategyProviderType::class.java,
         ) ?: throw UnsupportedOperationException("No Overdrive fulfillment strategy is available")
 
       val overdriveParameters =
@@ -461,7 +463,7 @@ class AudioBookStrategy(
 
       val strategies =
         this.request.strategyRegistry.findStrategy(
-          ManifestFulfillmentBasicType::class.java
+          ManifestFulfillmentBasicType::class.java,
         ) ?: throw UnsupportedOperationException("No Basic fulfillment strategy is available")
 
       val parameters =

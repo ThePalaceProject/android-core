@@ -29,7 +29,7 @@ class AccountListAdapter(
 ) : ListAdapter<AccountType, AccountListAdapter.AccountViewHolder>(AccountDiff) {
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): AccountViewHolder {
     val inflater =
       LayoutInflater.from(parent.context)
@@ -41,13 +41,13 @@ class AccountListAdapter(
       onItemAccountSwitch = this.onItemAccountSwitch,
       onItemAccountDetailsRequested = this.onItemAccountDetailsRequested,
       onItemAccountDeleteRequested = this.onItemAccountDeleteRequested,
-      onItemIsSelectedNow = this.onItemIsSelectedNow
+      onItemIsSelectedNow = this.onItemIsSelectedNow,
     )
   }
 
   override fun onBindViewHolder(
     holder: AccountViewHolder,
-    position: Int
+    position: Int,
   ) {
     holder.bind(this.getItem(position))
   }
@@ -119,7 +119,7 @@ class AccountListAdapter(
       this.imageLoader.loadAccountLogoIntoView(
         account = item.provider.toDescription(),
         defaultIcon = R.drawable.account_default,
-        iconView = this.accountIcon
+        iconView = this.accountIcon,
       )
       this.accountItem = item
 
@@ -136,7 +136,7 @@ class AccountListAdapter(
           } else {
             R.string.settingsAccessibilityAccountSelect
           },
-          name
+          name,
         )
       this.accountItemDetails.contentDescription =
         context.getString(R.string.settingsAccessibilityAccountDetails, name)
@@ -146,12 +146,12 @@ class AccountListAdapter(
   object AccountDiff : DiffUtil.ItemCallback<AccountType>() {
     override fun areItemsTheSame(
       oldItem: AccountType,
-      newItem: AccountType
+      newItem: AccountType,
     ): Boolean = oldItem.id.compareTo(newItem.id) == 0
 
     override fun areContentsTheSame(
       oldItem: AccountType,
-      newItem: AccountType
+      newItem: AccountType,
     ): Boolean =
       oldItem.provider.displayName == newItem.provider.displayName &&
         oldItem.provider.subtitle == newItem.provider.subtitle &&

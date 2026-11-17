@@ -8,5 +8,5 @@ import one.irradia.mime.api.MIMEType
  */
 
 class BookUnsupportedTypeException(
-  val type: MIMEType
+  val type: MIMEType,
 ) : BookException(type.fullType)

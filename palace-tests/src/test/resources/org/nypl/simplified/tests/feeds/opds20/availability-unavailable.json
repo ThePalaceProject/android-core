@@ -1,0 +1,27 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:7070707070",
+        "title": "Unavailable Book"
+      },
+      "links": [
+        {
+          "href": "https://example.com/book.epub",
+          "type": "application/epub+zip",
+          "rel": "http://opds-spec.org/acquisition/borrow",
+          "properties": {
+            "availability": {
+              "state": "unavailable"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

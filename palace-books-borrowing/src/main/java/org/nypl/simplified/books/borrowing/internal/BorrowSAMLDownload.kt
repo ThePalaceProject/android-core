@@ -37,7 +37,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
       type: MIMEType,
       target: Link?,
       account: AccountReadableType?,
-      remaining: List<MIMEType>
+      remaining: List<MIMEType>,
     ): Boolean =
       account?.loginState?.credentials is AccountAuthenticationCredentials.SAML2_0 &&
         BorrowDirectDownload.isApplicableFor(type, target, account, remaining)
@@ -48,7 +48,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
     context.bookDownloadIsRunning(
       "Requesting download...",
       receivedSize = 0L,
-      bytesPerSecond = 0L
+      bytesPerSecond = 0L,
     )
 
     val samlDownloadContext = context.samlDownloadContext
@@ -81,9 +81,9 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
         }
 
         properties.copy(
-          cookies = requestCookies
+          cookies = requestCookies,
         )
-      }
+      },
     )
   }
 
@@ -91,7 +91,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
    * Create a CookieStore containing the cookies belonging to the given account.
    */
 
-  private fun createAccountCookieStore(context: BorrowContextType,): CookieStore {
+  private fun createAccountCookieStore(context: BorrowContextType): CookieStore {
     val account = context.account
     val credentials = account.loginState.credentials as AccountAuthenticationCredentials.SAML2_0
     val cookieManager = CookieManager()
@@ -110,7 +110,7 @@ class BorrowSAMLDownload private constructor() : BorrowSubtaskType {
 
   private fun onDownloadFailedUnacceptableMIME(
     context: BorrowContextType,
-    result: DownloadFailedUnacceptableMIME
+    result: DownloadFailedUnacceptableMIME,
   ) {
     val samlDownloadContext = context.samlDownloadContext
     val isSAMLAuthComplete = samlDownloadContext != null && samlDownloadContext.isSAMLAuthComplete

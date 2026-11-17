@@ -56,7 +56,7 @@ class SplashFragment :
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     this.splashHolder =
       inflater.inflate(R.layout.splash_host, container, false) as ViewGroup
@@ -81,14 +81,15 @@ class SplashFragment :
         },
         onRequestPermission = {
           MainNotifications.requestPermissions(this.requireActivity())
-        })
+        },
+      )
 
     this.selectionListViewRoot =
       inflater.inflate(R.layout.account_registry, container, false) as ViewGroup
     this.selectionListViews =
       LibrarySelectionViews(
         this.requireActivity(),
-        this.selectionListViewRoot
+        this.selectionListViewRoot,
       )
 
     this.openBootProgress()
@@ -97,7 +98,7 @@ class SplashFragment :
 
   private data class LibrarySelectionViews(
     private val activity: Activity,
-    private val root: ViewGroup
+    private val root: ViewGroup,
   ) {
     val backButton: View =
       this.root.findViewById(R.id.accountRegistryToolbarBackIconTouch)
@@ -110,7 +111,7 @@ class SplashFragment :
   private data class NotificationsViews(
     private val root: ViewGroup,
     private val onFinished: () -> Unit,
-    private val onRequestPermission: () -> Unit
+    private val onRequestPermission: () -> Unit,
   ) {
     val notificationsSkip =
       this.root.findViewById<View>(R.id.splashNotificationsSkip)
@@ -129,7 +130,7 @@ class SplashFragment :
   }
 
   private data class SplashViews(
-    private val root: ViewGroup
+    private val root: ViewGroup,
   ) {
     val splashText: TextView =
       this.root.findViewById(R.id.splashText)
@@ -177,13 +178,13 @@ class SplashFragment :
     this.subscriptions.add(
       MainApplication.application.servicesBootEvents.subscribe { _, newValue ->
         this.onBootEvent(newValue)
-      }
+      },
     )
 
     this.subscriptions.add(
       SplashModel.splashScreenStatus.subscribe { _, newValue ->
         this.onSplashScreenStatusChanged(newValue)
-      }
+      },
     )
   }
 
@@ -268,8 +269,8 @@ class SplashFragment :
 
     registry.refreshAsync(
       AccountProviderRegistryRefresh.Incremental(
-        includeTestingLibraries = false
-      )
+        includeTestingLibraries = false,
+      ),
     )
 
     val accountListAdapter =
@@ -277,7 +278,7 @@ class SplashFragment :
         imageLoader = imageLoader,
         onItemClicked = { description ->
           this.onUserSelectedLibraryForAddition(description)
-        }
+        },
       )
 
     this.accountListViews =
@@ -288,21 +289,21 @@ class SplashFragment :
         onSwipeTouched = {
           registry.refreshAsync(
             AccountProviderRegistryRefresh.Incremental(
-              includeTestingLibraries = profiles.profileCurrent().preferences().showTestingLibraries
-            )
+              includeTestingLibraries = profiles.profileCurrent().preferences().showTestingLibraries,
+            ),
           )
-        }
+        },
       )
 
     this.subscriptions.add(
       registry.accountProviderDescriptionsSortedAttribute.subscribe { _, descriptions ->
         this.accountListViews.submitAccountProviderDescriptionList(descriptions)
-      }
+      },
     )
     this.subscriptions.add(
       registry.statusAttribute.subscribe { _, status ->
         this.accountListViews.reconfigureForRegistryStatus(status)
-      }
+      },
     )
   }
 

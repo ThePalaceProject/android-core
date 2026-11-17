@@ -1,5 +1,8 @@
 package org.nypl.simplified.tests.accessibility
 
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
+
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_SPOKEN
 import android.content.Context
@@ -70,10 +73,13 @@ class AccessibilityServiceTest {
         AccountID(UUID.randomUUID()),
         null,
         null,
-        OPDSAcquisitionFeedEntry.newBuilder(
-          "hello", "Book", DateTime.now(), OPDSAvailabilityLoanable.get()
-        )
-          .build(),
+        OPDS12FeedConverter.convertEntry(
+          AccountID(UUID.randomUUID()),
+          OPDSAcquisitionFeedEntry.newBuilder(
+            "hello", "Book", DateTime.now(), OPDSAvailabilityLoanable.get()
+          )
+            .build()
+        ),
         listOf()
       )
   }

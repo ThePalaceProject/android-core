@@ -29,7 +29,7 @@ class OPDSParseException : IOException {
 
   constructor(
     message: String,
-    cause: Throwable
+    cause: Throwable,
   ) : super(message, cause)
 
   /**

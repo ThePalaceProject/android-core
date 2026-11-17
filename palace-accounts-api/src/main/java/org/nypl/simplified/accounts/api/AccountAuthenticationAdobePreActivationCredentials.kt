@@ -32,5 +32,5 @@ data class AccountAuthenticationAdobePreActivationCredentials(
    * The post activation credentials that resulted from device activation, iff any device activation has been performed
    */
 
-  val postActivationCredentials: AccountAuthenticationAdobePostActivationCredentials?
+  val postActivationCredentials: AccountAuthenticationAdobePostActivationCredentials?,
 )

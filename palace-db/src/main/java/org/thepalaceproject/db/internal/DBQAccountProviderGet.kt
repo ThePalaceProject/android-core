@@ -23,7 +23,7 @@ internal object DBQAccountProviderGet : DBQAccountProviderGetType {
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: URI
+    parameters: URI,
   ): AccountProvider? =
     transaction.connection.connection.prepareStatement(this.text).use { statement ->
       statement.setString(1, parameters.toString())

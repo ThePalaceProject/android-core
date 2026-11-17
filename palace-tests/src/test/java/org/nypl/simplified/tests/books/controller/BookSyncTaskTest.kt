@@ -19,12 +19,21 @@ import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountProvider
 import org.nypl.simplified.accounts.api.AccountUsername
+import org.nypl.simplified.books.api.FeedBookIDConversions
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
 import org.nypl.simplified.books.controller.BookSyncTask
+import java.time.OffsetDateTime
+import org.nypl.simplified.feeds.api.FeedAvailabilityLoaned
+import org.nypl.simplified.feeds.api.FeedBookIDs
+import org.nypl.simplified.feeds.api.FeedData
+import org.nypl.simplified.feeds.api.FeedDataWithGroups
+import org.nypl.simplified.feeds.api.FeedEntryBook
+import org.nypl.simplified.feeds.api.FeedGroup
 import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedAuthentication
-import org.nypl.simplified.opds.core.OPDSAcquisitionFeedEntryParser
-import org.nypl.simplified.opds.core.OPDSFeedParser
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderFailure.FeedLoaderFailedGeneral
+import org.nypl.simplified.feeds.api.FeedLoaderResult.FeedLoaderSuccess
+
 import org.nypl.simplified.patron.PatronUserProfileParsers
 import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.profiles.api.ProfileID
@@ -32,6 +41,7 @@ import org.nypl.simplified.taskrecorder.api.TaskResult
 import org.nypl.simplified.tests.books.controller.FakeAccounts.fakeAccountProvider
 import org.nypl.simplified.tests.mocking.FakeBooksController
 import org.nypl.simplified.tests.mocking.FakeFeedLoader
+import org.nypl.simplified.tests.mocking.MockBookDatabase
 import org.nypl.simplified.tests.mocking.FakeProfilesDatabase
 import org.nypl.simplified.tests.mocking.MockAccountProviderRegistry
 import org.nypl.simplified.tests.mocking.MockProfile
@@ -136,10 +146,17 @@ class BookSyncTaskTest {
 
     val accountRegistry =
       MockAccountProviderRegistry.singleton(accountProvider)
-    val opdsParser =
-      OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
     val feedLoader =
       FakeFeedLoader()
+
+    feedLoader.addResponse(
+      FeedLoaderFailedGeneral(
+        problemReport = null,
+        exception = Exception(),
+        message = "Access Denied",
+        attributesInitial = mapOf()
+      )
+    )
 
     Assertions.assertFalse(fakeAccount.credentialsExpired, "Credentials must have expired.")
 
@@ -153,7 +170,6 @@ class BookSyncTaskTest {
         http = this.http,
         accountRegistry = accountRegistry,
         booksController = fakeBooksController,
-        feedParser = opdsParser
       )
 
     val result = task.call()
@@ -216,14 +232,12 @@ class BookSyncTaskTest {
 
     val accountRegistry =
       MockAccountProviderRegistry.singleton(accountProvider)
-    val opdsParser =
-      OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
 
     val feedLoader =
       FakeFeedLoader()
 
     feedLoader.addResponse(
-      FeedLoaderFailedAuthentication(
+      FeedLoaderFailedGeneral(
         problemReport = null,
         exception = Exception(),
         message = "Access Denied",
@@ -243,7 +257,6 @@ class BookSyncTaskTest {
         http = this.http,
         accountRegistry = accountRegistry,
         booksController = fakeBooksController,
-        feedParser = opdsParser
       )
 
     val result = task.call()
@@ -315,8 +328,6 @@ class BookSyncTaskTest {
 
     val accountRegistry =
       MockAccountProviderRegistry.singleton(accountProvider)
-    val opdsParser =
-      OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
 
     val feedLoader =
       FakeFeedLoader()
@@ -342,14 +353,15 @@ class BookSyncTaskTest {
         http = this.http,
         accountRegistry = accountRegistry,
         booksController = fakeBooksController,
-        feedParser = opdsParser
       )
 
     val result = task.call()
     TaskDumps.dump(this.logger, result)
     result as TaskResult.Failure
 
-    Assertions.assertTrue(fakeAccount.credentialsExpired, "Credentials must have expired.")
+    // A 401 with no problem report is not the specific recoverable credentials-expired case,
+    // so the credentials must not be expired.
+    Assertions.assertFalse(fakeAccount.credentialsExpired, "Credentials must not have expired.")
   }
 
   @Test
@@ -414,8 +426,6 @@ class BookSyncTaskTest {
 
     val accountRegistry =
       MockAccountProviderRegistry.singleton(accountProvider)
-    val opdsParser =
-      OPDSFeedParser.newParser(OPDSAcquisitionFeedEntryParser.newParser())
 
     val feedLoader =
       FakeFeedLoader()
@@ -446,7 +456,6 @@ class BookSyncTaskTest {
         http = this.http,
         accountRegistry = accountRegistry,
         booksController = fakeBooksController,
-        feedParser = opdsParser
       )
 
     val result = task.call()
@@ -456,6 +465,286 @@ class BookSyncTaskTest {
     Assertions.assertTrue(fakeAccount.credentialsExpired, "Credentials must have expired.")
   }
 
+
+  @Test
+  fun testSyncSuccess_FeedData() {
+    val accountProvider =
+      fakeAccountProvider()
+
+    val fakeProfilesDatabase =
+      FakeProfilesDatabase()
+    val fakeBooksController =
+      FakeBooksController()
+    val fakeProfile =
+      MockProfile(this.profileID, 1)
+
+    fakeProfilesDatabase.profile = fakeProfile
+
+    val fakeAccount =
+      fakeProfile.accountList[0]
+    val accountID =
+      fakeAccount.id
+
+    val fakeAccountProvider =
+      (fakeAccount.provider as AccountProvider)
+
+    fakeAccount.setAccountProvider(
+      fakeAccountProvider.copy(
+        loansURI = this.server.url("/loans").toUri(),
+        patronSettingsURI = this.server.url("/patron").toUri(),
+      )
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(resource("/org/nypl/simplified/tests/patron/example.json"))
+    )
+
+    fakeAccount.setLoginState(AccountLoginState.AccountLoggedIn(
+      AccountAuthenticationCredentials.Basic(
+        userName = AccountUsername("someone"),
+        password = AccountPassword("password"),
+        adobeCredentials = null,
+        authenticationDescription = null,
+        annotationsURI = null,
+        deviceRegistrationURI = null,
+        patronAuthorization = PatronAuthorization("identifier", null)
+      )
+    ))
+
+    val accountRegistry =
+      MockAccountProviderRegistry.singleton(accountProvider)
+
+    val entry =
+      FeedEntryBook(
+        accountID = accountID,
+        id = "urn:uuid:1234",
+        title = "Test Book",
+        updated = OffsetDateTime.now(),
+        authors = listOf("Author"),
+        availability = FeedAvailabilityLoaned(
+          startDate = OffsetDateTime.now(),
+          endDate = OffsetDateTime.now().plusDays(14),
+          revoke = null,
+        ),
+        acquisitions = listOf(),
+        categories = listOf(),
+        cover = null,
+        previewAcquisitions = listOf(),
+        annotations = null,
+        groups = setOf(),
+        issues = null,
+        related = null,
+        published = null,
+        publisher = null,
+        distribution = "",
+        summary = "",
+        narrators = listOf(),
+        thumbnail = null,
+        timeTrackingUri = null,
+        alternate = null,
+        analytics = null,
+        licensor = null,
+        duration = null,
+        language = null,
+        audience = null,
+        series = null,
+      )
+
+    val feed =
+      FeedData(
+        feedID = "test-feed",
+        feedSearch = null,
+        feedTitle = "Loans",
+        feedUpdated = OffsetDateTime.now(),
+        feedURI = this.server.url("/loans").toUri(),
+        feedTermsOfService = null,
+        feedPrivacyPolicy = null,
+        feedAbout = null,
+        feedLicenses = null,
+        feedNext = null,
+        feedAuthDocument = null,
+        facetsByGroup = emptyMap(),
+        facetsOrder = emptyList(),
+        entries = listOf(entry),
+      )
+
+    val feedLoader =
+      FakeFeedLoader()
+
+    feedLoader.addResponse(
+      FeedLoaderSuccess(
+        feed = feed,
+        accessToken = null,
+      )
+    )
+
+    val task =
+      BookSyncTask(
+        accountID = accountID,
+        profiles = fakeProfilesDatabase,
+        bookRegistry = this.bookRegistry,
+        feedLoader = feedLoader,
+        patronParsers = PatronUserProfileParsers(),
+        http = this.http,
+        accountRegistry = accountRegistry,
+        booksController = fakeBooksController,
+      )
+
+    val result = task.call()
+    TaskDumps.dump(this.logger, result)
+    result as TaskResult.Success
+
+    val bookId = FeedBookIDs.newFromText("urn:uuid:1234")
+    val bookIdConverted = FeedBookIDConversions.toBookID(bookId)
+    val db = fakeAccount.bookDatabase as MockBookDatabase
+    Assertions.assertTrue(db.entries.containsKey(bookIdConverted))
+  }
+
+  @Test
+  fun testSyncSuccess_FeedDataWithGroups() {
+    val accountProvider =
+      fakeAccountProvider()
+
+    val fakeProfilesDatabase =
+      FakeProfilesDatabase()
+    val fakeBooksController =
+      FakeBooksController()
+    val fakeProfile =
+      MockProfile(this.profileID, 1)
+
+    fakeProfilesDatabase.profile = fakeProfile
+
+    val fakeAccount =
+      fakeProfile.accountList[0]
+    val accountID =
+      fakeAccount.id
+
+    val fakeAccountProvider =
+      (fakeAccount.provider as AccountProvider)
+
+    fakeAccount.setAccountProvider(
+      fakeAccountProvider.copy(
+        loansURI = this.server.url("/loans").toUri(),
+        patronSettingsURI = this.server.url("/patron").toUri(),
+      )
+    )
+
+    this.server.enqueue(
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(resource("/org/nypl/simplified/tests/patron/example.json"))
+    )
+
+    fakeAccount.setLoginState(AccountLoginState.AccountLoggedIn(
+      AccountAuthenticationCredentials.Basic(
+        userName = AccountUsername("someone"),
+        password = AccountPassword("password"),
+        adobeCredentials = null,
+        authenticationDescription = null,
+        annotationsURI = null,
+        deviceRegistrationURI = null,
+        patronAuthorization = PatronAuthorization("identifier", null)
+      )
+    ))
+
+    val accountRegistry =
+      MockAccountProviderRegistry.singleton(accountProvider)
+
+    val entry =
+      FeedEntryBook(
+        accountID = accountID,
+        id = "urn:uuid:5678",
+        title = "Grouped Book",
+        updated = OffsetDateTime.now(),
+        authors = listOf("Author"),
+        availability = FeedAvailabilityLoaned(
+          startDate = OffsetDateTime.now(),
+          endDate = OffsetDateTime.now().plusDays(14),
+          revoke = null,
+        ),
+        acquisitions = listOf(),
+        categories = listOf(),
+        cover = null,
+        previewAcquisitions = listOf(),
+        annotations = null,
+        groups = setOf(),
+        issues = null,
+        related = null,
+        published = null,
+        publisher = null,
+        distribution = "",
+        summary = "",
+        narrators = listOf(),
+        thumbnail = null,
+        timeTrackingUri = null,
+        alternate = null,
+        analytics = null,
+        licensor = null,
+        duration = null,
+        language = null,
+        audience = null,
+        series = null,
+      )
+
+    val group =
+      FeedGroup(
+        account = accountID,
+        groupTitle = "My Group",
+        groupURI = this.server.url("/group").toUri(),
+        groupEntries = listOf(entry),
+      )
+
+    val feed =
+      FeedDataWithGroups(
+        feedID = "test-feed",
+        feedSearch = null,
+        feedTitle = "Loans",
+        feedUpdated = OffsetDateTime.now(),
+        feedURI = this.server.url("/loans").toUri(),
+        feedTermsOfService = null,
+        feedPrivacyPolicy = null,
+        feedAbout = null,
+        feedLicenses = null,
+        feedNext = null,
+        feedAuthDocument = null,
+        facetsByGroup = emptyMap(),
+        facetsOrder = emptyList(),
+        groups = listOf(group),
+      )
+
+    val feedLoader =
+      FakeFeedLoader()
+
+    feedLoader.addResponse(
+      FeedLoaderSuccess(
+        feed = feed,
+        accessToken = null,
+      )
+    )
+
+    val task =
+      BookSyncTask(
+        accountID = accountID,
+        profiles = fakeProfilesDatabase,
+        bookRegistry = this.bookRegistry,
+        feedLoader = feedLoader,
+        patronParsers = PatronUserProfileParsers(),
+        http = this.http,
+        accountRegistry = accountRegistry,
+        booksController = fakeBooksController,
+      )
+
+    val result = task.call()
+    TaskDumps.dump(this.logger, result)
+    result as TaskResult.Success
+
+    val bookId = FeedBookIDs.newFromText("urn:uuid:5678")
+    val bookIdConverted = FeedBookIDConversions.toBookID(bookId)
+    val db = fakeAccount.bookDatabase as MockBookDatabase
+    Assertions.assertTrue(db.entries.containsKey(bookIdConverted))
+  }
 
   private fun resource(file: String): Buffer {
     val buffer = Buffer()

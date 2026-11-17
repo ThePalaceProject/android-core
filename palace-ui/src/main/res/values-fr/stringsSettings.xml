@@ -8,8 +8,11 @@
     <string name="settingsAccessibilityAccountDetails">Voir les détails pour \"%1$s\".</string>
     <string name="settingsAccessibilityAccountSelect">Appuyez pour définir \"%1$s\" comme bibliothèque actuelle. Appuyez longuement pour supprimer.</string>
     <string name="settingsAccessibilityAccountSelectCurrent">\"%1$s\", votre bibliothèque actuelle. Appuyez longuement pour supprimer.</string>
+    <string name="settingsAccessibilityLibrariesFound">Bibliothèques trouvées : %1$d</string>
+    <string name="settingsAccessibilityNoLibrariesFound">Aucune bibliothèque trouvée.</string>
     <string name="settingsAccessibilitySearchButton">Bouton de recherche de bibliothèque</string>
     <string name="settingsAccessibilitySearchButtonClose">Fermer le bouton de recherche</string>
+    <string name="settingsAccessibilitySearchHint">Rechercher. Mise à jour des résultats lorsque vous tapez.</string>
     <string name="settingsAccounts">Bibliothèques</string>
     <string name="settingsAccountsSummary">Ajouter, supprimer ou configurer des bibliothèques</string>
     <string name="settingsAcknowledgements">Remerciements</string>
@@ -56,6 +59,7 @@
     <string name="settingsDevSendErrorLogs">Envoyer des journaux d\'erreur</string>
     <string name="settingsDevShowErrorPage">Afficher la page d\'erreur</string>
     <string name="settingsDevShowSupportedBooks">Seulement afficher les livres pris en charge (Désélectionner pour afficher les livres non pris en charge)</string>
+    <string name="settingsDevShowBookCoverDebugLabels">Afficher le format et les étiquettes DRM sur les couvertures de livres</string>
     <string name="settingsDevSyncAccounts">Synchroniser les comptes</string>
     <string name="settingsDevTestingFeatures">Caractéristiques d\'essai</string>
     <string name="settingsDevToggleOpenEBooksQAAccount">Activer le compte OpenEBooks QA</string>

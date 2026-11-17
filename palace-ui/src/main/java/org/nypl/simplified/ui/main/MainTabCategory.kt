@@ -9,7 +9,8 @@ enum class MainTabCategory {
   TAB_CATALOG,
   TAB_BOOKS,
   TAB_RESERVATIONS,
-  TAB_SETTINGS;
+  TAB_SETTINGS,
+  ;
 
   companion object {
     fun forPart(catalogPart: CatalogPart): MainTabCategory =

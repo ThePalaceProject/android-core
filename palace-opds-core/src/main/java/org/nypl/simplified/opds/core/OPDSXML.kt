@@ -31,7 +31,7 @@ object OPDSXML {
   fun getChildElementsWithName(
     node: Element,
     namespace: URI,
-    name: String
+    name: String,
   ): MutableList<Element> {
     val namespaceText: String = namespace.toString()
     val children = node.childNodes
@@ -65,7 +65,7 @@ object OPDSXML {
   fun getChildElementsWithNameNonEmpty(
     node: Element,
     namespace: URI,
-    name: String
+    name: String,
   ): MutableList<Element> {
     val elements: MutableList<Element> = getChildElementsWithName(node, namespace, name)
     if (!elements.isEmpty()) {
@@ -92,7 +92,7 @@ object OPDSXML {
    */
   fun getChildElementsWithNames(
     node: Element,
-    names: MutableSet<MutableMap.MutableEntry<URI, String>>
+    names: MutableSet<MutableMap.MutableEntry<URI, String>>,
   ): MutableList<Element> {
     val children = node.childNodes
     val xs: MutableList<Element> = ArrayList(children.length)
@@ -129,7 +129,7 @@ object OPDSXML {
   @Throws(OPDSParseException::class)
   fun getChildElementsWithNamesNonEmpty(
     node: Element,
-    names: MutableSet<MutableMap.MutableEntry<URI, String>>
+    names: MutableSet<MutableMap.MutableEntry<URI, String>>,
   ): MutableList<Element> {
     val elements: MutableList<Element> = getChildElementsWithNames(node, names)
     if (!elements.isEmpty()) {
@@ -158,7 +158,7 @@ object OPDSXML {
   fun getFirstChildElementTextWithName(
     node: Element,
     namespace: URI,
-    name: String
+    name: String,
   ): String {
     val e: Element = getFirstChildElementWithName(node, namespace, name)
     return e.textContent.trim { it <= ' ' }
@@ -176,7 +176,7 @@ object OPDSXML {
   fun getFirstChildElementTextWithNameOptional(
     node: Element,
     namespace: URI,
-    name: String
+    name: String,
   ): String? {
     val children = node.childNodes
     for (index in 0..<children.length) {
@@ -205,7 +205,7 @@ object OPDSXML {
     node: Element,
     namespace: URI,
     name: String,
-    attribute: String
+    attribute: String,
   ): String {
     val children = node.childNodes
     for (index in 0..<children.length) {
@@ -238,7 +238,7 @@ object OPDSXML {
   fun getFirstChildElementWithName(
     node: Element,
     namespace: URI,
-    name: String
+    name: String,
   ): Element {
     val children = node.childNodes
     for (index in 0..<children.length) {
@@ -274,7 +274,7 @@ object OPDSXML {
   fun getFirstChildElementWithNameOptional(
     node: Element,
     namespace: URI,
-    name: String
+    name: String,
   ): Element? {
     val children = node.childNodes
     for (index in 0..<children.length) {
@@ -337,7 +337,7 @@ object OPDSXML {
   fun nodeAsElementWithName(
     node: Node,
     namespace: URI,
-    name: String
+    name: String,
   ): Element {
     val e: Element = nodeAsElement(node)
     if (nodeHasName(e, namespace, name)) {
@@ -371,7 +371,7 @@ object OPDSXML {
   fun nodeHasName(
     node: Element,
     namespace: URI,
-    name: String
+    name: String,
   ): Boolean {
     val nodeLocal = node.localName
     if (nodeLocal == name) {
@@ -392,7 +392,7 @@ object OPDSXML {
   @Throws(OPDSParseException::class)
   fun getAttributeRFC3339Optional(
     e: Element,
-    name: String
+    name: String,
   ): DateTime? {
     try {
       if (e.hasAttribute(name)) {
@@ -416,7 +416,7 @@ object OPDSXML {
   @Throws(OPDSParseException::class)
   fun getAttributeRFC3339(
     e: Element,
-    name: String
+    name: String,
   ): DateTime {
     if (e.hasAttribute(name)) {
       try {
@@ -447,7 +447,7 @@ object OPDSXML {
   @Throws(OPDSSerializationException::class)
   fun serializeDocumentToStream(
     d: Document,
-    o: OutputStream
+    o: OutputStream,
   ) {
     try {
       val tf = TransformerFactory.newInstance()
@@ -479,7 +479,7 @@ object OPDSXML {
   @Throws(OPDSParseException::class)
   fun getAttributeIntegerOptional(
     e: Element,
-    name: String
+    name: String,
   ): Int? {
     if (e.hasAttribute(name)) {
       try {
@@ -503,7 +503,7 @@ object OPDSXML {
   @Throws(OPDSParseException::class)
   fun getAttributeInteger(
     e: Element,
-    name: String
+    name: String,
   ): Int {
     if (e.hasAttribute(name)) {
       try {

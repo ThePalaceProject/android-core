@@ -5,6 +5,9 @@ plugins {
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
+    implementation(project(":palace-feeds"))
+    implementation(project(":palace-feeds-opds12"))
+    implementation(project(":palace-feeds-api"))
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-accounts-database-api"))
     implementation(project(":palace-adobe-extensions"))
@@ -15,6 +18,7 @@ dependencies {
     implementation(project(":palace-books-formats-api"))
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-content-api"))
+    implementation(project(":palace-diagnostics-api"))
     implementation(project(":palace-links"))
     implementation(project(":palace-opds-core"))
     implementation(project(":palace-patron"))
@@ -30,6 +34,7 @@ dependencies {
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
     implementation(libs.io7m.junreachable)
+    implementation(libs.io7m.verona)
     implementation(libs.irradia.mime.api)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)

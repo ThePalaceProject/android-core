@@ -16,7 +16,7 @@ internal object DBQAccountProviderDescriptionIDSet : DBQAccountProviderDescripti
 
   override fun execute(
     transaction: DBTransactionType,
-    parameters: Unit
+    parameters: Unit,
   ): Set<URI> =
     transaction.connection.connection
       .prepareStatement(queryText)
@@ -28,7 +28,7 @@ internal object DBQAccountProviderDescriptionIDSet : DBQAccountProviderDescripti
 
   private fun parseResults(
     transaction: DBTransactionType,
-    resultSet: ResultSet
+    resultSet: ResultSet,
   ): Set<URI> {
     val data = mutableSetOf<URI>()
     while (resultSet.next()) {

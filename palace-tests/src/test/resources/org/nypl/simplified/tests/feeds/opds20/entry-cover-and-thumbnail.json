@@ -1,0 +1,27 @@
+{
+  "type": "feed",
+  "metadata": {
+    "title": "Test Feed"
+  },
+  "publications": [
+    {
+      "type": "publication",
+      "metadata": {
+        "identifier": "urn:isbn:9999999999",
+        "title": "Book With Images"
+      },
+      "links": [
+        {
+          "href": "https://example.com/cover.jpg",
+          "type": "image/jpeg",
+          "rel": "http://opds-spec.org/image"
+        },
+        {
+          "href": "https://example.com/thumb.jpg",
+          "type": "image/jpeg",
+          "rel": "http://opds-spec.org/image/thumbnail"
+        }
+      ]
+    }
+  ]
+}

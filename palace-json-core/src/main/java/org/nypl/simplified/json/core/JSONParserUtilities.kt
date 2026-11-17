@@ -30,7 +30,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun checkObject(
     key: String?,
-    n: JsonNode
+    n: JsonNode,
   ): ObjectNode =
     when (n.nodeType) {
       JsonNodeType.ARRAY,
@@ -40,7 +40,8 @@ object JSONParserUtilities {
       JsonNodeType.NULL,
       JsonNodeType.NUMBER,
       JsonNodeType.POJO,
-      JsonNodeType.STRING -> {
+      JsonNodeType.STRING,
+      -> {
         val sb = StringBuilder(128)
         if (key != null) {
           sb.append("Expected: A key '")
@@ -76,7 +77,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun checkArray(
     key: String?,
-    n: JsonNode
+    n: JsonNode,
   ): ArrayNode =
     when (n.nodeType) {
       JsonNodeType.ARRAY -> {
@@ -90,7 +91,8 @@ object JSONParserUtilities {
       JsonNodeType.NUMBER,
       JsonNodeType.POJO,
       JsonNodeType.OBJECT,
-      JsonNodeType.STRING -> {
+      JsonNodeType.STRING,
+      -> {
         val sb = StringBuilder(128)
         if (key != null) {
           sb.append("Expected: A key '")
@@ -132,7 +134,8 @@ object JSONParserUtilities {
       JsonNodeType.NULL,
       JsonNodeType.NUMBER,
       JsonNodeType.POJO,
-      JsonNodeType.OBJECT -> {
+      JsonNodeType.OBJECT,
+      -> {
         val sb = StringBuilder(128)
         sb.append("Expected: A value of type String\n")
         sb.append("Got: A value of type ")
@@ -153,7 +156,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getArray(
     s: ObjectNode,
-    key: String
+    key: String,
   ): ArrayNode {
     val n = getNode(s, key)
     return when (n.nodeType) {
@@ -168,7 +171,8 @@ object JSONParserUtilities {
       JsonNodeType.NUMBER,
       JsonNodeType.POJO,
       JsonNodeType.STRING,
-      JsonNodeType.OBJECT -> {
+      JsonNodeType.OBJECT,
+      -> {
         val sb = StringBuilder(128)
         sb.append("Expected: A key '")
         sb.append(key)
@@ -192,7 +196,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getArrayOrNull(
     s: ObjectNode,
-    key: String
+    key: String,
   ): ArrayNode? =
     if (s.has(key)) {
       getArray(s, key)
@@ -211,7 +215,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getBoolean(
     o: ObjectNode,
-    key: String
+    key: String,
   ): Boolean {
     val v = getNode(o, key)
     return when (v.nodeType) {
@@ -222,7 +226,8 @@ object JSONParserUtilities {
       JsonNodeType.OBJECT,
       JsonNodeType.POJO,
       JsonNodeType.STRING,
-      JsonNodeType.NUMBER -> {
+      JsonNodeType.NUMBER,
+      -> {
         val sb = StringBuilder(128)
         sb.append("Expected: A key '")
         sb.append(key)
@@ -250,7 +255,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getInteger(
     n: ObjectNode,
-    key: String
+    key: String,
   ): Int {
     val v = getNode(n, key)
     return when (v.nodeType) {
@@ -261,7 +266,8 @@ object JSONParserUtilities {
       JsonNodeType.NULL,
       JsonNodeType.OBJECT,
       JsonNodeType.POJO,
-      JsonNodeType.STRING -> {
+      JsonNodeType.STRING,
+      -> {
         val sb = StringBuilder(128)
         sb.append("Expected: A key '")
         sb.append(key)
@@ -289,7 +295,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getDouble(
     n: ObjectNode,
-    key: String
+    key: String,
   ): Double {
     val v = getNode(n, key)
     return when (v.nodeType) {
@@ -300,7 +306,8 @@ object JSONParserUtilities {
       JsonNodeType.NULL,
       JsonNodeType.OBJECT,
       JsonNodeType.POJO,
-      JsonNodeType.STRING -> {
+      JsonNodeType.STRING,
+      -> {
         val sb = StringBuilder(128)
         sb.append("Expected: A key '")
         sb.append(key)
@@ -328,7 +335,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getNode(
     s: ObjectNode,
-    key: String
+    key: String,
   ): JsonNode {
     if (s.has(key)) {
       return s[key]
@@ -352,7 +359,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getObject(
     s: ObjectNode,
-    key: String
+    key: String,
   ): ObjectNode {
     val n = getNode(s, key)
     return checkObject(key, n)
@@ -369,7 +376,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getObjectOrNull(
     s: ObjectNode,
-    key: String
+    key: String,
   ): ObjectNode? =
     if (s.has(key)) {
       getObject(s, key)
@@ -387,7 +394,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getString(
     s: ObjectNode,
-    key: String
+    key: String,
   ): String {
     val v = getNode(s, key)
     return when (v.nodeType) {
@@ -398,7 +405,8 @@ object JSONParserUtilities {
       JsonNodeType.NULL,
       JsonNodeType.NUMBER,
       JsonNodeType.OBJECT,
-      JsonNodeType.POJO -> {
+      JsonNodeType.POJO,
+      -> {
         val sb = StringBuilder(128)
         sb.append("Expected: A key '")
         sb.append(key)
@@ -425,7 +433,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getIntegerOrNull(
     n: ObjectNode,
-    key: String
+    key: String,
   ): Int? =
     if (n.has(key)) {
       getInteger(n, key)
@@ -445,7 +453,7 @@ object JSONParserUtilities {
   fun getIntegerDefault(
     n: ObjectNode,
     key: String,
-    defaultValue: Int
+    defaultValue: Int,
   ): Int {
     val r = getIntegerOrNull(n, key)
     return if (r == null) {
@@ -465,7 +473,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getDoubleOrNull(
     n: ObjectNode,
-    key: String
+    key: String,
   ): Double? =
     if (n.has(key)) {
       getDouble(n, key)
@@ -484,7 +492,7 @@ object JSONParserUtilities {
   fun getDoubleDefault(
     n: ObjectNode,
     key: String,
-    defaultValue: Double
+    defaultValue: Double,
   ): Double {
     val r = getDoubleOrNull(n, key)
     return if (r == null) {
@@ -505,7 +513,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getStringOrNull(
     n: ObjectNode,
-    key: String
+    key: String,
   ): String? =
     if (n.has(key)) {
       if (n[key].isNull) {
@@ -529,7 +537,7 @@ object JSONParserUtilities {
   fun getStringDefault(
     n: ObjectNode,
     key: String,
-    defaultValue: String
+    defaultValue: String,
   ): String {
     val r = getStringOrNull(n, key)
     return if (r == null) {
@@ -550,7 +558,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getTimestamp(
     s: ObjectNode,
-    key: String
+    key: String,
   ): DateTime =
     try {
       ISODateTimeFormat
@@ -561,8 +569,9 @@ object JSONParserUtilities {
       throw JSONParseException(
         String.format(
           "Could not parse RFC3999 date for key '%s'",
-          key
-        ), e
+          key,
+        ),
+        e,
       )
     }
 
@@ -577,7 +586,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getTimestampOrNull(
     n: ObjectNode,
-    key: String
+    key: String,
   ): DateTime? =
     if (n.has(key)) {
       if (n[key].isNull) {
@@ -600,7 +609,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getURIOrNull(
     n: ObjectNode,
-    key: String
+    key: String,
   ): URI? =
     if (n.has(key)) {
       if (n[key].isNull) {
@@ -623,7 +632,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getURI(
     n: ObjectNode,
-    key: String
+    key: String,
   ): URI =
     try {
       URI(getString(n, key).trim { it <= ' ' })
@@ -643,7 +652,7 @@ object JSONParserUtilities {
   fun getURIDefault(
     n: ObjectNode,
     key: String,
-    defaultValue: URI
+    defaultValue: URI,
   ): URI {
     val r = getURIOrNull(n, key)
     return if (r == null) {
@@ -667,7 +676,7 @@ object JSONParserUtilities {
   fun getBooleanDefault(
     n: ObjectNode,
     key: String,
-    v: Boolean
+    v: Boolean,
   ): Boolean =
     if (n.has(key)) {
       getBoolean(n, key)
@@ -686,7 +695,7 @@ object JSONParserUtilities {
   @Throws(JSONParseException::class)
   fun getBigInteger(
     n: ObjectNode,
-    key: String
+    key: String,
   ): BigInteger {
     val v = getNode(n, key)
     return when (v.nodeType) {
@@ -697,7 +706,8 @@ object JSONParserUtilities {
       JsonNodeType.NULL,
       JsonNodeType.OBJECT,
       JsonNodeType.POJO,
-      JsonNodeType.STRING -> {
+      JsonNodeType.STRING,
+      -> {
         val sb = StringBuilder(128)
         sb.append("Expected: A key '")
         sb.append(key)
@@ -731,7 +741,7 @@ object JSONParserUtilities {
   fun getBigIntegerDefault(
     node: ObjectNode,
     key: String,
-    defaultValue: BigInteger
+    defaultValue: BigInteger,
   ): BigInteger =
     if (node.has(key)) {
       getBigInteger(node, key)

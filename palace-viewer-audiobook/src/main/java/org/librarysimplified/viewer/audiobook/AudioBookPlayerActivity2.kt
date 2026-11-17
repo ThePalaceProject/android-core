@@ -63,8 +63,9 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.thepalaceproject.palace.battery.BatteryModel
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 
 class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_base) {
   private val logger =
@@ -124,15 +125,18 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
     this.loadCoverImage()
 
-    val parameters = AudioBookViewerModel.parameters ?: return
+    val parameters = AudioBookViewerModel.parameters
+    if (parameters == null) {
+      return
+    }
     this.bookmarkService.bookmarkSyncAndLoad(
       accountID = parameters.accountID,
-      book = parameters.bookID
+      book = parameters.bookID,
     )
 
     this.onBackPressedDispatcher.addCallback(
       this,
-      this.backCallback
+      this.backCallback,
     )
 
     this.showBatteryOptimizerDialogIfNecessary()
@@ -150,8 +154,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           description.copy(
             preferences =
               description.preferences.copy(
-                audioBookBatteryDialogAccepted = isChecked
-              )
+                audioBookBatteryDialogAccepted = isChecked,
+              ),
           )
         }
       }
@@ -241,26 +245,29 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       is PlayerEventPlaybackProgressUpdate,
       is PlayerEventPlaybackStarted,
       is PlayerEventPlaybackStopped,
-      is PlayerEventPlaybackWaitingForAction -> {
+      is PlayerEventPlaybackWaitingForAction,
+      -> {
         // Nothing to do
       }
 
       is PlayerEventCreateBookmark -> {
-        val parameters =
-          AudioBookViewerModel.parameters ?: return
+        val parameters = AudioBookViewerModel.parameters
+        if (parameters == null) {
+          return
+        }
 
         val playerBookmark =
           PlayerBookmark(
             kind = event.kind,
             readingOrderID = event.readingOrderItem.id,
             offsetMilliseconds = event.readingOrderItemOffsetMilliseconds,
-            metadata = event.bookmarkMetadata
+            metadata = event.bookmarkMetadata,
           )
 
         this.logger.debug(
           "Creating bookmark (Kind {}, Position {})",
           playerBookmark.kind,
-          playerBookmark.position
+          playerBookmark.position,
         )
         this.bookmarkService.bookmarkCreate(
           accountID = parameters.accountID,
@@ -268,7 +275,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             AudioBookBookmarks.fromPlayerBookmark(
               feedEntry = parameters.opdsEntry,
               deviceId = "null",
-              source = playerBookmark
+              source = playerBookmark,
             ),
           ignoreRemoteFailures = true,
         )
@@ -309,8 +316,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerEventDeleteBookmark -> {
-        val parameters =
-          AudioBookViewerModel.parameters ?: return
+        val parameters = AudioBookViewerModel.parameters
+        if (parameters == null) {
+          return
+        }
 
         val playerBookmark =
           event.bookmark
@@ -318,7 +327,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           AudioBookBookmarks.fromPlayerBookmark(
             feedEntry = parameters.opdsEntry,
             deviceId = "null",
-            source = playerBookmark
+            source = playerBookmark,
           )
         this.bookmarkService.bookmarkDelete(
           accountID = parameters.accountID,
@@ -341,8 +350,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       is PlayerEventPlaybackRateChanged -> {
-        val parameters =
-          AudioBookViewerModel.parameters ?: return
+        val parameters = AudioBookViewerModel.parameters
+        if (parameters == null) {
+          return
+        }
 
         this.profiles.profileUpdate { description ->
           description.copy(
@@ -350,9 +361,9 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
               description.preferences.copy(
                 playbackRates =
                   description.preferences.playbackRates.plus(
-                    Pair(parameters.bookID.value(), event.rate)
-                  )
-              )
+                    Pair(parameters.bookID.value(), event.rate),
+                  ),
+              ),
           )
         }
       }
@@ -363,8 +374,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onModelStateEvent(state: PlayerModelState) {
     PlayerUIThread.checkIsUIThread()
 
-    val bookParameters =
-      AudioBookViewerModel.parameters ?: return
+    val bookParameters = AudioBookViewerModel.parameters
+    if (bookParameters == null) {
+      return
+    }
 
     when (state) {
       is PlayerModelState.PlayerBookOpenFailed -> {
@@ -394,7 +407,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             accountID = bookParameters.accountID,
             bookId = PlayerPalaceID(bookParameters.opdsEntry.id),
             libraryId = bookParameters.accountProviderID.toString(),
-            timeTrackingUri = timeTrackingUri
+            timeTrackingUri = timeTrackingUri,
           )
         } else {
           this.logger.debug("Book has no time tracking URI. No time tracking will occur.")
@@ -441,7 +454,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
   private fun handleBookmarks(
     state: PlayerModelState.PlayerOpen,
-    bookParameters: AudioBookPlayerParameters
+    bookParameters: AudioBookPlayerParameters,
   ) {
     try {
       val bookmarksAll =
@@ -452,7 +465,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         bookmarksForAccount[bookParameters.bookID] ?: BookmarksForBook.empty(bookParameters.bookID)
 
       this.logger.debug("Assigning {} bookmarks.", bookmarks.bookmarks.size)
-      val lastRead = this.assignBookmarks(bookmarks) ?: return
+      val lastRead = this.assignBookmarks(bookmarks)
+      if (lastRead == null) {
+        return
+      }
 
       if (state.positionOnOpen != null) {
         this.logger.debug("Player already has a saved last-read position.")
@@ -466,15 +482,27 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       AudioBookViewerModel.appliedLastReadBookmarkMigration = true
       PlayerModel.movePlayheadTo(lastRead.position)
     } catch (e: Throwable) {
-      MDC.put("Ticket", "PP-2680")
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.AUDIOBOOK_BOOKMARK_TIMEOUT,
+        data =
+          mapOf(
+            Pair("Ticket", "PP-2680"),
+            Pair("AccountID", bookParameters.accountID.uuid.toString()),
+            Pair("BookID", bookParameters.bookID.value()),
+          ),
+        throwable = e,
+      )
       this.logger.error("Timed out waiting for audiobooks bookmarks!")
-      MDC.remove("Ticket")
     }
   }
 
   private fun setPlaybackRateFromPreferencesIfRequired() {
-    val bookParameters =
-      AudioBookViewerModel.parameters ?: return
+    val bookParameters = AudioBookViewerModel.parameters
+    if (bookParameters == null) {
+      return
+    }
     val preferencesRate =
       this.profiles
         .profileCurrent()
@@ -493,7 +521,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
   private fun compareBookmarks(
     x: PlayerBookmark,
-    y: PlayerBookmark
+    y: PlayerBookmark,
   ): Int {
     val c = x.readingOrderID.text.compareTo(y.readingOrderID.text)
     if (c == 0) {
@@ -517,7 +545,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   }
 
   private fun loadCoverImage() {
-    val parameters = AudioBookViewerModel.parameters ?: return
+    val parameters = AudioBookViewerModel.parameters
+    if (parameters == null) {
+      return
+    }
 
     /*
      * Set the cover image (loading it asynchronously).
@@ -528,7 +559,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       this.imageLoader.loadCoverAsBitmap(
         source = coverURI,
         onBitmapLoaded = PlayerModel::setCoverImage,
-        defaultResource = R.drawable.empty
+        defaultResource = R.drawable.empty,
       )
     }
   }
@@ -536,16 +567,39 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onManifestParseFailed(state: PlayerModelState.PlayerManifestParseFailed) {
     this.logger.error("onManifestParseFailed: {}", state)
 
+    val bookParameters = AudioBookViewerModel.parameters
+    if (bookParameters == null) {
+      return
+    }
+
     val task = TaskRecorder.create()
     task.beginNewStep("Parsing manifest…")
 
     val extraMessages =
       state.failure.map { error -> "${error.line}:${error.column}: ${error.message}" }
 
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "manifestParse"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("Details", extraMessages.joinToString("; ")),
+        ),
+    )
+
     task.currentStepFailed(
       message = "Parsing failed.",
       errorCode = "error-manifest-parse",
-      extraMessages = extraMessages
+      extraMessages = extraMessages,
     )
 
     val alert = MaterialAlertDialogBuilder(this)
@@ -568,7 +622,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         body = "",
         subject = "[palace-audiobook-error-report]",
         attributes = sortedMapOf(),
-        taskSteps = result.steps
+        taskSteps = result.steps,
       )
 
     this.switchFragment(ErrorPageFragment())
@@ -577,13 +631,37 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onBookOpenFailed(state: PlayerModelState.PlayerBookOpenFailed) {
     this.logger.error("onBookOpenFailed: {}", state)
 
+    val bookParameters = AudioBookViewerModel.parameters
+    if (bookParameters == null) {
+      return
+    }
+
     val task = TaskRecorder.create()
     task.beginNewStep("Opening book…")
     task.currentStepFailed(
       message = state.message,
       errorCode = "error-book-open",
       exception = state.exception,
-      extraMessages = listOf()
+      extraMessages = listOf(),
+    )
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "bookOpen"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("ExceptionType", state.exception.javaClass.name),
+        ),
+      throwable = state.exception,
     )
 
     val alert = MaterialAlertDialogBuilder(this)
@@ -602,6 +680,11 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onManifestDownloadFailed(state: PlayerModelState.PlayerManifestDownloadFailed) {
     this.logger.error("onManifestDownloadFailed: {}", state)
 
+    val bookParameters = AudioBookViewerModel.parameters
+    if (bookParameters == null) {
+      return
+    }
+
     val task = TaskRecorder.create()
     task.beginNewStep("Downloading manifest…")
     val serverData = state.failure.serverData
@@ -614,7 +697,25 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     task.currentStepFailed(
       message = state.failure.message,
       errorCode = "error-manifest-download",
-      extraMessages = listOf()
+      extraMessages = listOf(),
+    )
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "manifestDownload"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("Details", state.failure.message),
+        ),
     )
 
     val alert = MaterialAlertDialogBuilder(this)
@@ -633,12 +734,35 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private fun onManifestLicenseChecksFailed(state: PlayerModelState.PlayerManifestLicenseChecksFailed) {
     this.logger.error("onManifestLicenseChecksFailed: {}", state)
 
+    val bookParameters = AudioBookViewerModel.parameters
+    if (bookParameters == null) {
+      return
+    }
+
     val task = TaskRecorder.create()
     task.beginNewStep("Checking license…")
     task.currentStepFailed(
       message = "License checks failed.",
       errorCode = "error-manifest-license",
-      extraMessages = state.messages
+      extraMessages = state.messages,
+    )
+
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.AUDIOBOOK_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "manifestLicense"),
+          Pair("AccountInternalID", bookParameters.accountID.uuid.toString()),
+          Pair("AccountProviderID", bookParameters.accountProviderID.toString()),
+          Pair("BookID", bookParameters.opdsEntry.id),
+          Pair("BookInternalID", bookParameters.bookID.value()),
+          Pair("BookTitle", bookParameters.opdsEntry.title),
+          Pair("BookPublisher", bookParameters.opdsEntry.publisher.orEmpty()),
+          Pair("BookDRM", bookParameters.drmInfo.kind.name),
+          Pair("Details", state.messages.joinToString("; ")),
+        ),
     )
 
     val alert = MaterialAlertDialogBuilder(this)
@@ -713,7 +837,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
             message = status.message,
             errorCode = "error-download",
             exception = status.exception,
-            extraMessages = listOf()
+            extraMessages = listOf(),
           )
         }
       }

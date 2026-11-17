@@ -9,6 +9,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "SIMPLIFIED_VERSION", "\"${rootProject.ext["VERSION_NAME"]}\"")
+        buildConfigField("String", "ADOBE_DRM_PROVIDER_VERSION", "\"${libs.versions.palace.drm.adobe.get()}\"")
     }
 }
 
@@ -22,6 +23,7 @@ dependencies {
     implementation(libs.google.failureaccess)
     implementation(libs.google.guava)
     implementation(libs.io7m.junreachable)
+    implementation(libs.io7m.verona)
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)
     implementation(libs.joda.time)

@@ -13,7 +13,7 @@ import java.util.Properties
 
 class MainOverdriveSecretService private constructor(
   override val clientKey: String?,
-  override val clientPass: String?
+  override val clientPass: String?,
 ) : AudioBookOverdriveSecretServiceType {
   companion object {
     private val logger =
@@ -41,7 +41,7 @@ class MainOverdriveSecretService private constructor(
 
       return MainOverdriveSecretService(
         clientKey = clientKey,
-        clientPass = clientPass
+        clientPass = clientPass,
       )
     }
   }

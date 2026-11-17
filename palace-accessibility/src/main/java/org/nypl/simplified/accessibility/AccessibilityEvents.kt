@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
  */
 
 class AccessibilityEvents(
-  context: Context
+  context: Context,
 ) : AccessibilityEventsType {
   private val logger =
     LoggerFactory.getLogger(AccessibilityEvents::class.java)

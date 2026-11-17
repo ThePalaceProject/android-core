@@ -19,7 +19,7 @@ data class TaskStep(
    * A humanly-readable, localized description of the resolution task step.
    */
 
-  var resolution: TaskStepResolution = TaskStepResolution.TaskStepSucceeded("")
+  var resolution: TaskStepResolution = TaskStepResolution.TaskStepSucceeded(""),
 ) : Serializable,
   PresentableType {
   override val message: String

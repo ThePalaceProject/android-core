@@ -5,10 +5,10 @@ plugins {
 dependencies {
     coreLibraryDesugaring(libs.android.desugaring)
 
+    implementation(project(":palace-feeds-api"))
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-books-api"))
     implementation(project(":palace-books-formats-api"))
-    implementation(project(":palace-opds-core"))
 
     implementation(libs.irradia.mime.api)
     implementation(libs.irradia.mime.vanilla)

@@ -31,6 +31,6 @@ interface BorrowSubtaskFactoryType {
     type: MIMEType,
     target: Link?,
     account: AccountReadableType?,
-    remaining: List<MIMEType>
+    remaining: List<MIMEType>,
   ): Boolean
 }

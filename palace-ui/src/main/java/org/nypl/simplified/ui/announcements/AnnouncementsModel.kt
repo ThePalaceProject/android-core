@@ -33,7 +33,7 @@ object AnnouncementsModel {
   init {
     MainAttributes.wrapAttribute(
       this.announcementsUnacknowledgedAttribute,
-      this.announcementsUnacknowledgedAttributeUI
+      this.announcementsUnacknowledgedAttributeUI,
     )
   }
 
@@ -41,7 +41,7 @@ object AnnouncementsModel {
     val announcement: Announcement,
     val providerTitle: String,
     val index: Int,
-    val count: Int
+    val count: Int,
   )
 
   val announcements: AttributeReadableType<SortedMap<UUID, EnumeratedAnnouncement>> =
@@ -63,7 +63,7 @@ object AnnouncementsModel {
         .subscribe { _ -> this.onProfileUpdated(profiles) }
 
     this.subscriptions.add(
-      AutoCloseable { subscription.dispose() }
+      AutoCloseable { subscription.dispose() },
     )
 
     this.onProfileUpdated(profiles)
@@ -88,7 +88,7 @@ object AnnouncementsModel {
           .plus(id)
 
       account.setPreferences(
-        account.preferences.copy(announcementsAcknowledged = newList.toList())
+        account.preferences.copy(announcementsAcknowledged = newList.toList()),
       )
     } catch (e: Throwable) {
       this.logger.debug("Failed to update announcements: ", e)
@@ -124,14 +124,14 @@ object AnnouncementsModel {
               announcement = entry,
               providerTitle = account.provider.displayName,
               index = index,
-              count = count
+              count = count,
             )
           ++index
         }
       }
 
       this.announcementsUnacknowledgedAttribute.set(
-        this.announcementsUnacknowledged.toSortedMap()
+        this.announcementsUnacknowledged.toSortedMap(),
       )
     } catch (e: Throwable) {
       this.logger.debug("Failed to update announcements: ", e)

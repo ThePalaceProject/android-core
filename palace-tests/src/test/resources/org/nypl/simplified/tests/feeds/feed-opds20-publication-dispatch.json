@@ -1,0 +1,15 @@
+{
+  "type": "publication",
+  "metadata": {
+    "identifier": "urn:test:revoke-book",
+    "title": "Revoke Publication Book",
+    "author": [{"name": "Test Author"}]
+  },
+  "links": [
+    {
+      "href": "https://example.com/revoke-book.epub",
+      "type": "application/epub+zip",
+      "rel": "http://opds-spec.org/acquisition/borrow"
+    }
+  ]
+}

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
  */
 
 class BookFormatSupport private constructor(
-  private val parameters: BookFormatSupportParameters
+  private val parameters: BookFormatSupportParameters,
 ) : BookFormatSupportType {
   private val logger =
     LoggerFactory.getLogger(BookFormatSupport::class.java)

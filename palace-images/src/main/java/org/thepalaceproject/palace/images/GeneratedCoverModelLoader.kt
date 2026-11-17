@@ -8,7 +8,7 @@ import com.bumptech.glide.signature.ObjectKey
 import java.net.URI
 
 class GeneratedCoverModelLoader(
-  private val coverGenerator: BookCoverGeneratorType
+  private val coverGenerator: BookCoverGeneratorType,
 ) : ModelLoader<URI, Bitmap> {
   override fun handles(uri: URI): Boolean = uri.scheme == "generated-cover"
 
@@ -16,17 +16,18 @@ class GeneratedCoverModelLoader(
     uri: URI,
     width: Int,
     height: Int,
-    options: com.bumptech.glide.load.Options
+    options: com.bumptech.glide.load.Options,
   ): ModelLoader.LoadData<Bitmap> =
     ModelLoader.LoadData(
       ObjectKey(uri),
-      GeneratedCoverDataFetcher(coverGenerator, uri, width, height)
+      GeneratedCoverDataFetcher(coverGenerator, uri, width, height),
     )
 
   class Factory(
-    private val coverGenerator: BookCoverGeneratorType
+    private val coverGenerator: BookCoverGeneratorType,
   ) : ModelLoaderFactory<URI, Bitmap> {
-    override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<URI, Bitmap> = GeneratedCoverModelLoader(coverGenerator)
+    override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<URI, Bitmap> =
+      GeneratedCoverModelLoader(coverGenerator)
 
     override fun teardown() {
       // No resources to clean up.

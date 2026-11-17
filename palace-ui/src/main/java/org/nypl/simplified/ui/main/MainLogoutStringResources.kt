@@ -9,14 +9,14 @@ import org.nypl.simplified.accounts.api.AccountLogoutStringResourcesType
  */
 
 class MainLogoutStringResources(
-  private val resources: Resources
+  private val resources: Resources,
 ) : AccountLogoutStringResourcesType {
   override val logoutUnexpectedException: String
     get() = this.resources.getString(R.string.unexpectedException)
 
   override fun logoutDeactivatingDeviceAdobeFailed(
     errorCode: String,
-    e: Throwable
+    e: Throwable,
   ): String = this.resources.getString(R.string.logoutDeactivatingDeviceAdobeFailed, errorCode, e.javaClass.simpleName)
 
   override val logoutDeviceDeactivationPostDeviceManagerFinished: String
@@ -43,7 +43,8 @@ class MainLogoutStringResources(
   override val logoutClearingBookDatabaseFailed: String
     get() = this.resources.getString(R.string.logoutClearingBookDatabaseFailed)
 
-  override fun logoutUpdatingOPDSEntry(bookID: String): String = this.resources.getString(R.string.logoutUpdatingOpdsEntry, bookID)
+  override fun logoutUpdatingOPDSEntry(bookID: String): String =
+    this.resources.getString(R.string.logoutUpdatingOpdsEntry, bookID)
 
   override val logoutNoAlternateLinkInDatabase: String
     get() = this.resources.getString(R.string.logoutNoAlternateLinkInDatabase)

@@ -10,7 +10,7 @@ import java.net.URI
 
 data class OPDSAvailabilityHeldReady constructor(
   override val endDate: DateTime?,
-  val revoke: URI?
+  val revoke: URI?,
 ) : OPDSAvailabilityType {
   override fun toString(): String {
     val fmt = ISODateTimeFormat.dateTime()
@@ -38,11 +38,11 @@ data class OPDSAvailabilityHeldReady constructor(
     @JvmStatic
     fun get(
       endDate: DateTime?,
-      revoke: URI?
+      revoke: URI?,
     ): OPDSAvailabilityHeldReady =
       OPDSAvailabilityHeldReady(
         endDate = endDate,
-        revoke = revoke
+        revoke = revoke,
       )
   }
 }

@@ -20,7 +20,7 @@ object AnnouncementJSON {
 
   fun serializeToJSON(
     objectMapper: ObjectMapper,
-    announcement: Announcement
+    announcement: Announcement,
   ): ObjectNode {
     val node = objectMapper.createObjectNode()
     node.put("id", announcement.id.toString())
@@ -30,7 +30,7 @@ object AnnouncementJSON {
         "expires",
         ISODateTimeFormat
           .dateTime()
-          .print(it.toDateTime(DateTimeZone.UTC))
+          .print(it.toDateTime(DateTimeZone.UTC)),
       )
     }
     return node
@@ -57,7 +57,7 @@ object AnnouncementJSON {
     return Announcement(
       id = id,
       content = text,
-      expires = expires
+      expires = expires,
     )
   }
 
@@ -66,5 +66,6 @@ object AnnouncementJSON {
    */
 
   @Throws(JSONParseException::class)
-  fun deserializeFromJSON(node: JsonNode): Announcement = deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
+  fun deserializeFromJSON(node: JsonNode): Announcement =
+    deserializeFromJSON(JSONParserUtilities.checkObject(null, node))
 }

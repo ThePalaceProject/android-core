@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.io.TempDir
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.time_tracking.PlayerTimeTracked
+import org.mockito.Mockito
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
@@ -28,6 +29,7 @@ import org.nypl.simplified.tests.mocking.FakeTimeTrackingHTTPCalls
 import org.nypl.simplified.tests.mocking.MockAccount
 import org.nypl.simplified.tests.mocking.MockProfile
 import org.nypl.simplified.tests.mocking.MockProfilesController
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
@@ -92,7 +94,8 @@ class TimeTrackingSenderTest {
         httpCalls = this.httpCalls,
         frequency = Duration.ofMillis(100L),
         debugDirectory = debugDirectory,
-        inputDirectory = inboxDirectory
+        inputDirectory = inboxDirectory,
+        diagnostics = Mockito.mock(DiagnosticsServiceType::class.java)
       )
 
     this.resources.add(AutoCloseable { this.sender.close() })

@@ -46,7 +46,9 @@ class MockProfile(
         isLCPManualPassphraseEnabled = false,
         audioBookPlaybackSkipIntervalForwardMs = 30_000L,
         audioBookPlaybackSkipIntervalBackwardMs = 30_000L,
-        audioBookBatteryDialogAccepted = false
+        audioBookBatteryDialogAccepted = false,
+        showBookCoverDebugLabels = false,
+        preferOPDS20 = false
       ),
       attributes = ProfileAttributes(sortedMapOf())
     )

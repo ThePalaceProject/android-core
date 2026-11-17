@@ -40,12 +40,12 @@ import javax.xml.parsers.ParserConfigurationException
  */
 
 class OPDSFeedParser private constructor(
-  private val entryParser: OPDSAcquisitionFeedEntryParserType
+  private val entryParser: OPDSAcquisitionFeedEntryParserType,
 ) : OPDSFeedParserType {
   @Throws(OPDSParseException::class)
   override fun parse(
     uri: URI,
-    s: InputStream?
+    s: InputStream?,
   ): OPDSAcquisitionFeed {
     Objects.requireNonNull<InputStream?>(s)
 
@@ -71,8 +71,8 @@ class OPDSFeedParser private constructor(
         throw OPDSParseException(
           String.format(
             "Feed root is '%s', expected 'feed' or 'entry'",
-            root_e.localName
-          )
+            root_e.localName,
+          ),
         )
       } else {
         throw OPDSParseException("Feed root is not 'feed' or 'entry'")
@@ -94,15 +94,18 @@ class OPDSFeedParser private constructor(
       LOG.debug(
         "parsing completed ({}ms - parse: {}ms, interp: {}ms): {}",
         TimeUnit.MILLISECONDS.convert(
-          timeParse + timeInterp, TimeUnit.NANOSECONDS
+          timeParse + timeInterp,
+          TimeUnit.NANOSECONDS,
         ),
         TimeUnit.MILLISECONDS.convert(
-          timeParse, TimeUnit.NANOSECONDS
+          timeParse,
+          TimeUnit.NANOSECONDS,
         ),
         TimeUnit.MILLISECONDS.convert(
-          timeInterp, TimeUnit.NANOSECONDS
+          timeInterp,
+          TimeUnit.NANOSECONDS,
         ),
-        uri
+        uri,
       )
     }
   }
@@ -110,7 +113,7 @@ class OPDSFeedParser private constructor(
   @Throws(OPDSParseException::class)
   private fun parseAsEntry(
     uri: URI,
-    e: Element
+    e: Element,
   ): OPDSAcquisitionFeed {
     LOG.debug("parsing feed as single entry: {}", uri)
 
@@ -132,7 +135,7 @@ class OPDSFeedParser private constructor(
   @Throws(OPDSParseException::class)
   private fun parseAsFeed(
     uri: URI,
-    root: Node
+    root: Node,
   ): OPDSAcquisitionFeed {
     LOG.debug("parsing feed as ordinary feed: {}", uri)
 
@@ -252,7 +255,9 @@ class OPDSFeedParser private constructor(
         // parse licensor
         run {
           if (nodeHasName(
-              child, DRM_URI, "licensor"
+              child,
+              DRM_URI,
+              "licensor",
             )
           ) {
             val e = nodeAsElement(child)
@@ -320,7 +325,7 @@ class OPDSFeedParser private constructor(
     private fun parseFacet(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): OPDSFacet? {
       val hasName = nodeHasName(e, ATOM_URI, "link")
       Preconditions.checkArgument(hasName, "Node has name 'link'")
@@ -349,15 +354,15 @@ class OPDSFeedParser private constructor(
               scrubURI(source, href),
               group,
               title,
-              groupType
+              groupType,
             )
           } catch (ex: URISyntaxException) {
             builder.addParseError(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel(FACET_URI_TEXT),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -385,13 +390,13 @@ class OPDSFeedParser private constructor(
     private fun parseNextLink(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): URI? {
       Preconditions.checkArgument(
         "link" == e.localName,
         "localname %s == %s",
         e.localName,
-        "link"
+        "link",
       )
 
       val rel = e.getAttribute("rel")
@@ -404,8 +409,8 @@ class OPDSFeedParser private constructor(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel("next"),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -418,7 +423,7 @@ class OPDSFeedParser private constructor(
     @Throws(URISyntaxException::class)
     private fun scrubURI(
       base: URI,
-      text: String
+      text: String,
     ): URI {
       val unresolvedURI = URI(text.trim { it <= ' ' })
       if (unresolvedURI.isAbsolute) {
@@ -430,7 +435,7 @@ class OPDSFeedParser private constructor(
     private fun parseSearchLink(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): OPDSSearchLink? {
       val hasName = nodeHasName(e, ATOM_URI, "link")
       Preconditions.checkArgument(hasName, "Node has name 'link'")
@@ -452,8 +457,8 @@ class OPDSFeedParser private constructor(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel("search"),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -474,7 +479,7 @@ class OPDSFeedParser private constructor(
     private fun parseTermsOfService(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): URI? {
       val hasName = nodeHasName(e, ATOM_URI, "link")
       Preconditions.checkArgument(hasName, "Node has name 'link'")
@@ -492,8 +497,8 @@ class OPDSFeedParser private constructor(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel("terms-of-service"),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -506,7 +511,7 @@ class OPDSFeedParser private constructor(
     private fun parseAbout(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): URI? {
       val hasName = nodeHasName(e, ATOM_URI, "link")
       Preconditions.checkArgument(hasName, "Node has name 'link'")
@@ -523,8 +528,8 @@ class OPDSFeedParser private constructor(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel("about"),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -537,7 +542,7 @@ class OPDSFeedParser private constructor(
     private fun parsePrivacyPolicy(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): URI? {
       val hasName = nodeHasName(e, ATOM_URI, "link")
       Preconditions.checkArgument(hasName, "Node has name 'link'")
@@ -555,8 +560,8 @@ class OPDSFeedParser private constructor(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel("privacy-policy"),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -568,7 +573,7 @@ class OPDSFeedParser private constructor(
     private fun parseAuthenticationDocumentLink(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): URI? {
       val hasName = nodeHasName(e, ATOM_URI, "link")
 
@@ -587,8 +592,8 @@ class OPDSFeedParser private constructor(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel(AUTHENTICATION_DOCUMENT_RELATION_URI_TEXT),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -601,7 +606,7 @@ class OPDSFeedParser private constructor(
     private fun parseAnnotationsLink(
       source: URI,
       builder: OPDSAcquisitionFeedBuilderType,
-      e: Element
+      e: Element,
     ): URI? {
       val hasName = nodeHasName(e, ATOM_URI, "link")
       Preconditions.checkArgument(hasName, "Node has name 'link'")
@@ -619,8 +624,8 @@ class OPDSFeedParser private constructor(
               invalidURI(
                 source,
                 hrefAttributeOfLinkRel("http://www.w3.org/ns/oa#annotationService"),
-                ex
-              )
+                ex,
+              ),
             )
             return null
           }
@@ -635,7 +640,7 @@ class OPDSFeedParser private constructor(
     private fun invalidURI(
       source: URI,
       sourceLocation: String,
-      e: Exception
+      e: Exception,
     ): ParseError {
       val builder = StringBuilder(128)
       builder.append("Could not parse URI: ")
@@ -648,7 +653,7 @@ class OPDSFeedParser private constructor(
         builder.toString(),
         -1,
         0,
-        e
+        e,
       )
     }
   }

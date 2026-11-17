@@ -10,11 +10,11 @@ class GeneratedCoverDataFetcher(
   private val coverGenerator: BookCoverGeneratorType,
   private val uri: URI,
   private val width: Int,
-  private val height: Int
+  private val height: Int,
 ) : DataFetcher<Bitmap> {
   override fun loadData(
     priority: Priority,
-    callback: DataFetcher.DataCallback<in Bitmap>
+    callback: DataFetcher.DataCallback<in Bitmap>,
   ) {
     val bitmap = coverGenerator.generateImage(uri, width, height)
     callback.onDataReady(bitmap)

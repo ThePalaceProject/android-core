@@ -1,31 +1,26 @@
 package org.nypl.simplified.feeds.api
 
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetOPDS12Single.Companion.ENTRYPOINT_FACET_GROUP_TYPE
-import org.nypl.simplified.feeds.api.FeedFacet.FeedFacetSingle
-
 /**
  * Functions to process facets.
  */
-
 object FeedFacets {
   private val specialFacets =
     mapOf(
       Pair("SORT BY", 0),
       Pair("AVAILABILITY", 1),
       Pair("DISTRIBUTOR", 2),
-      Pair("COLLECTION NAME", 3)
+      Pair("COLLECTION NAME", 3),
     )
 
   /**
    * A special comparator for facets. We want to ensure that some facets are displayed
    * first. Facets that aren't "special" are simply in alphabetical order afterwards.
    */
-
   val facetComparator: Comparator<in String> =
     object : Comparator<String> {
       override fun compare(
         p0: String,
-        p1: String
+        p1: String,
       ): Int {
         val p0u = p0.uppercase()
         val p1u = p1.uppercase()
@@ -55,18 +50,10 @@ object FeedFacets {
    * @param feed The feed
    * @return A list of facets, or nothing if no entry point group is available
    */
-
   @JvmStatic
-  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? =
-    when (feed) {
-      is Feed.FeedWithoutGroups -> {
-        findEntryPointFacetGroup(feed.facetsByGroup)
-      }
-
-      is Feed.FeedWithGroups -> {
-        findEntryPointFacetGroup(feed.facetsByGroup)
-      }
-    }
+  fun findEntryPointFacetGroupForFeed(feed: Feed): List<FeedFacetSingle>? {
+    return findEntryPointFacetGroup(feed.facetsByGroup)
+  }
 
   /**
    * Find the list of facets that represent an "entry point" group.
@@ -74,7 +61,6 @@ object FeedFacets {
    * @param groups The facets by group
    * @return A list of facets, or nothing if no entry point group is available
    */
-
   @JvmStatic
   fun findEntryPointFacetGroup(groups: Map<String, List<FeedFacetSingle>>): List<FeedFacetSingle>? {
     for (groupName in groups.keys) {
@@ -93,7 +79,6 @@ object FeedFacets {
   /**
    * @return `true` if all of the facet groups are "entry point" type facets
    */
-
   @JvmStatic
   fun facetGroupsAreAllEntryPoints(facetGroups: Map<String, List<FeedFacetSingle>>): Boolean =
     facetGroups.all { entry -> facetGroupIsEntryPointTyped(entry.value) }
@@ -101,22 +86,25 @@ object FeedFacets {
   /**
    * @return `true` if the given facet group is "entry point" typed
    */
-
   @JvmStatic
-  fun facetGroupIsEntryPointTyped(facets: List<FeedFacetSingle>): Boolean = facets.all { facet -> facetIsEntryPointTyped(facet) }
+  fun facetGroupIsEntryPointTyped(facets: List<FeedFacetSingle>): Boolean =
+    facets.all { facet -> facetIsEntryPointTyped(facet) }
 
   /**
    * @return `true` if the given facet is "entry point" typed
    */
-
   @JvmStatic
   fun facetIsEntryPointTyped(facet: FeedFacetSingle): Boolean =
     when (facet) {
-      is FeedFacet.FeedFacetOPDS12Single -> {
-        facet.opdsFacet.groupType == ENTRYPOINT_FACET_GROUP_TYPE
+      is FeedFacetData -> {
+        facet.groupType == FeedFacetData.ENTRYPOINT_FACET_GROUP_TYPE
       }
 
-      is FeedFacet.FeedFacetPseudo -> {
+      is FeedFacetPseudoFiltering -> {
+        false
+      }
+
+      is FeedFacetPseudoSorting -> {
         false
       }
     }

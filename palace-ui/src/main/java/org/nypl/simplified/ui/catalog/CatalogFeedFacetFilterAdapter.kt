@@ -17,7 +17,7 @@ import java.util.Objects
 
 class CatalogFeedFacetFilterAdapter :
   ListAdapter<FeedFacetModel, CatalogFeedFacetFilterAdapter.CatalogFeedFacetFilterViewHolder>(
-    diffCallback
+    diffCallback,
   ) {
   class CatalogFeedFacetFilterViewHolder(
     private val parent: View,
@@ -78,7 +78,7 @@ class CatalogFeedFacetFilterAdapter :
       object : DiffUtil.ItemCallback<FeedFacetModel>() {
         override fun areContentsTheSame(
           oldItem: FeedFacetModel,
-          newItem: FeedFacetModel
+          newItem: FeedFacetModel,
         ): Boolean {
           return if (oldItem.title == newItem.title) {
             return Objects.equals(oldItem.feedFacets, newItem.feedFacets)
@@ -89,14 +89,14 @@ class CatalogFeedFacetFilterAdapter :
 
         override fun areItemsTheSame(
           oldItem: FeedFacetModel,
-          newItem: FeedFacetModel
+          newItem: FeedFacetModel,
         ): Boolean = oldItem.title == newItem.title
       }
   }
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): CatalogFeedFacetFilterViewHolder {
     val inflater =
       LayoutInflater.from(parent.context)
@@ -104,13 +104,13 @@ class CatalogFeedFacetFilterAdapter :
       inflater.inflate(R.layout.catalog_facet_filter_element, parent, false)
 
     return CatalogFeedFacetFilterViewHolder(
-      parent = item
+      parent = item,
     )
   }
 
   override fun onBindViewHolder(
     holder: CatalogFeedFacetFilterViewHolder,
-    position: Int
+    position: Int,
   ) {
     holder.bindTo(this.getItem(position))
   }

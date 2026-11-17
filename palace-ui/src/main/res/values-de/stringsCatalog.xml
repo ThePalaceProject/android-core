@@ -2,6 +2,7 @@
 <resources>
     <string name="catalogAccessibilitySeriesLink">\"%1$s\". Tippen Sie, um alle Einträge der Serie zu sehen.</string>
     <string name="catalogAccessibilityFeedLoading">Die Liste der Bücher wird derzeit geladen.</string>
+    <string name="catalogAccessibilitySearchResultsCount">Ergebnisse gefunden: %1$d</string>
     <string name="catalogAccessibilitySearchButtonClose">Suchtaste schließen</string>
     <string name="catalogAccessibilityAccountSelection">Kontoauswahl-Button</string>
     <string name="catalogAccessibilityBookBorrow">Ausleihen-Button. Tippen Sie auf diese Schaltfläche, um „%1$s“ auszuleihen.</string>
@@ -110,4 +111,7 @@
     <string name="announcementTitle">%1$s (%2$d von %3$d)</string>
     <string name="announcementOK">OK</string>
     <string name="registryFailure">Beim Abrufen der Bibliotheken ist ein Fehler aufgetreten.\nDie Liste der Bibliotheken unten könnte unvollständig sein.</string>
+
+    <string name="wiproMigrationDownloadAgainCellular">Um weiterlesen zu können, muss dieses Buch erneut heruntergeladen werden. Sie können es jetzt über Mobilfunkdaten herunterladen, oder verbinden Sie sich mit Wi-Fi und versuchen Sie es erneut.</string>
+    <string name="wiproMigrationDownloadAgainNoNetwork">Dieses Buch muss erneut heruntergeladen werden, bevor Sie weiterlesen können. Verbinden Sie sich mit Wi-Fi oder Mobilfunkdaten und versuchen Sie es erneut.</string>
 </resources>

@@ -12,7 +12,7 @@ import java.net.URI
 class AccountProviderDescriptionSerializer internal constructor(
   private val uri: URI,
   private val stream: OutputStream,
-  private val document: AccountProviderDescription
+  private val document: AccountProviderDescription,
 ) : AccountProviderDescriptionSerializerType {
   private val mapper = ObjectMapper()
 

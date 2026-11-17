@@ -17,5 +17,5 @@ data class AnalyticsConfiguration(
    * The HTTP interface used for analytics requests, if necessary.
    */
 
-  val http: LSHTTPClientType
+  val http: LSHTTPClientType,
 )

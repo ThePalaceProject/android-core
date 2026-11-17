@@ -26,7 +26,7 @@ sealed class ProfileAccountLoginRequest {
     override val accountId: AccountID,
     val description: AccountProviderAuthenticationDescription.Basic,
     val username: AccountUsername,
-    val password: AccountPassword
+    val password: AccountPassword,
   ) : ProfileAccountLoginRequest()
 
   /**
@@ -37,7 +37,7 @@ sealed class ProfileAccountLoginRequest {
     override val accountId: AccountID,
     val description: AccountProviderAuthenticationDescription.BasicToken,
     val username: AccountUsername,
-    val password: AccountPassword
+    val password: AccountPassword,
   ) : ProfileAccountLoginRequest()
 
   /**
@@ -52,7 +52,7 @@ sealed class ProfileAccountLoginRequest {
 
   data class SAML20Initiate(
     override val accountId: AccountID,
-    val description: AccountProviderAuthenticationDescription.SAML2_0
+    val description: AccountProviderAuthenticationDescription.SAML2_0,
   ) : SAML20()
 
   /**
@@ -64,7 +64,7 @@ sealed class ProfileAccountLoginRequest {
     override val accountId: AccountID,
     val accessToken: String,
     val patronInfo: String,
-    val cookies: List<AccountCookie>
+    val cookies: List<AccountCookie>,
   ) : SAML20()
 
   /**
@@ -73,7 +73,7 @@ sealed class ProfileAccountLoginRequest {
 
   data class SAML20Cancel(
     override val accountId: AccountID,
-    val description: AccountProviderAuthenticationDescription.SAML2_0
+    val description: AccountProviderAuthenticationDescription.SAML2_0,
   ) : SAML20()
 
   /**
@@ -108,6 +108,6 @@ sealed class ProfileAccountLoginRequest {
 
   data class OIDCCancel(
     override val accountId: AccountID,
-    val description: AccountProviderAuthenticationDescription.OpenIDConnect
+    val description: AccountProviderAuthenticationDescription.OpenIDConnect,
   ) : OIDC()
 }

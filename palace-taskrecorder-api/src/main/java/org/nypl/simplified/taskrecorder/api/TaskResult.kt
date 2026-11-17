@@ -20,12 +20,12 @@ sealed class TaskResult<A> : PresentableType {
   data class Success<A>(
     val result: A,
     override val steps: List<TaskStep>,
-    override val attributes: Map<String, String>
+    override val attributes: Map<String, String>,
   ) : TaskResult<A>() {
     init {
       Preconditions.checkArgument(
         this.steps.isNotEmpty(),
-        "Must have logged at least one step"
+        "Must have logged at least one step",
       )
     }
 
@@ -39,13 +39,13 @@ sealed class TaskResult<A> : PresentableType {
 
   data class Failure<A>(
     override val steps: List<TaskStep>,
-    override val attributes: Map<String, String>
+    override val attributes: Map<String, String>,
   ) : TaskResult<A>(),
     PresentableErrorType {
     init {
       Preconditions.checkArgument(
         this.steps.isNotEmpty(),
-        "Must have logged at least one step"
+        "Must have logged at least one step",
       )
     }
 
@@ -81,14 +81,14 @@ sealed class TaskResult<A> : PresentableType {
         Success(
           result = f(this.result),
           steps = this.steps,
-          attributes = this.attributes
+          attributes = this.attributes,
         )
       }
 
       is Failure -> {
         Failure(
           steps = this.steps,
-          attributes = this.attributes
+          attributes = this.attributes,
         )
       }
     }
@@ -105,14 +105,14 @@ sealed class TaskResult<A> : PresentableType {
             Success(
               result = next.result,
               steps = this.steps.plus(next.steps),
-              attributes = mergeAttributes(this.attributes, next.attributes)
+              attributes = mergeAttributes(this.attributes, next.attributes),
             )
           }
 
           is Failure -> {
             Failure(
               steps = this.steps.plus(next.steps),
-              attributes = mergeAttributes(this.attributes, next.attributes)
+              attributes = mergeAttributes(this.attributes, next.attributes),
             )
           }
         }
@@ -121,7 +121,7 @@ sealed class TaskResult<A> : PresentableType {
       is Failure -> {
         Failure(
           steps = this.steps,
-          attributes = this.attributes
+          attributes = this.attributes,
         )
       }
     }
@@ -135,7 +135,7 @@ sealed class TaskResult<A> : PresentableType {
     fun <A> fail(
       description: String,
       resolution: String,
-      errorCode: String
+      errorCode: String,
     ): TaskResult<A> =
       Failure(
         attributes = mapOf(),
@@ -148,10 +148,10 @@ sealed class TaskResult<A> : PresentableType {
                   message = resolution,
                   errorCode = errorCode,
                   exception = null,
-                  extraMessages = listOf()
-                )
-            )
-          )
+                  extraMessages = listOf(),
+                ),
+            ),
+          ),
       )
   }
 }

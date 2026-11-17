@@ -15,7 +15,7 @@ class AnnouncementsDialog : DialogFragment(R.layout.announcements_dialog) {
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -32,7 +32,7 @@ class AnnouncementsDialog : DialogFragment(R.layout.announcements_dialog) {
 
     this.dialog?.window?.setLayout(
       WindowManager.LayoutParams.MATCH_PARENT,
-      WindowManager.LayoutParams.WRAP_CONTENT
+      WindowManager.LayoutParams.WRAP_CONTENT,
     )
 
     try {
@@ -59,7 +59,7 @@ class AnnouncementsDialog : DialogFragment(R.layout.announcements_dialog) {
           R.string.announcementTitle,
           announcement.providerTitle,
           announcement.index,
-          announcement.count
+          announcement.count,
         )
 
       this.title.text = title

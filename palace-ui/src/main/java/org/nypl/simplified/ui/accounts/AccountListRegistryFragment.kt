@@ -59,12 +59,13 @@ class AccountListRegistryFragment :
       override fun fragment(): AccountListRegistryFragment = AccountListRegistryFragment()
     }
 
-    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, AccountListRegistryFragment> = ScreenAccountRegistryList()
+    override fun createScreenDefinition(p: Unit): ScreenDefinitionType<Unit, AccountListRegistryFragment> =
+      ScreenAccountRegistryList()
   }
 
   override fun onViewCreated(
     view: View,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
 
@@ -89,10 +90,10 @@ class AccountListRegistryFragment :
           registry.refreshAsync(
             AccountProviderRegistryRefresh.Full(
               clearBeforeRefresh = true,
-              includeTestingLibraries = profiles.profileCurrent().preferences().showTestingLibraries
-            )
+              includeTestingLibraries = profiles.profileCurrent().preferences().showTestingLibraries,
+            ),
           )
-        }
+        },
       )
 
     this.accountListViews.setOnBackButtonListener { button ->
@@ -118,7 +119,7 @@ class AccountListRegistryFragment :
       Toast.makeText(
         activity,
         activity.resources.getString(R.string.settingsAddedLibrary, account.title),
-        Toast.LENGTH_LONG
+        Toast.LENGTH_LONG,
       )
     toast.show()
   }
@@ -142,18 +143,18 @@ class AccountListRegistryFragment :
     this.subscriptions.add(
       registry.accountProviderDescriptionsSortedAttribute.subscribe { _, descriptions ->
         this.accountListViews.submitAccountProviderDescriptionList(descriptions)
-      }
+      },
     )
     this.subscriptions.add(
       registry.statusAttribute.subscribe { _, status ->
         this.accountListViews.reconfigureForRegistryStatus(status)
-      }
+      },
     )
 
     this.subscriptions.add(
       AutoCloseable {
         accountSub.dispose()
-      }
+      },
     )
 
     registry.loadAsync()
@@ -221,12 +222,12 @@ class AccountListRegistryFragment :
         body = "",
         subject = "[palace-error-report]",
         attributes = accountEvent.attributes.toSortedMap(),
-        taskSteps = accountEvent.taskResult.steps
+        taskSteps = accountEvent.taskResult.steps,
       )
 
     MainNavigation.openErrorPage(
       activity = this.requireActivity(),
-      parameters = parameters
+      parameters = parameters,
     )
   }
 

@@ -16,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.runBlocking
 import org.joda.time.LocalDateTime
-import org.librarysimplified.mdc.MDCKeys
 import org.librarysimplified.r2.api.SR2ControllerType
 import org.librarysimplified.r2.api.SR2Event
 import org.librarysimplified.r2.api.SR2Event.SR2BookmarkEvent.SR2BookmarkCreated
@@ -50,6 +49,7 @@ import org.nypl.simplified.books.api.BookContentProtections
 import org.nypl.simplified.books.api.BookDRMInformation
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.api.bookmark.BookmarkKind
+import org.nypl.simplified.feeds.opds12.OPDS12FeedConverter
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
@@ -59,7 +59,8 @@ import org.readium.r2.shared.util.asset.AssetRetriever
 import org.readium.r2.shared.util.asset.ContainerAsset
 import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.io.File
 import java.io.IOException
 import java.util.ServiceLoader
@@ -78,24 +79,16 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
 
   companion object {
-    private const val ARG_PARAMETERS =
-      "org.librarysimplified.viewer.epub.readium2.Reader2Activity2.parameters"
-
     /**
      * Start a new reader for the given book.
      */
 
     fun startActivity(
       activity: Activity,
-      parameters: Reader2ActivityParameters
+      parameters: Reader2ActivityParameters,
     ) {
-      val intent = Intent(activity, Reader2Activity::class.java)
-      val bundle =
-        Bundle().apply {
-          this.putSerializable(this@Companion.ARG_PARAMETERS, parameters)
-        }
-      intent.putExtras(bundle)
-      activity.startActivity(intent)
+      Reader2Model.parameters = parameters
+      activity.startActivity(Intent(activity, Reader2Activity::class.java))
     }
   }
 
@@ -129,52 +122,46 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.subscriptions =
       CompositeDisposable()
 
-    val intent = this.intent
-    if (intent == null) {
-      this.logger.warn("ReaderActivity2 lacks an intent!")
-      this.finish()
-      return
-    }
-
-    val extras = intent.extras
-    if (extras == null) {
-      this.logger.warn("ReaderActivity2 intent lacks extras!")
-      this.finish()
-      return
-    }
-
-    val params = extras.getSerializable(ARG_PARAMETERS) as Reader2ActivityParameters?
+    val params = Reader2Model.parameters
     if (params == null) {
-      this.logger.warn("ReaderActivity2 intent lacks parameters!")
+      this.logger.warn("ReaderActivity2 lacks parameters!")
       this.finish()
       return
     }
 
     this.parameters = params
-    MDC.put(
-      MDCKeys.ACCOUNT_INTERNAL_ID,
-      this.parameters.accountId.uuid
-        .toString()
-    )
-    MDC.put(MDCKeys.BOOK_INTERNAL_ID, this.parameters.bookId.value())
-    MDC.put(MDCKeys.BOOK_TITLE, this.parameters.entry.feedEntry.title)
-    MDC.put(MDCKeys.BOOK_ID, this.parameters.entry.feedEntry.id)
-    MDCKeys.put(MDCKeys.BOOK_PUBLISHER, this.parameters.entry.feedEntry.publisher)
-    MDC.put(MDCKeys.BOOK_DRM, this.parameters.drmInfo.kind.name)
-    MDC.remove(MDCKeys.BOOK_FORMAT)
 
     try {
       this.account =
         this.profilesController
           .profileCurrent()
           .account(this.parameters.accountId)
-      MDC.put(
-        MDCKeys.ACCOUNT_PROVIDER_ID,
-        this.account.provider.id
-          .toString()
-      )
     } catch (e: Exception) {
       this.logger.debug("Unable to locate account: ", e)
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "accountNotFound"),
+            Pair(
+              "AccountInternalID",
+              this.parameters.accountId.uuid
+                .toString(),
+            ),
+            Pair("BookID", this.parameters.entry.id),
+            Pair("BookInternalID", this.parameters.bookId.value()),
+            Pair("BookTitle", this.parameters.entry.title),
+            Pair(
+              "BookPublisher",
+              this.parameters.entry.publisher
+                .orEmpty(),
+            ),
+            Pair("BookDRM", this.parameters.drmInfo.kind.name),
+          ),
+        throwable = e,
+      )
       this.finish()
       return
     }
@@ -187,6 +174,35 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           .findFormat(BookFormat.BookFormatEPUB::class.java)!!
     } catch (e: Throwable) {
       this.logger.debug("Unable to locate book format: ", e)
+      val diagnostics =
+        Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+      diagnostics.report(
+        code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+        data =
+          mapOf(
+            Pair("Reason", "formatNotFound"),
+            Pair(
+              "AccountInternalID",
+              this.parameters.accountId.uuid
+                .toString(),
+            ),
+            Pair(
+              "AccountProviderID",
+              this.account.provider.id
+                .toString(),
+            ),
+            Pair("BookID", this.parameters.entry.id),
+            Pair("BookInternalID", this.parameters.bookId.value()),
+            Pair("BookTitle", this.parameters.entry.title),
+            Pair(
+              "BookPublisher",
+              this.parameters.entry.publisher
+                .orEmpty(),
+            ),
+            Pair("BookDRM", this.parameters.drmInfo.kind.name),
+          ),
+        throwable = e,
+      )
       this.finish()
       return
     }
@@ -216,7 +232,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
 
     this.onBackPressedDispatcher.addCallback(
       this,
-      this.backCallback
+      this.backCallback,
     )
   }
 
@@ -247,8 +263,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           profileUUID = profile.id.uuid,
           accountProvider = this.account.provider.id,
           accountUUID = this.account.id.uuid,
-          opdsEntry = this.parameters.entry.feedEntry
-        )
+          opdsEntry = this.parameters.entry,
+        ),
       )
     }
   }
@@ -273,7 +289,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         Reader2Bookmarks.loadBookmarks(
           bookmarkService = this.bookmarkService,
           accountID = this.parameters.accountId,
-          bookID = this.parameters.bookId
+          bookID = this.parameters.bookId,
         )
 
       /*
@@ -307,7 +323,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
           onLCPDialogDismissed = {
             this.logger.debug("Dismissed LCP dialog. Shutting down...")
             this.finish()
-          }
+          },
         )
 
       this.logger.debug("Opening asset...")
@@ -318,8 +334,10 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         )
 
       val rawBookAsset =
-        when (val a =
-          runBlocking { assetRetriever.retrieve(this@Reader2Activity.parameters.file) }) {
+        when (
+          val a =
+            runBlocking { assetRetriever.retrieve(this@Reader2Activity.parameters.file) }
+        ) {
           is Try.Failure -> throw IOException(a.value.message)
           is Try.Success -> a.value
         }
@@ -352,7 +370,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         context = this.application,
         controllers = SR2Controllers(),
         bookmarks = bookmarks,
-        allowCopyPaste = this.parameters.drmInfo is BookDRMInformation.None
+        allowCopyPaste = this.parameters.drmInfo is BookDRMInformation.None,
       )
     } catch (e: Exception) {
       this.onBookLoadingFailed(e)
@@ -362,7 +380,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
   @Throws(IOException::class)
   private fun openWithAdobe(
     rawBookAsset: Asset,
-    rights: Pair<File, AdobeAdeptLoan>?
+    rights: Pair<File, AdobeAdeptLoan>?,
   ): Asset {
     if (rawBookAsset !is ContainerAsset) {
       throw IOException("Attempted to open something that is not an EPUB file.")
@@ -372,7 +390,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     }
     return AdobeAdeptAssets.openAsset(
       epubAsset = rawBookAsset,
-      rightsFile = rights.first
+      rightsFile = rights.first,
     )
   }
 
@@ -450,7 +468,8 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       is SR2Event.SR2Error.SR2WebViewInaccessible,
       is SR2Event.SR2ExternalLinkSelected,
       is SR2Event.SR2OnCenterTapped,
-      is SR2Event.SR2ReadingPositionChanged -> {
+      is SR2Event.SR2ReadingPositionChanged,
+      -> {
         // Ignored.
       }
 
@@ -478,9 +497,9 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
             readerPreferences =
               Reader2Themes.fromSR2(
                 existing = oldPreferences,
-                theme = event.theme
-              )
-          )
+                theme = event.theme,
+              ),
+          ),
       )
     }
   }
@@ -493,13 +512,13 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       Reader2Bookmarks.fromSR2Bookmark(
         bookEntry = this.parameters.entry,
         deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-        source = event.bookmark
+        source = event.bookmark,
       )
 
     this.bookmarkService.bookmarkDelete(
       accountID = this.account.id,
       bookmark = bookmark,
-      ignoreRemoteFailures = true
+      ignoreRemoteFailures = true,
     )
   }
 
@@ -511,7 +530,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
       Reader2Bookmarks.fromSR2Bookmark(
         bookEntry = this.parameters.entry,
         deviceId = Reader2Devices.deviceId(this.profilesController, this.parameters.bookId),
-        source = event.bookmark
+        source = event.bookmark,
       )
 
     when (localBookmark.kind) {
@@ -522,7 +541,7 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
     this.bookmarkService.bookmarkCreate(
       accountID = this.parameters.accountId,
       bookmark = localBookmark,
-      ignoreRemoteFailures = true
+      ignoreRemoteFailures = true,
     )
   }
 
@@ -578,9 +597,37 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         exception
       }
 
-    MDC.put("DRMFailure", actualException.message)
+    val diagnostics =
+      Services.serviceDirectory().requireService(DiagnosticsServiceType::class.java)
+    diagnostics.report(
+      code = DiagnosticCodes.EPUB_BOOK_OPEN_FAILED,
+      data =
+        mapOf(
+          Pair("Reason", "readerOpenFailed"),
+          Pair(
+            "AccountInternalID",
+            this.parameters.accountId.uuid
+              .toString(),
+          ),
+          Pair(
+            "AccountProviderID",
+            this.account.provider.id
+              .toString(),
+          ),
+          Pair("BookID", this.parameters.entry.id),
+          Pair("BookInternalID", this.parameters.bookId.value()),
+          Pair("BookTitle", this.parameters.entry.title),
+          Pair(
+            "BookPublisher",
+            this.parameters.entry.publisher
+              .orEmpty(),
+          ),
+          Pair("BookDRM", this.parameters.drmInfo.kind.name),
+          Pair("ExceptionType", actualException.javaClass.name),
+        ),
+      throwable = actualException,
+    )
     this.logger.error("Failed to open book: ", actualException)
-    MDC.remove("DRMFailure")
 
     MaterialAlertDialogBuilder(this)
       .setTitle(R.string.bookOpenFailedTitle)
@@ -588,15 +635,15 @@ class Reader2Activity : AppCompatActivity(R.layout.reader2) {
         this.getString(
           R.string.bookOpenFailedMessage,
           actualException.javaClass.name,
-          actualException.message
-        )
+          actualException.message,
+        ),
       ).setOnDismissListener { this.finish() }
       .create()
       .show()
   }
 
   private fun showToastMessage(
-    @StringRes messageRes: Int
+    @StringRes messageRes: Int,
   ) {
     UIThread.runOnUIThread {
       Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()

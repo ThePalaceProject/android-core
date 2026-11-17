@@ -9,6 +9,7 @@ import org.librarysimplified.audiobook.time_tracking.PlayerTimeTracked
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
 import java.nio.file.Path
 import java.time.Duration
@@ -18,7 +19,7 @@ class TimeTrackingService private constructor(
   private val status: AttributeType<TimeTrackingStatus>,
   private val collector: TimeTrackingCollectorServiceType,
   private val merge: TimeTrackingMergeServiceType,
-  private val sender: TimeTrackingSenderServiceType
+  private val sender: TimeTrackingSenderServiceType,
 ) : TimeTrackingServiceType {
   private val resources =
     CloseableCollection.create()
@@ -41,6 +42,7 @@ class TimeTrackingService private constructor(
       debugDirectory: Path,
       collectorDirectory: Path,
       senderDirectory: Path,
+      diagnostics: DiagnosticsServiceType,
     ): TimeTrackingServiceType {
       val status: AttributeType<TimeTrackingStatus> =
         Attributes
@@ -55,7 +57,8 @@ class TimeTrackingService private constructor(
             status = status,
             timeSegments = timeSegments,
             debugDirectory = debugDirectory,
-            outputDirectory = collectorDirectory
+            outputDirectory = collectorDirectory,
+            diagnostics = diagnostics,
           ),
         merge =
           TimeTrackingMerge.create(
@@ -63,7 +66,7 @@ class TimeTrackingService private constructor(
             frequency = Duration.ofSeconds(30L),
             inputDirectory = collectorDirectory,
             debugDirectory = debugDirectory,
-            outputDirectory = senderDirectory
+            outputDirectory = senderDirectory,
           ),
         sender =
           TimeTrackingSender.create(
@@ -71,8 +74,9 @@ class TimeTrackingService private constructor(
             httpCalls = httpCalls,
             debugDirectory = debugDirectory,
             inputDirectory = senderDirectory,
-            frequency = Duration.ofSeconds(30L)
-          )
+            frequency = Duration.ofSeconds(30L),
+            diagnostics = diagnostics,
+          ),
       )
     }
   }
@@ -81,15 +85,15 @@ class TimeTrackingService private constructor(
     accountID: AccountID,
     bookId: PlayerPalaceID,
     libraryId: String,
-    timeTrackingUri: URI
+    timeTrackingUri: URI,
   ) {
     this.status.set(
       TimeTrackingStatus.Active(
         accountID = accountID,
         bookId = bookId,
         libraryId = libraryId,
-        timeTrackingUri = timeTrackingUri
-      )
+        timeTrackingUri = timeTrackingUri,
+      ),
     )
   }
 
