@@ -116,6 +116,7 @@ import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.mdm.MDMConfigurationReader
+import org.thepalaceproject.mdm.MDMConfigurationWatcher
 import org.thepalaceproject.mdm.MDMLibraryApplier
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
@@ -990,12 +991,15 @@ internal object MainServices {
     )
 
     val profile = bookController.profileCurrent() as ProfileType
-    MDMLibraryApplier(
-      profiles = profilesControllerTypeService,
-      diagnostics = DiagnosticsService.create(),
-    ).apply(
-      MDMConfigurationReader(context).readConfiguration(),
-    )
+    MDMConfigurationWatcher(
+      context = context,
+      reader = MDMConfigurationReader(context),
+      applier =
+        MDMLibraryApplier(
+          profiles = profilesControllerTypeService,
+          diagnostics = DiagnosticsService.create(),
+        ),
+    ).start()
 
     val subscription =
       profilesControllerTypeService
