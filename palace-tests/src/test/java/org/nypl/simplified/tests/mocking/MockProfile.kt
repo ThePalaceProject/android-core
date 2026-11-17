@@ -48,7 +48,8 @@ class MockProfile(
         audioBookPlaybackSkipIntervalBackwardMs = 30_000L,
         audioBookBatteryDialogAccepted = false,
         showBookCoverDebugLabels = false,
-        preferOPDS20 = false
+        preferOPDS20 = false,
+        enableMDMLibraries = false
       ),
       attributes = ProfileAttributes(sortedMapOf())
     )

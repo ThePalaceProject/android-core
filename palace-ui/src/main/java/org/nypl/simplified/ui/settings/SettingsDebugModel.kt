@@ -212,6 +212,14 @@ object SettingsDebugModel {
   }
 
   @UiThread
+  fun enableMDMLibraries(): Boolean = this.preferences().enableMDMLibraries
+
+  @UiThread
+  fun setEnableMDMLibraries(enable: Boolean) {
+    this.updatePreferences { it.copy(enableMDMLibraries = enable) }
+  }
+
+  @UiThread
   fun adeptSupported(): Boolean {
     val services = Services.serviceDirectory()
     return services.optionalService(AdobeAdeptExecutorType::class.java) != null

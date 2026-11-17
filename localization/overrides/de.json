@@ -196,5 +196,8 @@
     "bookPreviewAccessibilitySecond": "Sekunde",
     "bookPreviewAccessibilityTimeRemaining": "%s verbleibend",
     "bookPreviewFailedTitle": "\"Buchvorschau-Download fehlgeschlagen"
+  },
+  "palace-mdm/src/main/res/values/strings.xml": {
+    "mdmLibraryDescription": "Die UUID der Bibliothek im Verzeichnis, formatiert als urn:uuid:…"
   }
 }

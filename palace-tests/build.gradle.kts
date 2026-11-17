@@ -71,6 +71,7 @@ val dependencyObjects =
         project(":palace-lcp"),
         project(":palace-links"),
         project(":palace-links-json"),
+        project(":palace-mdm"),
         project(":palace-notifications"),
         project(":palace-opds-auth-document"),
         project(":palace-opds-auth-document-api"),

@@ -48,4 +48,6 @@ data class ProfilePreferences(
   val showBookCoverDebugLabels: Boolean,
   /** @return `true` if the feed loader should prefer OPDS 2.0 over OPDS 1.2. */
   val preferOPDS20: Boolean,
+  /** @return `true` if libraries named in the managed device (MDM) configuration should be added. */
+  val enableMDMLibraries: Boolean,
 )

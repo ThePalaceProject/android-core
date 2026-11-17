@@ -283,6 +283,7 @@ dependencies {
     implementation(project(":palace-lcp"))
     implementation(project(":palace-links"))
     implementation(project(":palace-links-json"))
+    implementation(project(":palace-mdm"))
     implementation(project(":palace-notifications"))
     implementation(project(":palace-opds-auth-document"))
     implementation(project(":palace-opds-auth-document-api"))

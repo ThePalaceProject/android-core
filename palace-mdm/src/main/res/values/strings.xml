@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string name="mdmLibraryDescription">Registry UUID of the library, formatted as urn:uuid:…</string>
+</resources>

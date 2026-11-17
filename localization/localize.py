@@ -564,7 +564,8 @@ def _extract_translations(resp):
 
 def mt_translate(texts, source, target, base_url, batch):
     out = []
-    for i in range(0, len(texts), batch):
+    total = (len(texts) + batch - 1) // batch
+    for n, i in enumerate(range(0, len(texts), batch), start=1):
         chunk = texts[i:i + batch]
         resp = http_post_json(base_url.rstrip("/") + "/translate",
                               {"q": chunk, "source": source, "target": target, "format": "text"})
@@ -572,6 +573,8 @@ def mt_translate(texts, source, target, base_url, batch):
         if len(t) != len(chunk):
             raise RuntimeError(f"MT returned {len(t)} results for {len(chunk)} inputs")
         out.extend(t)
+        print(f"  {source}->{target}: batch {n}/{total} ({len(out)}/{len(texts)} units)",
+              flush=True)
     return out
 
 

@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<restrictions xmlns:android="http://schemas.android.com/apk/res/android">
+  <restriction
+      android:key="Library-0"
+      android:restrictionType="string"
+      android:title="Library 0"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-1"
+      android:restrictionType="string"
+      android:title="Library 1"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-2"
+      android:restrictionType="string"
+      android:title="Library 2"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-3"
+      android:restrictionType="string"
+      android:title="Library 3"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-4"
+      android:restrictionType="string"
+      android:title="Library 4"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-5"
+      android:restrictionType="string"
+      android:title="Library 5"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-6"
+      android:restrictionType="string"
+      android:title="Library 6"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-7"
+      android:restrictionType="string"
+      android:title="Library 7"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-8"
+      android:restrictionType="string"
+      android:title="Library 8"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-9"
+      android:restrictionType="string"
+      android:title="Library 9"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-10"
+      android:restrictionType="string"
+      android:title="Library 10"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-11"
+      android:restrictionType="string"
+      android:title="Library 11"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-12"
+      android:restrictionType="string"
+      android:title="Library 12"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-13"
+      android:restrictionType="string"
+      android:title="Library 13"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-14"
+      android:restrictionType="string"
+      android:title="Library 14"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-15"
+      android:restrictionType="string"
+      android:title="Library 15"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-16"
+      android:restrictionType="string"
+      android:title="Library 16"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-17"
+      android:restrictionType="string"
+      android:title="Library 17"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-18"
+      android:restrictionType="string"
+      android:title="Library 18"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-19"
+      android:restrictionType="string"
+      android:title="Library 19"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-20"
+      android:restrictionType="string"
+      android:title="Library 20"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-21"
+      android:restrictionType="string"
+      android:title="Library 21"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-22"
+      android:restrictionType="string"
+      android:title="Library 22"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-23"
+      android:restrictionType="string"
+      android:title="Library 23"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-24"
+      android:restrictionType="string"
+      android:title="Library 24"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-25"
+      android:restrictionType="string"
+      android:title="Library 25"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-26"
+      android:restrictionType="string"
+      android:title="Library 26"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-27"
+      android:restrictionType="string"
+      android:title="Library 27"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-28"
+      android:restrictionType="string"
+      android:title="Library 28"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-29"
+      android:restrictionType="string"
+      android:title="Library 29"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-30"
+      android:restrictionType="string"
+      android:title="Library 30"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-31"
+      android:restrictionType="string"
+      android:title="Library 31"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-32"
+      android:restrictionType="string"
+      android:title="Library 32"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-33"
+      android:restrictionType="string"
+      android:title="Library 33"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-34"
+      android:restrictionType="string"
+      android:title="Library 34"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-35"
+      android:restrictionType="string"
+      android:title="Library 35"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-36"
+      android:restrictionType="string"
+      android:title="Library 36"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-37"
+      android:restrictionType="string"
+      android:title="Library 37"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-38"
+      android:restrictionType="string"
+      android:title="Library 38"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-39"
+      android:restrictionType="string"
+      android:title="Library 39"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-40"
+      android:restrictionType="string"
+      android:title="Library 40"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-41"
+      android:restrictionType="string"
+      android:title="Library 41"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-42"
+      android:restrictionType="string"
+      android:title="Library 42"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-43"
+      android:restrictionType="string"
+      android:title="Library 43"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-44"
+      android:restrictionType="string"
+      android:title="Library 44"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-45"
+      android:restrictionType="string"
+      android:title="Library 45"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-46"
+      android:restrictionType="string"
+      android:title="Library 46"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-47"
+      android:restrictionType="string"
+      android:title="Library 47"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-48"
+      android:restrictionType="string"
+      android:title="Library 48"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-49"
+      android:restrictionType="string"
+      android:title="Library 49"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-50"
+      android:restrictionType="string"
+      android:title="Library 50"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-51"
+      android:restrictionType="string"
+      android:title="Library 51"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-52"
+      android:restrictionType="string"
+      android:title="Library 52"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-53"
+      android:restrictionType="string"
+      android:title="Library 53"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-54"
+      android:restrictionType="string"
+      android:title="Library 54"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-55"
+      android:restrictionType="string"
+      android:title="Library 55"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-56"
+      android:restrictionType="string"
+      android:title="Library 56"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-57"
+      android:restrictionType="string"
+      android:title="Library 57"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-58"
+      android:restrictionType="string"
+      android:title="Library 58"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-59"
+      android:restrictionType="string"
+      android:title="Library 59"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-60"
+      android:restrictionType="string"
+      android:title="Library 60"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-61"
+      android:restrictionType="string"
+      android:title="Library 61"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-62"
+      android:restrictionType="string"
+      android:title="Library 62"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-63"
+      android:restrictionType="string"
+      android:title="Library 63"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-64"
+      android:restrictionType="string"
+      android:title="Library 64"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-65"
+      android:restrictionType="string"
+      android:title="Library 65"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-66"
+      android:restrictionType="string"
+      android:title="Library 66"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-67"
+      android:restrictionType="string"
+      android:title="Library 67"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-68"
+      android:restrictionType="string"
+      android:title="Library 68"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-69"
+      android:restrictionType="string"
+      android:title="Library 69"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-70"
+      android:restrictionType="string"
+      android:title="Library 70"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-71"
+      android:restrictionType="string"
+      android:title="Library 71"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-72"
+      android:restrictionType="string"
+      android:title="Library 72"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-73"
+      android:restrictionType="string"
+      android:title="Library 73"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-74"
+      android:restrictionType="string"
+      android:title="Library 74"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-75"
+      android:restrictionType="string"
+      android:title="Library 75"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-76"
+      android:restrictionType="string"
+      android:title="Library 76"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-77"
+      android:restrictionType="string"
+      android:title="Library 77"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-78"
+      android:restrictionType="string"
+      android:title="Library 78"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-79"
+      android:restrictionType="string"
+      android:title="Library 79"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-80"
+      android:restrictionType="string"
+      android:title="Library 80"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-81"
+      android:restrictionType="string"
+      android:title="Library 81"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-82"
+      android:restrictionType="string"
+      android:title="Library 82"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-83"
+      android:restrictionType="string"
+      android:title="Library 83"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-84"
+      android:restrictionType="string"
+      android:title="Library 84"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-85"
+      android:restrictionType="string"
+      android:title="Library 85"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-86"
+      android:restrictionType="string"
+      android:title="Library 86"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-87"
+      android:restrictionType="string"
+      android:title="Library 87"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-88"
+      android:restrictionType="string"
+      android:title="Library 88"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-89"
+      android:restrictionType="string"
+      android:title="Library 89"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-90"
+      android:restrictionType="string"
+      android:title="Library 90"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-91"
+      android:restrictionType="string"
+      android:title="Library 91"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-92"
+      android:restrictionType="string"
+      android:title="Library 92"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-93"
+      android:restrictionType="string"
+      android:title="Library 93"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-94"
+      android:restrictionType="string"
+      android:title="Library 94"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-95"
+      android:restrictionType="string"
+      android:title="Library 95"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-96"
+      android:restrictionType="string"
+      android:title="Library 96"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-97"
+      android:restrictionType="string"
+      android:title="Library 97"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-98"
+      android:restrictionType="string"
+      android:title="Library 98"
+      android:description="@string/mdmLibraryDescription"/>
+  <restriction
+      android:key="Library-99"
+      android:restrictionType="string"
+      android:title="Library 99"
+      android:description="@string/mdmLibraryDescription"/>
+</restrictions>

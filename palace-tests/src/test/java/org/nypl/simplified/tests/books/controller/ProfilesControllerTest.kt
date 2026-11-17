@@ -247,6 +247,13 @@ class ProfilesControllerTest {
   fun testProfilesPreferences() {
     val profiles =
       this.profilesDatabaseOf(this.directoryProfiles)
+
+    /*
+     * A newly-created profile starts with managed device (MDM) libraries disabled.
+     */
+
+    Assertions.assertFalse(profiles.currentProfile().preferences().enableMDMLibraries)
+
     val accountProvider =
       MockAccountProviders.fakeProvider("urn:fake:0")
     val accountProviders =

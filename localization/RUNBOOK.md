@@ -3,8 +3,9 @@
 This is the complete procedure to (re)produce the German, Spanish, French, and
 Italian string resources from scratch, with **no human review and no cloud
 service**. A future instance of the agent (model + harness) should read this
-top to bottom and execute it. The MT engine is local (LibreTranslate/Argos);
-the agent itself is the fix layer for everything MT gets wrong.
+top to bottom and execute it. The MT engine is self-hosted
+(LibreTranslate/Argos); the agent itself is the fix layer for everything MT
+gets wrong.
 
 - Target languages: `de es fr it`
 - Source language: `en`
@@ -38,49 +39,38 @@ at every stage. Native-speaker verification is out of scope.
 ## 0. Prerequisites
 
 - Python 3 (the script uses only the stdlib: `json`, `urllib`, `xml.etree`, `pathlib`).
-- A running **LibreTranslate** server (Argos backend). It is normally a local
-  podman container named `libretranslate`.
+- A running **LibreTranslate** server (Argos backend), with the forward pairs
+  `en_de en_es en_fr en_it` loaded. (The reverse pairs are only needed if you
+  add a back-translation QA gate, see "Optional" below.)
 
-### Bring up LibreTranslate
+### Locate the server — ask the user
 
-```sh
-# Is it already up?
-podman ps --filter name=libretranslate --format '{{.Names}} {{.Ports}}'
-```
+The server's address is **not fixed and must not be assumed**. It has been a
+shared host and a local container in different environments, and a
+containerized server's host port is ephemeral. Before running any pipeline
+stage, **ask the user for the server's location** — a base URL such as
+`http://host:port`. Do not guess, do not probe for container runtimes
+(podman, docker), and do not rely on the script's built-in default.
 
-If it's up, get its host port (it is **ephemeral**, e.g. `39265`):
-
-```sh
-PORT=$(podman ps --filter name=libretranslate --format '{{.Ports}}' | sed -n 's/^[0-9.]*:\([0-9]*\)->.*/\1/p')
-# -> e.g. 39265
-curl -s "http://127.0.0.1:$PORT/health"    # expect {"status":"ok"}
-```
-
-If it's not up, start it (downloads language models at first start — needs
-internet only the first time; models live in the container's writable layer):
+Once the user provides the address, export it once so every command below
+picks it up:
 
 ```sh
-podman run -d --name libretranslate \
-  -p 127.0.0.1::5000/tcp \
-  docker.io/libretranslate/libretranslate:latest \
-  --load-only en,de,es,fr,it
-# wait for health, then:
-PORT=$(podman ps --filter name=libretranslate --format '{{.Ports}}' | sed -n 's/^[0-9.]*:\([0-9]*\)->.*/\1/p')
+export LIBRETRANSLATE_URL="<base URL given by the user>"
 ```
 
-> To restrict model load use `--load-only en,de,es,fr,it` (faster, smaller).
-> Omitting it loads all languages. The forward pairs the pipeline needs are
-> `en_de en_es en_fr en_it`; the reverse pairs are only needed if you add a
-> back-translation QA gate (see "Optional" below).
-
-Export the base URL once so every command below picks it up:
+Verify the server answers before doing anything else:
 
 ```sh
-export LIBRETRANSLATE_URL="http://127.0.0.1:$PORT"
+curl -s "$LIBRETRANSLATE_URL/health"    # expect {"status":"ok"}
 ```
 
-(The script reads `LIBRETRANSLATE_URL`, defaulting to `http://127.0.0.1:5000`.
-You can also pass `--base-url` per command.)
+If the health check fails, stop and report the exact URL and the response to
+the user; do not try alternate addresses on your own.
+
+(The script reads `LIBRETRANSLATE_URL`, defaulting to `http://127.0.0.1:5000`
+when unset, and also accepts `--base-url` per command. The default is a
+backward-compatibility fallback, not a sanctioned location.)
 
 ---
 

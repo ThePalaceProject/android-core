@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mdmLibraryDescription">Die UUID der Bibliothek im Verzeichnis, formatiert als urn:uuid:…</string>
+</resources>
