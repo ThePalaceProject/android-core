@@ -20,8 +20,8 @@ import java.net.URI
  * the profile are left alone, and libraries that the patron added are never
  * removed.
  *
- * Application is intended to happen at application start-up only. All
- * failures are reported to the diagnostics backend and never propagate.
+ * All failures are reported to the diagnostics backend and never
+ * propagate.
  */
 class MDMLibraryApplier(
   private val profiles: ProfilesControllerType,
