@@ -232,5 +232,8 @@
     "bookPreviewAccessibilityTimeCurrent": "%s reproducido",
     "bookPreviewAccessibilityTimeRemaining": "%s restantes",
     "bookPreviewFailedTitle": "\"La descarga de la vista previa del libro falló"
+  },
+  "palace-mdm/src/main/res/values/strings.xml": {
+    "mdmLibraryDescription": "UUID del registro de la biblioteca, en formato urn:uuid:…"
   }
 }

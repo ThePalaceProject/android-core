@@ -157,5 +157,8 @@
     "bookPreviewAccessibilitySecond": "Seconde",
     "bookPreviewAccessibilitySeconds": "Secondes",
     "bookPreviewAccessibilityTimeCurrent": "%s écoulé"
+  },
+  "palace-mdm/src/main/res/values/strings.xml": {
+    "mdmLibraryDescription": "UUID du registre de la bibliothèque, au format urn:uuid:…"
   }
 }

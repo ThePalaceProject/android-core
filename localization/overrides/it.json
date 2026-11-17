@@ -275,5 +275,8 @@
     "bookPreviewFailedMessage": "C'è stato un errore nel scaricare l'anteprima di questo libro. Riprovi più tardi.",
     "bookPreviewFailedTitle": "\"Download dell'anteprima del libro non riuscito",
     "bookPreviewPlayerInitialTime": "00:00:00"
+  },
+  "palace-mdm/src/main/res/values/strings.xml": {
+    "mdmLibraryDescription": "UUID del registro della biblioteca, in formato urn:uuid:…"
   }
 }
