@@ -1593,6 +1593,11 @@
     <c:release date="2026-11-19T11:47:32+00:00" is-open="true" ticket-system="org.lyrasis.jira" version="1.34.0">
       <c:changes>
         <c:change date="2026-11-12T17:36:00+00:00" summary="Fix the catalog not updating a book's status (for example, the borrow button) after borrowing completes."/>
+        <c:change date="2026-11-18T00:00:00+00:00" summary="Show the library's own message when a sign-in is refused, honouring the show_title option.">
+          <c:tickets>
+            <c:ticket id="PP-5235"/>
+          </c:tickets>
+        </c:change>
         <c:change date="2026-11-19T00:00:00+00:00" summary="Store time tracking data in the database instead of files, migrating any existing data. Add a time tracking screen to the debug menu."/>
       </c:changes>
     </c:release>
