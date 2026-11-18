@@ -1,5 +1,6 @@
 package org.nypl.simplified.books.time.tracking
 
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntry
 import java.net.URI
 
 data class TimeTrackingRequest(

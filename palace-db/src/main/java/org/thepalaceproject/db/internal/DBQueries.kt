@@ -13,6 +13,15 @@ import org.thepalaceproject.db.api.queries.DBQAccountProviderPutType
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsGetType
 import org.thepalaceproject.db.api.queries.DBQAccountRegistrySettingsPutType
 import org.thepalaceproject.db.api.queries.DBQSchemaVersionType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntryDeleteType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntryPutType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntrySelectType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEventPurgeType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEventPutType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEventSelectType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingSpanDeleteType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingSpanPutType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingSpanSelectType
 
 internal object DBQueries {
   private val queryList =
@@ -35,6 +44,15 @@ internal object DBQueries {
       Pair(DBQSchemaVersionType::class.java, DBQSchemaVersion),
       Pair(DBQAccountRegistrySettingsPutType::class.java, DBQAccountRegistrySettingsPut),
       Pair(DBQAccountRegistrySettingsGetType::class.java, DBQAccountRegistrySettingsGet),
+      Pair(DBQTimeTrackingEntryDeleteType::class.java, DBQTimeTrackingEntryDelete),
+      Pair(DBQTimeTrackingEntryPutType::class.java, DBQTimeTrackingEntryPut),
+      Pair(DBQTimeTrackingEntrySelectType::class.java, DBQTimeTrackingEntrySelect),
+      Pair(DBQTimeTrackingEventPurgeType::class.java, DBQTimeTrackingEventPurge),
+      Pair(DBQTimeTrackingEventPutType::class.java, DBQTimeTrackingEventPut),
+      Pair(DBQTimeTrackingEventSelectType::class.java, DBQTimeTrackingEventSelect),
+      Pair(DBQTimeTrackingSpanDeleteType::class.java, DBQTimeTrackingSpanDelete),
+      Pair(DBQTimeTrackingSpanPutType::class.java, DBQTimeTrackingSpanPut),
+      Pair(DBQTimeTrackingSpanSelectType::class.java, DBQTimeTrackingSpanSelect),
     )
 
   fun <P, R, Q : DBQueryType<P, R>> query(clazz: Class<Q>): Q {

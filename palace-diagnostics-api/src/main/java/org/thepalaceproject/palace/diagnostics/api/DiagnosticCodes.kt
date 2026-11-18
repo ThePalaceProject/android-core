@@ -50,6 +50,33 @@ object DiagnosticCodes {
   const val TIME_TRACKING_LOSS = "TimeTrackingLoss"
 
   /**
+   * The migration of the legacy file-based time tracking data into the database encountered
+   * a problem. The specific problem is carried in the `Reason` data field, and the affected
+   * file (if any) is carried in the `File` data field. No time tracking data was deleted
+   * without being successfully migrated, with the exception of the legacy event log, where a
+   * partial tail record may be skipped.
+   */
+
+  const val TIME_TRACKING_MIGRATION = "TimeTrackingMigration"
+
+  /**
+   * An attempt to record an event in the time tracking event log failed. The event log is an
+   * audit aid; its failure does not affect the integrity of the time tracking data itself.
+   * The failing operation is carried in the `Operation` data field.
+   */
+
+  const val TIME_TRACKING_AUDIT = "TimeTrackingAudit"
+
+  /**
+   * The time tracking pipeline held entries for an account that no longer exists in the
+   * profile, and so could not send them. The entries are retained in the database so that
+   * they can be inspected and settled manually; they will not be retried. The account
+   * identifier is carried in the `Account` data field.
+   */
+
+  const val TIME_TRACKING_ORPHANED = "TimeTrackingOrphaned"
+
+  /**
    * An EPUB book failed to open (e.g. a DRM decryption failure, a content-protection failure,
    * or a corrupted/unreadable content file). The failing stage (account lookup, format lookup,
    * or reader open) is carried in the `Reason` data field; the specific cause is carried by the

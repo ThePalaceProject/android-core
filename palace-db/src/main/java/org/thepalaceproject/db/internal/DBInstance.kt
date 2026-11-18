@@ -63,6 +63,14 @@ internal class DBInstance private constructor(
     const val DATABASE_SQLITE_ID: Int = 0x50504442
     const val DATABASE_APPLICATION_ID: String = "org.thepalaceproject.palace"
 
+    /**
+     * The number of milliseconds to wait for a database lock before failing with
+     * SQLITE_BUSY. The database is shared by multiple concurrently running services
+     * (the account registry, the books database, the time tracking pipeline), each on
+     * its own thread.
+     */
+    const val BUSY_TIMEOUT_MILLIS: Int = 10_000
+
     fun open(parameters: DBParameters): DBType {
       try {
         val absFile = parameters.file.toAbsolutePath()
@@ -84,6 +92,7 @@ internal class DBInstance private constructor(
       config.setOpenMode(SQLiteOpenMode.CREATE)
       config.setLockingMode(SQLiteConfig.LockingMode.NORMAL)
       config.setJournalMode(SQLiteConfig.JournalMode.WAL)
+      config.setBusyTimeout(BUSY_TIMEOUT_MILLIS)
 
       val dataSource = SQLiteDataSource(config)
       dataSource.setUrl(url.toString())
@@ -220,6 +229,7 @@ internal class DBInstance private constructor(
       config.enforceForeignKeys(true)
       config.setLockingMode(SQLiteConfig.LockingMode.NORMAL)
       config.setJournalMode(SQLiteConfig.JournalMode.WAL)
+      config.setBusyTimeout(BUSY_TIMEOUT_MILLIS)
 
       val dataSource = SQLiteDataSource(config)
       dataSource.url = url.toString()

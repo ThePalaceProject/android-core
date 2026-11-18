@@ -28,7 +28,7 @@ import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
 import org.nypl.simplified.books.book_registry.BookRegistry
 import org.nypl.simplified.books.book_registry.BookRegistryType
-import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
@@ -117,7 +117,7 @@ class TimeTrackingRefreshTokenTest {
       timeEntries = listOf(
         TimeTrackingEntry(
           id = "id",
-          duringMinute = "2024-10-16T00:00:00",
+          duringMinute = java.time.OffsetDateTime.parse("2024-10-16T00:00:00Z"),
           secondsPlayed = 60
         )
       )

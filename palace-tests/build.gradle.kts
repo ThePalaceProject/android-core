@@ -52,6 +52,7 @@ val dependencyObjects =
         project(":palace-books-preview"),
         project(":palace-books-registry-api"),
         project(":palace-books-time-tracking"),
+        project(":palace-books-time-tracking-api"),
         project(":palace-boot-api"),
         project(":palace-buildconfig-api"),
         project(":palace-content-api"),
