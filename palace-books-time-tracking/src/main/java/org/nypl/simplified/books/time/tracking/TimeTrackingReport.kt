@@ -1,5 +1,13 @@
 package org.nypl.simplified.books.time.tracking
 
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryCreated
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttempt
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailed
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedExceptionally
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedPermanently
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptSucceeded
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStarted
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStopped
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingTime
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntrySelectType
@@ -114,30 +122,79 @@ object TimeTrackingReport {
         "time,operation,library_id,book_id,entry_id,during_minute,seconds_played,exception",
       )
     for (event in events) {
-      val duringMinute = event.duringMinute
-      val secondsPlayed = event.secondsPlayed
-      val duringMinuteText =
-        if (duringMinute != null) {
-          TimeTrackingTime.format(duringMinute)
-        } else {
-          ""
+      val entryID: String
+      val duringMinuteText: String
+      val secondsPlayedText: String
+      val exceptionText: String
+
+      when (val e = event) {
+        is TimeTrackingStarted -> {
+          entryID = ""
+          duringMinuteText = ""
+          secondsPlayedText = ""
+          exceptionText = ""
         }
-      val secondsPlayedText =
-        if (secondsPlayed != null) {
-          secondsPlayed.toString()
-        } else {
-          ""
+
+        is TimeTrackingStopped -> {
+          entryID = ""
+          duringMinuteText = ""
+          secondsPlayedText = ""
+          exceptionText = ""
         }
+
+        is TimeTrackingEntryCreated -> {
+          entryID = e.entryID
+          duringMinuteText = TimeTrackingTime.format(e.duringMinute)
+          secondsPlayedText = e.secondsPlayed.toString()
+          exceptionText = ""
+        }
+
+        is TimeTrackingSendAttempt -> {
+          entryID = e.entryID
+          duringMinuteText = ""
+          secondsPlayedText = e.secondsPlayed.toString()
+          exceptionText = ""
+        }
+
+        is TimeTrackingSendAttemptSucceeded -> {
+          entryID = e.entryID
+          duringMinuteText = ""
+          secondsPlayedText = e.secondsPlayed.toString()
+          exceptionText = ""
+        }
+
+        is TimeTrackingSendAttemptFailed -> {
+          entryID = e.entryID
+          duringMinuteText = ""
+          secondsPlayedText = e.secondsPlayed.toString()
+          exceptionText = ""
+        }
+
+        is TimeTrackingSendAttemptFailedExceptionally -> {
+          entryID = e.entryID
+          duringMinuteText = ""
+          secondsPlayedText = e.secondsPlayed.toString()
+          exceptionText = e.exception
+        }
+
+        is TimeTrackingSendAttemptFailedPermanently -> {
+          entryID = e.entryID
+          duringMinuteText = ""
+          secondsPlayedText = e.secondsPlayed.toString()
+          exceptionText = ""
+        }
+      }
+
       lines.add(
         listOf(
           TimeTrackingTime.format(event.time),
-          event.operation.name,
+          event.operationName,
           event.libraryID,
           event.bookID,
-          csvEscape(event.entryID),
+          csvEscape(entryID),
           duringMinuteText,
           secondsPlayedText,
-          csvEscape(event.exception),
+          csvEscape(exceptionText),
         ).joinToString(","),
       )
     }

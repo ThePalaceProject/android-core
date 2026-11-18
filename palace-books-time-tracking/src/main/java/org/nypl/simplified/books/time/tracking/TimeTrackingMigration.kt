@@ -1,9 +1,16 @@
 package org.nypl.simplified.books.time.tracking
 
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryCreated
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryOutgoing
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEvent
-import org.nypl.simplified.books.time.tracking.api.TimeTrackingEventOperation
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingReceivedSpan
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttempt
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailed
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedExceptionally
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedPermanently
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptSucceeded
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStarted
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStopped
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingTime
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.db.api.DBType
@@ -320,13 +327,6 @@ class TimeTrackingMigration private constructor(
       return null
     }
 
-    val operation: TimeTrackingEventOperation
-    try {
-      operation = TimeTrackingEventOperation.valueOf(operationText)
-    } catch (e: Throwable) {
-      return null
-    }
-
     val timeText = properties.getProperty("Time")
     if (timeText == null) {
       return null
@@ -362,16 +362,113 @@ class TimeTrackingMigration private constructor(
 
     val exception = properties.getProperty("Exception")
 
-    return TimeTrackingEvent(
-      operation = operation,
-      time = time,
-      libraryID = libraryID,
-      bookID = bookID,
-      entryID = entryID,
-      duringMinute = duringMinute,
-      secondsPlayed = secondsPlayed,
-      exception = exception,
-    )
+    return when (operationText) {
+      TimeTrackingStarted.OPERATION_NAME -> {
+        TimeTrackingStarted(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+        )
+      }
+
+      TimeTrackingStopped.OPERATION_NAME -> {
+        TimeTrackingStopped(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+        )
+      }
+
+      TimeTrackingEntryCreated.OPERATION_NAME -> {
+        if (entryID == null || duringMinute == null || secondsPlayed == null) {
+          null
+        } else {
+          TimeTrackingEntryCreated(
+            time = time,
+            libraryID = libraryID,
+            bookID = bookID,
+            entryID = entryID,
+            duringMinute = duringMinute,
+            secondsPlayed = secondsPlayed,
+          )
+        }
+      }
+
+      TimeTrackingSendAttempt.OPERATION_NAME -> {
+        if (entryID == null || secondsPlayed == null) {
+          null
+        } else {
+          TimeTrackingSendAttempt(
+            time = time,
+            libraryID = libraryID,
+            bookID = bookID,
+            entryID = entryID,
+            secondsPlayed = secondsPlayed,
+          )
+        }
+      }
+
+      TimeTrackingSendAttemptSucceeded.OPERATION_NAME -> {
+        if (entryID == null || secondsPlayed == null) {
+          null
+        } else {
+          TimeTrackingSendAttemptSucceeded(
+            time = time,
+            libraryID = libraryID,
+            bookID = bookID,
+            entryID = entryID,
+            secondsPlayed = secondsPlayed,
+          )
+        }
+      }
+
+      TimeTrackingSendAttemptFailed.OPERATION_NAME -> {
+        if (entryID == null || secondsPlayed == null) {
+          null
+        } else {
+          TimeTrackingSendAttemptFailed(
+            time = time,
+            libraryID = libraryID,
+            bookID = bookID,
+            entryID = entryID,
+            secondsPlayed = secondsPlayed,
+          )
+        }
+      }
+
+      TimeTrackingSendAttemptFailedExceptionally.OPERATION_NAME -> {
+        if (entryID == null || secondsPlayed == null || exception == null) {
+          null
+        } else {
+          TimeTrackingSendAttemptFailedExceptionally(
+            time = time,
+            libraryID = libraryID,
+            bookID = bookID,
+            entryID = entryID,
+            secondsPlayed = secondsPlayed,
+            exception = exception,
+          )
+        }
+      }
+
+      TimeTrackingSendAttemptFailedPermanently.OPERATION_NAME -> {
+        if (entryID == null || secondsPlayed == null) {
+          null
+        } else {
+          TimeTrackingSendAttemptFailedPermanently(
+            time = time,
+            libraryID = libraryID,
+            bookID = bookID,
+            entryID = entryID,
+            secondsPlayed = secondsPlayed,
+          )
+        }
+      }
+
+      else -> {
+        null
+      }
+    }
   }
 
   private fun reportFailure(

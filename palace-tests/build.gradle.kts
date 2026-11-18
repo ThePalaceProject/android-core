@@ -140,6 +140,7 @@ val dependencyObjects =
         libs.bouncycastle.bcprov,
         libs.bytebuddy,
         libs.bytebuddy.agent,
+        libs.commons.csv,
         libs.commons.compress,
         libs.commons.io,
         libs.conscrypt,

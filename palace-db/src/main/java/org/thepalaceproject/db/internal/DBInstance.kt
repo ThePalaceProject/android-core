@@ -16,6 +16,7 @@ import org.apache.xerces.jaxp.SAXParserFactoryImpl
 import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollectionParsersType
 import org.nypl.simplified.accounts.api.AccountProviderDescriptionCollectionSerializersType
 import org.slf4j.LoggerFactory
+import org.sqlite.Function
 import org.sqlite.SQLiteConfig
 import org.sqlite.SQLiteDataSource
 import org.sqlite.SQLiteErrorCode
@@ -34,9 +35,11 @@ import java.sql.Connection
 import java.sql.SQLException
 import java.util.Map
 import java.util.Optional
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Consumer
 import java.util.function.Supplier
+import java.util.regex.Pattern
 
 internal class DBInstance private constructor(
   private val dataSource: SQLiteDataSource,
@@ -70,6 +73,19 @@ internal class DBInstance private constructor(
      * its own thread.
      */
     const val BUSY_TIMEOUT_MILLIS: Int = 10_000
+
+    /**
+     * The name of the regular expression matching function registered on each connection.
+     * It is used by the schema's CHECK constraints to enforce the format of column values.
+     */
+    const val REGEX_FUNCTION_NAME: String = "REGEX"
+
+    /**
+     * The cache of compiled regular expression patterns, keyed by pattern text. The schema's
+     * CHECK constraints invoke the REGEX function with a constant pattern on every insert and
+     * update, so the patterns are compiled once and reused.
+     */
+    private val REGEX_PATTERN_CACHE = ConcurrentHashMap<String, Pattern>()
 
     fun open(parameters: DBParameters): DBType {
       try {
@@ -118,6 +134,7 @@ internal class DBInstance private constructor(
 
       dataSource.connection.use { connection ->
         this.setWALMode(connection)
+        this.registerFunctions(connection)
         connection.setAutoCommit(false)
 
         TrExecutors()
@@ -136,6 +153,35 @@ internal class DBInstance private constructor(
           ).execute()
         connection.commit()
       }
+    }
+
+    /**
+     * Register the functions that the schema relies on. This must be done on every
+     * connection, and on the upgrade connection before the schema is executed, since a
+     * CREATE TABLE statement that references an unregistered function fails immediately.
+     */
+
+    private fun registerFunctions(connection: Connection) {
+      Function.create(
+        connection,
+        this.REGEX_FUNCTION_NAME,
+        object : Function() {
+          override fun xFunc() {
+            val patternText = this.value_text(0)
+            val value = this.value_text(1)
+            if (value == null) {
+              this.result()
+              return
+            }
+            val pattern =
+              DBInstance.REGEX_PATTERN_CACHE
+                .computeIfAbsent(patternText) { Pattern.compile(it) }
+            this.result(if (pattern.matcher(value).matches()) 1 else 0)
+          }
+        },
+        2,
+        Function.FLAG_DETERMINISTIC,
+      )
     }
 
     @Throws(SQLException::class)
@@ -326,6 +372,7 @@ internal class DBInstance private constructor(
   override fun openConnection(): DBConnectionType {
     val connection = this.dataSource.connection
     setWALMode(connection)
+    DBInstance.registerFunctions(connection)
     connection.transactionIsolation = Connection.TRANSACTION_READ_COMMITTED
     connection.autoCommit = false
     return DBConnection(connection)

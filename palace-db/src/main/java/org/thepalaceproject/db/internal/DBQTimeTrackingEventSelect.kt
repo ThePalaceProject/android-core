@@ -1,7 +1,14 @@
 package org.thepalaceproject.db.internal
 
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryCreated
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEvent
-import org.nypl.simplified.books.time.tracking.api.TimeTrackingEventOperation
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttempt
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailed
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedExceptionally
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedPermanently
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptSucceeded
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStarted
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStopped
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingTime
 import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQTimeTrackingEventSelectType
@@ -37,7 +44,7 @@ internal object DBQTimeTrackingEventSelect : DBQTimeTrackingEventSelectType {
         statement.setString(1, TimeTrackingTime.formatUTC(parameters))
         statement.executeQuery().use { resultSet ->
           while (resultSet.next()) {
-            data.add(parseResult(resultSet))
+            data.add(this.parseResult(resultSet))
           }
         }
       }
@@ -45,30 +52,153 @@ internal object DBQTimeTrackingEventSelect : DBQTimeTrackingEventSelectType {
   }
 
   private fun parseResult(resultSet: ResultSet): TimeTrackingEvent {
-    val duringMinuteText = resultSet.getString(7)
-    val secondsPlayed: Int?
-    val seconds = resultSet.getInt(8)
-    secondsPlayed =
-      if (resultSet.wasNull()) {
+    val time =
+      TimeTrackingTime.parse(resultSet.getString(2))
+    val operationName =
+      resultSet.getString(3)
+    val libraryID =
+      resultSet.getString(4)
+    val bookID =
+      resultSet.getString(5)
+    val entryID =
+      resultSet.getString(6)
+    val duringMinuteText =
+      resultSet.getString(7)
+    val secondsPlayed: Int? =
+      if (resultSet.getString(8) == null) {
         null
       } else {
-        seconds
+        resultSet.getInt(8)
+      }
+    val exception =
+      resultSet.getString(9)
+
+    return when (operationName) {
+      TimeTrackingStarted.OPERATION_NAME -> {
+        TimeTrackingStarted(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+        )
       }
 
-    return TimeTrackingEvent(
-      operation = TimeTrackingEventOperation.valueOf(resultSet.getString(3)),
-      time = TimeTrackingTime.parse(resultSet.getString(2)),
-      libraryID = resultSet.getString(4),
-      bookID = resultSet.getString(5),
-      entryID = resultSet.getString(6),
-      duringMinute =
-        if (duringMinuteText == null) {
-          null
-        } else {
-          TimeTrackingTime.parse(duringMinuteText)
-        },
-      secondsPlayed = secondsPlayed,
-      exception = resultSet.getString(9),
-    )
+      TimeTrackingStopped.OPERATION_NAME -> {
+        TimeTrackingStopped(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+        )
+      }
+
+      TimeTrackingEntryCreated.OPERATION_NAME -> {
+        val duringMinute =
+          requireNotNull(duringMinuteText) {
+            "An entry created event is missing its during minute."
+          }
+        TimeTrackingEntryCreated(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+          entryID =
+            requireNotNull(entryID) {
+              "An entry created event is missing its entry id."
+            },
+          duringMinute =
+            TimeTrackingTime.parse(duringMinute),
+          secondsPlayed =
+            requireNotNull(secondsPlayed) {
+              "An entry created event is missing its seconds played."
+            },
+        )
+      }
+
+      TimeTrackingSendAttempt.OPERATION_NAME -> {
+        TimeTrackingSendAttempt(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+          entryID =
+            requireNotNull(entryID) {
+              "A send attempt event is missing its entry id."
+            },
+          secondsPlayed =
+            requireNotNull(secondsPlayed) {
+              "A send attempt event is missing its seconds played."
+            },
+        )
+      }
+
+      TimeTrackingSendAttemptSucceeded.OPERATION_NAME -> {
+        TimeTrackingSendAttemptSucceeded(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+          entryID =
+            requireNotNull(entryID) {
+              "A send attempt event is missing its entry id."
+            },
+          secondsPlayed =
+            requireNotNull(secondsPlayed) {
+              "A send attempt event is missing its seconds played."
+            },
+        )
+      }
+
+      TimeTrackingSendAttemptFailed.OPERATION_NAME -> {
+        TimeTrackingSendAttemptFailed(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+          entryID =
+            requireNotNull(entryID) {
+              "A send attempt event is missing its entry id."
+            },
+          secondsPlayed =
+            requireNotNull(secondsPlayed) {
+              "A send attempt event is missing its seconds played."
+            },
+        )
+      }
+
+      TimeTrackingSendAttemptFailedExceptionally.OPERATION_NAME -> {
+        TimeTrackingSendAttemptFailedExceptionally(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+          entryID =
+            requireNotNull(entryID) {
+              "A send attempt event is missing its entry id."
+            },
+          secondsPlayed =
+            requireNotNull(secondsPlayed) {
+              "A send attempt event is missing its seconds played."
+            },
+          exception =
+            requireNotNull(exception) {
+              "A send attempt failed exceptionally event is missing its exception."
+            },
+        )
+      }
+
+      TimeTrackingSendAttemptFailedPermanently.OPERATION_NAME -> {
+        TimeTrackingSendAttemptFailedPermanently(
+          time = time,
+          libraryID = libraryID,
+          bookID = bookID,
+          entryID =
+            requireNotNull(entryID) {
+              "A send attempt event is missing its entry id."
+            },
+          secondsPlayed =
+            requireNotNull(secondsPlayed) {
+              "A send attempt event is missing its seconds played."
+            },
+        )
+      }
+
+      else -> {
+        throw IllegalArgumentException("Unknown operation '$operationName'")
+      }
+    }
   }
 }

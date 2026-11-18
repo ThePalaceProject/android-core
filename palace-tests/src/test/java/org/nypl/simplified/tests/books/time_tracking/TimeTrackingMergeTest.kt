@@ -14,8 +14,8 @@ import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryCreated
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryOutgoing
-import org.nypl.simplified.books.time.tracking.api.TimeTrackingEventOperation
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingReceivedSpan
 import org.nypl.simplified.books.time.tracking.TimeTrackingMerge
 import org.nypl.simplified.books.time.tracking.TimeTrackingMergeServiceType
@@ -396,13 +396,13 @@ class TimeTrackingMergeTest {
 
     assertEquals(1, events.size)
     val event = events[0]
-    assertEquals(TimeTrackingEventOperation.TimeTrackingEntryCreated, event.operation)
-    assertEquals("urn:uuid:f19fc9b0-6259-4e0a-a76b-2246543e8b6b", event.libraryID)
-    assertEquals("cbd92367-f3e1-4310-a767-a07058271c2b", event.bookID)
-    assertEquals(entries[0].timeEntry.id, event.entryID)
-    assertEquals(OffsetDateTime.parse("2024-10-15T00:00:00Z"), event.duringMinute)
-    assertEquals(30, event.secondsPlayed)
-    assertEquals(null, event.exception)
+    assertTrue(event is TimeTrackingEntryCreated)
+    val entryCreated = event as TimeTrackingEntryCreated
+    assertEquals("urn:uuid:f19fc9b0-6259-4e0a-a76b-2246543e8b6b", entryCreated.libraryID)
+    assertEquals("cbd92367-f3e1-4310-a767-a07058271c2b", entryCreated.bookID)
+    assertEquals(entries[0].timeEntry.id, entryCreated.entryID)
+    assertEquals(OffsetDateTime.parse("2024-10-15T00:00:00Z"), entryCreated.duringMinute)
+    assertEquals(30, entryCreated.secondsPlayed)
   }
 
   @Test

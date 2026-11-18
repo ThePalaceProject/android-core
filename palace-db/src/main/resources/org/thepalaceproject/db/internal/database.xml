@@ -86,9 +86,15 @@ CREATE TABLE account_registry_settings (
             delivery is confirmed. time_tracking_events is an append-only event log of the
             operations performed by the pipeline, subject to a bounded retention period.
 
-            All times are stored in UTC, rendered with a fixed-width explicit offset
-            (YYYY-MM-ddTHH:MM:SS+00:00), so that lexicographic ordering is equivalent to
-            chronological ordering.
+            The column formats are enforced with CHECK constraints that invoke the REGEX
+            function (registered on the connection before the schema is executed). The
+            identifier fields are checked against the UUID and ULID formats, the time fields
+            against the rendering used by the pipeline (the span start and end times and the
+            entry minutes preserve their original offset and sub-second precision, and the
+            times that are used only in database comparisons are a fixed-width UTC time at
+            whole-second granularity), and the event log's operation field against the set of
+            known operations, with the remaining event fields checked for the presence or
+            absence that each operation requires.
         </Comment>
 
         <Statement><![CDATA[
@@ -103,7 +109,22 @@ CREATE TABLE time_tracking_spans (
   tts_target_uri     TEXT    NOT NULL,
 
   CONSTRAINT time_tracking_spans_primary_key
-    PRIMARY KEY (tts_span_uuid)
+    PRIMARY KEY (tts_span_uuid),
+
+  CONSTRAINT time_tracking_spans_check_span_uuid
+    CHECK (REGEX('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', tts_span_uuid) = 1),
+
+  CONSTRAINT time_tracking_spans_check_account_uuid
+    CHECK (REGEX('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', tts_account_uuid) = 1),
+
+  CONSTRAINT time_tracking_spans_check_time_started
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', tts_time_started) = 1),
+
+  CONSTRAINT time_tracking_spans_check_time_ended
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', tts_time_ended) = 1),
+
+  CONSTRAINT time_tracking_spans_check_time_received
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$', tts_time_received) = 1)
 ) STRICT
 ]]></Statement>
 
@@ -121,7 +142,16 @@ CREATE TABLE time_tracking_entries (
     PRIMARY KEY (tte_entry_ulid),
 
   CONSTRAINT time_tracking_entries_check_seconds
-    CHECK (tte_seconds_played >= 0 AND tte_seconds_played <= 60)
+    CHECK (tte_seconds_played >= 0 AND tte_seconds_played <= 60),
+
+  CONSTRAINT time_tracking_entries_check_entry_ulid
+    CHECK (REGEX('^[0-9A-HJKMNP-TV-Z]{26}$', tte_entry_ulid) = 1),
+
+  CONSTRAINT time_tracking_entries_check_account_uuid
+    CHECK (REGEX('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', tte_account_uuid) = 1),
+
+  CONSTRAINT time_tracking_entries_check_during_minute
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', tte_during_minute) = 1)
 ) STRICT
 ]]></Statement>
 
@@ -135,7 +165,76 @@ CREATE TABLE time_tracking_events (
   ttev_entry_ulid     TEXT,
   ttev_during_minute  TEXT,
   ttev_seconds_played INTEGER,
-  ttev_exception      TEXT
+  ttev_exception      TEXT,
+
+  CONSTRAINT time_tracking_events_check_time
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$', ttev_time) = 1),
+
+  CONSTRAINT time_tracking_events_check_entry_ulid_format
+    CHECK (
+      ttev_entry_ulid IS NULL
+      OR REGEX('^[0-9A-HJKMNP-TV-Z]{26}$', ttev_entry_ulid) = 1
+    ),
+
+  CONSTRAINT time_tracking_events_check_operation
+    CHECK (ttev_operation IN (
+      'TimeTrackingStarted',
+      'TimeTrackingStopped',
+      'TimeTrackingEntryCreated',
+      'TimeTrackingSendAttempt',
+      'TimeTrackingSendAttemptSucceeded',
+      'TimeTrackingSendAttemptFailed',
+      'TimeTrackingSendAttemptFailedExceptionally',
+      'TimeTrackingSendAttemptFailedPermanently'
+    )),
+
+  CONSTRAINT time_tracking_events_check_entry_ulid
+    CHECK (
+      (ttev_operation IN (
+        'TimeTrackingEntryCreated',
+        'TimeTrackingSendAttempt',
+        'TimeTrackingSendAttemptSucceeded',
+        'TimeTrackingSendAttemptFailed',
+        'TimeTrackingSendAttemptFailedExceptionally',
+        'TimeTrackingSendAttemptFailedPermanently'
+      ) AND ttev_entry_ulid IS NOT NULL)
+      OR
+      (ttev_operation IN (
+        'TimeTrackingStarted',
+        'TimeTrackingStopped'
+      ) AND ttev_entry_ulid IS NULL)
+    ),
+
+  CONSTRAINT time_tracking_events_check_during_minute
+    CHECK (
+      (ttev_operation = 'TimeTrackingEntryCreated' AND ttev_during_minute IS NOT NULL)
+      OR
+      (ttev_operation <> 'TimeTrackingEntryCreated' AND ttev_during_minute IS NULL)
+    ),
+
+  CONSTRAINT time_tracking_events_check_during_minute_format
+    CHECK (
+      ttev_during_minute IS NULL
+      OR REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', ttev_during_minute) = 1
+    ),
+
+  CONSTRAINT time_tracking_events_check_seconds_played
+    CHECK (
+      (ttev_operation NOT IN ('TimeTrackingStarted', 'TimeTrackingStopped')
+        AND ttev_seconds_played IS NOT NULL
+        AND ttev_seconds_played >= 0
+        AND ttev_seconds_played <= 60)
+      OR
+      (ttev_operation IN ('TimeTrackingStarted', 'TimeTrackingStopped')
+        AND ttev_seconds_played IS NULL)
+    ),
+
+  CONSTRAINT time_tracking_events_check_exception
+    CHECK (
+      (ttev_operation = 'TimeTrackingSendAttemptFailedExceptionally' AND ttev_exception IS NOT NULL)
+      OR
+      (ttev_operation <> 'TimeTrackingSendAttemptFailedExceptionally' AND ttev_exception IS NULL)
+    )
 ) STRICT
 ]]></Statement>
 

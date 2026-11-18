@@ -245,7 +245,7 @@ class TimeTrackingMigrationTest {
   fun testMigrationMovesEntryFiles() {
     val entryFile =
       this.writeLegacyEntryFile(
-        id = "018c4f6e2a1b4c3d5e6f708192a3b4c5",
+        id = "01J2A3B4C5D6E7F8A9B0C1D2E3",
         accountID = "f858f8a0-2b5c-4c2f-9d3f-1a2b3c4d5e6f",
         bookID = "cbd92367-f3e1-4310-a767-a07058271c2b",
         libraryID = "urn:uuid:f19fc9b0-6259-4e0a-a76b-2246543e8b6b",
@@ -300,7 +300,7 @@ class TimeTrackingMigrationTest {
       timeEnded = "2024-10-15T00:00:30Z",
     )
     this.writeLegacyEntryFile(
-      id = "018c4f6e2a1b4c3d5e6f708192a3b4c5",
+      id = "01J2A3B4C5D6E7F8A9B0C1D2E3",
       accountID = "f858f8a0-2b5c-4c2f-9d3f-1a2b3c4d5e6f",
       bookID = "cbd92367-f3e1-4310-a767-a07058271c2b",
       libraryID = "urn:uuid:f19fc9b0-6259-4e0a-a76b-2246543e8b6b",
@@ -386,7 +386,7 @@ class TimeTrackingMigrationTest {
       timeEnded = "2024-10-15T00:00:30Z",
     )
     this.writeLegacyEntryFile(
-      id = "018c4f6e2a1b4c3d5e6f708192a3b4c5",
+      id = "01J2A3B4C5D6E7F8A9B0C1D2E3",
       accountID = "f858f8a0-2b5c-4c2f-9d3f-1a2b3c4d5e6f",
       bookID = "cbd92367-f3e1-4310-a767-a07058271c2b",
       libraryID = "urn:uuid:f19fc9b0-6259-4e0a-a76b-2246543e8b6b",
@@ -399,7 +399,7 @@ class TimeTrackingMigrationTest {
     p.setProperty("Time", "2024-10-15T00:02:00Z")
     p.setProperty("LibraryID", "1014c482-0629-4a57-87ae-f9cc6e933397")
     p.setProperty("BookID", "cbd92367-f3e1-4310-a767-a07058271c2b")
-    p.setProperty("EntryID", "018c4f6e2a1b4c3d5e6f708192a3b4c5")
+    p.setProperty("EntryID", "01J2A3B4C5D6E7F8A9B0C1D2E3")
     p.setProperty("DuringMinute", "2024-10-15T00:00:00Z")
     p.setProperty("Seconds", "30")
     this.writeLegacyAuditRecord(p)

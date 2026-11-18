@@ -14,4 +14,10 @@ data class TimeTrackingEntry(
   val id: String,
   val duringMinute: OffsetDateTime,
   val secondsPlayed: Int,
-)
+) {
+  init {
+    require(this.secondsPlayed in 0..60) {
+      "The number of seconds played must be in the range [0, 60]."
+    }
+  }
+}

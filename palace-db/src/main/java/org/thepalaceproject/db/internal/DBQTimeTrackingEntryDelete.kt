@@ -4,6 +4,8 @@ import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntryDeleteType
 
 internal object DBQTimeTrackingEntryDelete : DBQTimeTrackingEntryDeleteType {
+  private const val CHUNK_SIZE: Int = 500
+
   override fun execute(
     transaction: DBTransactionType,
     parameters: List<String>,
@@ -12,17 +14,15 @@ internal object DBQTimeTrackingEntryDelete : DBQTimeTrackingEntryDeleteType {
       return 0
     }
 
-    val placeholders = parameters.joinToString(", ") { "?" }
-    val queryText =
-      """
-      DELETE FROM time_tracking_entries
-      WHERE tte_entry_ulid IN ($placeholders)
-      """.trimIndent()
-
     var total = 0
-    val chunkSize = 500
-    for (offset in parameters.indices step chunkSize) {
-      val chunk = parameters.subList(offset, minOf(offset + chunkSize, parameters.size))
+    for (offset in parameters.indices step this.CHUNK_SIZE) {
+      val chunk = parameters.subList(offset, minOf(offset + this.CHUNK_SIZE, parameters.size))
+      val placeholders = chunk.joinToString(", ") { "?" }
+      val queryText =
+        """
+        DELETE FROM time_tracking_entries
+        WHERE tte_entry_ulid IN ($placeholders)
+        """.trimIndent()
       total +=
         transaction.connection.connection
           .prepareStatement(queryText)

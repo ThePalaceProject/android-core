@@ -2,7 +2,13 @@ package org.nypl.simplified.books.time.tracking
 
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryOutgoing
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEvent
-import org.nypl.simplified.books.time.tracking.api.TimeTrackingEventOperation
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttempt
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailed
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedExceptionally
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedPermanently
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptSucceeded
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStarted
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStopped
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.db.api.queries.DBQTimeTrackingEventPurgeType
@@ -44,13 +50,11 @@ class TimeTrackingAudit private constructor(
     bookID: String,
   ) {
     this.appendEvent(
-      operation = TimeTrackingEventOperation.TimeTrackingStarted,
-      libraryID = libraryID,
-      bookID = bookID,
-      entryID = null,
-      duringMinute = null,
-      secondsPlayed = null,
-      exception = null,
+      TimeTrackingStarted(
+        time = this.clock.invoke(),
+        libraryID = libraryID,
+        bookID = bookID,
+      ),
     )
   }
 
@@ -65,13 +69,11 @@ class TimeTrackingAudit private constructor(
     bookID: String,
   ) {
     this.appendEvent(
-      operation = TimeTrackingEventOperation.TimeTrackingStopped,
-      libraryID = libraryID,
-      bookID = bookID,
-      entryID = null,
-      duringMinute = null,
-      secondsPlayed = null,
-      exception = null,
+      TimeTrackingStopped(
+        time = this.clock.invoke(),
+        libraryID = libraryID,
+        bookID = bookID,
+      ),
     )
   }
 
@@ -82,13 +84,13 @@ class TimeTrackingAudit private constructor(
    */
   fun sendAttempt(entry: TimeTrackingEntryOutgoing) {
     this.appendEvent(
-      operation = TimeTrackingEventOperation.TimeTrackingSendAttempt,
-      libraryID = entry.libraryID.toString(),
-      bookID = entry.bookID.value,
-      entryID = entry.timeEntry.id,
-      duringMinute = null,
-      secondsPlayed = entry.timeEntry.secondsPlayed,
-      exception = null,
+      TimeTrackingSendAttempt(
+        time = this.clock.invoke(),
+        libraryID = entry.libraryID.toString(),
+        bookID = entry.bookID.value,
+        entryID = entry.timeEntry.id,
+        secondsPlayed = entry.timeEntry.secondsPlayed,
+      ),
     )
   }
 
@@ -99,13 +101,13 @@ class TimeTrackingAudit private constructor(
    */
   fun sendAttemptSucceeded(entry: TimeTrackingEntryOutgoing) {
     this.appendEvent(
-      operation = TimeTrackingEventOperation.TimeTrackingSendAttemptSucceeded,
-      libraryID = entry.libraryID.toString(),
-      bookID = entry.bookID.value,
-      entryID = entry.timeEntry.id,
-      duringMinute = null,
-      secondsPlayed = entry.timeEntry.secondsPlayed,
-      exception = null,
+      TimeTrackingSendAttemptSucceeded(
+        time = this.clock.invoke(),
+        libraryID = entry.libraryID.toString(),
+        bookID = entry.bookID.value,
+        entryID = entry.timeEntry.id,
+        secondsPlayed = entry.timeEntry.secondsPlayed,
+      ),
     )
   }
 
@@ -116,13 +118,13 @@ class TimeTrackingAudit private constructor(
    */
   fun sendAttemptFailed(entry: TimeTrackingEntryOutgoing) {
     this.appendEvent(
-      operation = TimeTrackingEventOperation.TimeTrackingSendAttemptFailed,
-      libraryID = entry.libraryID.toString(),
-      bookID = entry.bookID.value,
-      entryID = entry.timeEntry.id,
-      duringMinute = null,
-      secondsPlayed = entry.timeEntry.secondsPlayed,
-      exception = null,
+      TimeTrackingSendAttemptFailed(
+        time = this.clock.invoke(),
+        libraryID = entry.libraryID.toString(),
+        bookID = entry.bookID.value,
+        entryID = entry.timeEntry.id,
+        secondsPlayed = entry.timeEntry.secondsPlayed,
+      ),
     )
   }
 
@@ -138,13 +140,14 @@ class TimeTrackingAudit private constructor(
     exception: Throwable,
   ) {
     this.appendEvent(
-      operation = TimeTrackingEventOperation.TimeTrackingSendAttemptFailedExceptionally,
-      libraryID = entry.libraryID.toString(),
-      bookID = entry.bookID.value,
-      entryID = entry.timeEntry.id,
-      duringMinute = null,
-      secondsPlayed = entry.timeEntry.secondsPlayed,
-      exception = this.exceptionTextOf(exception),
+      TimeTrackingSendAttemptFailedExceptionally(
+        time = this.clock.invoke(),
+        libraryID = entry.libraryID.toString(),
+        bookID = entry.bookID.value,
+        entryID = entry.timeEntry.id,
+        secondsPlayed = entry.timeEntry.secondsPlayed,
+        exception = this.exceptionTextOf(exception),
+      ),
     )
   }
 
@@ -155,13 +158,13 @@ class TimeTrackingAudit private constructor(
    */
   fun sendAttemptFailedPermanently(entry: TimeTrackingEntryOutgoing) {
     this.appendEvent(
-      operation = TimeTrackingEventOperation.TimeTrackingSendAttemptFailedPermanently,
-      libraryID = entry.libraryID.toString(),
-      bookID = entry.bookID.value,
-      entryID = entry.timeEntry.id,
-      duringMinute = null,
-      secondsPlayed = entry.timeEntry.secondsPlayed,
-      exception = null,
+      TimeTrackingSendAttemptFailedPermanently(
+        time = this.clock.invoke(),
+        libraryID = entry.libraryID.toString(),
+        bookID = entry.bookID.value,
+        entryID = entry.timeEntry.id,
+        secondsPlayed = entry.timeEntry.secondsPlayed,
+      ),
     )
   }
 
@@ -196,27 +199,7 @@ class TimeTrackingAudit private constructor(
     }
   }
 
-  private fun appendEvent(
-    operation: TimeTrackingEventOperation,
-    libraryID: String,
-    bookID: String,
-    entryID: String?,
-    duringMinute: OffsetDateTime?,
-    secondsPlayed: Int?,
-    exception: String?,
-  ) {
-    val event =
-      TimeTrackingEvent(
-        operation = operation,
-        time = this.clock.invoke(),
-        libraryID = libraryID,
-        bookID = bookID,
-        entryID = entryID,
-        duringMinute = duringMinute,
-        secondsPlayed = secondsPlayed,
-        exception = exception,
-      )
-
+  private fun appendEvent(event: TimeTrackingEvent) {
     try {
       this.database.openConnection().use { connection ->
         connection.openTransaction().use { transaction ->
@@ -229,7 +212,7 @@ class TimeTrackingAudit private constructor(
         code = DiagnosticCodes.TIME_TRACKING_AUDIT,
         data =
           mapOf(
-            Pair("Operation", operation.name),
+            Pair("Operation", event.operationName),
           ),
         throwable = e,
       )

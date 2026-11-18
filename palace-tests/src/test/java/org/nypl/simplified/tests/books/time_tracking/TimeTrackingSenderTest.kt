@@ -3,6 +3,7 @@ package org.nypl.simplified.tests.books.time_tracking
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import io.azam.ulidj.ULID
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -123,7 +124,7 @@ class TimeTrackingSenderTest {
       libraryID = URI.create("urn:uuid:f19fc9b0-6259-4e0a-a76b-2246543e8b6b"),
       timeEntry =
         TimeTrackingEntry(
-          id = UUID.randomUUID().toString(),
+          id = ULID.random(),
           duringMinute = OffsetDateTime.parse("2024-10-15T00:00:00Z"),
           secondsPlayed = 30,
         ),

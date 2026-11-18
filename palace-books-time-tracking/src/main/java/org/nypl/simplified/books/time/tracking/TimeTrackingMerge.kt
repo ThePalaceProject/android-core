@@ -5,9 +5,8 @@ import io.azam.ulidj.ULID
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntry
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryCreated
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryOutgoing
-import org.nypl.simplified.books.time.tracking.api.TimeTrackingEvent
-import org.nypl.simplified.books.time.tracking.api.TimeTrackingEventOperation
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingReceivedSpan
 import org.slf4j.LoggerFactory
 import org.thepalaceproject.db.api.DBType
@@ -121,15 +120,13 @@ class TimeTrackingMerge private constructor(
                 transaction.execute(DBQTimeTrackingEntryPutType::class.java, entry)
                 transaction.execute(
                   DBQTimeTrackingEventPutType::class.java,
-                  TimeTrackingEvent(
-                    operation = TimeTrackingEventOperation.TimeTrackingEntryCreated,
+                  TimeTrackingEntryCreated(
                     time = timeNow,
                     libraryID = entry.libraryID.toString(),
                     bookID = entry.bookID.value,
                     entryID = entry.timeEntry.id,
                     duringMinute = entry.timeEntry.duringMinute,
                     secondsPlayed = entry.timeEntry.secondsPlayed,
-                    exception = null,
                   ),
                 )
               }

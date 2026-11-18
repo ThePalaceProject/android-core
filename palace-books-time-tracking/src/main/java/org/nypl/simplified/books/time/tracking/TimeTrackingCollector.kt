@@ -120,10 +120,10 @@ class TimeTrackingCollector private constructor(
           /*
            * The start and end times are stored with their original offset preserved. The
            * minute to which an entry applies (and which is sent to the server) is derived
-           * from the start time, so preserving the offset keeps the wire format identical
-           * to that of the legacy file-based implementation. The receive time, by contrast,
-           * comes from the application clock (UTC) and is used only for the database merge
-           * threshold, so it is normalized to UTC by the storage layer.
+           * from the start time, so preserving the offset keeps the values sent to the
+           * server identical to the times that the player reported. The receive time, by
+           * contrast, comes from the application clock (UTC) and is used only for the
+           * database merge threshold, so it is normalized to UTC by the storage layer.
            */
 
           val span =

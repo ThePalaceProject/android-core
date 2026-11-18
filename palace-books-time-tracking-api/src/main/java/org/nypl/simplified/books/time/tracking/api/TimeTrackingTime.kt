@@ -13,8 +13,8 @@ import java.time.temporal.ChronoUnit
  * The fields that are read back and sent over the network (the span start and end times, and the
  * entry and event minutes) are stored with their original offset and sub-second precision intact.
  * They are rendered with [OffsetDateTime.toString], which round-trips losslessly through
- * [parse], so that the values sent to the server are byte-for-byte identical to the values that
- * the legacy file-based implementation sent.
+ * [parse], so that the values sent to the server are identical to the times that the player
+ * reported.
  *
  * The fields that are used only in database time comparisons (the span receive time, and the event
  * time) are normalized to UTC and truncated to whole seconds. They are rendered with a fixed-width
