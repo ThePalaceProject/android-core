@@ -78,6 +78,7 @@ class TimeTrackingMerge private constructor(
   }
 
   private fun tick() {
+    var committedInvalidSpans: List<TimeTrackingReceivedSpan> = emptyList()
     try {
       val timeNow =
         this.clock.invoke()
@@ -132,16 +133,25 @@ class TimeTrackingMerge private constructor(
               }
             }
 
-            if (invalidSpans.isNotEmpty()) {
-              this.reportInvalidSpans(invalidSpans)
-            }
-
             val spanIds =
               spans.map { s -> s.id.toString() }
             transaction.execute(DBQTimeTrackingSpanDeleteType::class.java, spanIds)
             transaction.commit()
+            committedInvalidSpans = invalidSpans
           }
         }
+      }
+
+      /*
+       * The loss report is issued only after the transaction has been committed and the
+       * connection closed. The diagnostics service performs external work (the loaded
+       * implementation reports to a crash reporting service), and the database writer lock
+       * must not be held across that work. If the transaction fails, the invalid spans
+       * remain in the database and will be reported by a later tick.
+       */
+
+      if (committedInvalidSpans.isNotEmpty()) {
+        this.reportInvalidSpans(committedInvalidSpans)
       }
     } catch (e: Throwable) {
       this.logger.error("Failed to process time tracking entries: ", e)
@@ -153,8 +163,8 @@ class TimeTrackingMerge private constructor(
   /**
    * Report the given spans, which carry no usable playback data, as a loss.
    *
-   * The spans are already scheduled for deletion by the caller; this only records their
-   * presence so that the loss is observable.
+   * The spans have already been deleted from the database by the caller; this only
+   * records their presence so that the loss is observable.
    *
    * @param spans The invalid spans
    */

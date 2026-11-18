@@ -235,7 +235,7 @@ class TimeTrackingMergeTest {
       this.selectEntries()
     assertTrue(entries.isEmpty())
 
-    Mockito.verify(this.diagnostics)
+    Mockito.verify(this.diagnostics, Mockito.timeout(4000L))
       .report(
         DiagnosticCodes.TIME_TRACKING_LOSS,
         mapOf(
@@ -289,7 +289,7 @@ class TimeTrackingMergeTest {
     assertEquals(this.palaceID, entries[0].bookID)
     assertTrue(spans.isEmpty())
 
-    Mockito.verify(this.diagnostics)
+    Mockito.verify(this.diagnostics, Mockito.timeout(4000L))
       .report(
         DiagnosticCodes.TIME_TRACKING_LOSS,
         mapOf(
