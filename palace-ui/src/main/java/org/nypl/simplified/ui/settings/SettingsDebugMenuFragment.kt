@@ -18,6 +18,7 @@ class SettingsDebugMenuFragment :
   private lateinit var itemAuto: ViewGroup
   private lateinit var itemBooks: ViewGroup
   private lateinit var itemStartup: ViewGroup
+  private lateinit var itemMDM: ViewGroup
   private lateinit var itemRegistry: ViewGroup
   private lateinit var itemErrors: ViewGroup
   private lateinit var itemDRM: ViewGroup
@@ -58,6 +59,7 @@ class SettingsDebugMenuFragment :
     this.itemRegistry = view.findViewById(R.id.debugRegistry)
     this.itemNetwork = view.findViewById(R.id.debugNetwork)
     this.itemStartup = view.findViewById(R.id.debugStartup)
+    this.itemMDM = view.findViewById(R.id.debugMdm)
 
     this.itemAuto.setOnClickListener {
       MainNavigation.Settings.openDebugAuto()
@@ -79,6 +81,9 @@ class SettingsDebugMenuFragment :
     }
     this.itemStartup.setOnClickListener {
       MainNavigation.Settings.openDebugStartupSettings()
+    }
+    this.itemMDM.setOnClickListener {
+      MainNavigation.Settings.openDebugMDMSettings()
     }
     this.itemNetwork.setOnClickListener {
       MainNavigation.Settings.openDebugNetworkSettings()

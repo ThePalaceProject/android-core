@@ -10,8 +10,10 @@ import org.mockito.Mockito
 import org.thepalaceproject.mdm.MDMConfiguration
 import org.thepalaceproject.mdm.MDMConfigurationParseResult
 import org.thepalaceproject.mdm.MDMConfigurationReader
-import org.thepalaceproject.mdm.MDMLibraryApplier
 import org.thepalaceproject.mdm.MDMConfigurationWatcher
+import org.thepalaceproject.mdm.MDMData
+import org.thepalaceproject.mdm.MDMDataServiceType
+import org.thepalaceproject.mdm.MDMLibraryApplier
 import java.net.URI
 
 /**
@@ -41,14 +43,30 @@ class MDMConfigurationWatcherTest {
       invalidFields = emptyList(),
     )
 
+  private val dataA =
+    MDMData(
+      rawValues = mapOf("Library-0" to this.libraryA.toString()),
+      parseResult = this.configurationA,
+    )
+  private val dataB =
+    MDMData(
+      rawValues = mapOf(
+        "Library-0" to this.libraryA.toString(),
+        "Library-1" to this.libraryB.toString(),
+      ),
+      parseResult = this.configurationB,
+    )
+
   private val context =
     Mockito.mock(Context::class.java)
   private val reader =
     Mockito.mock(MDMConfigurationReader::class.java)
+  private val dataService =
+    Mockito.mock(MDMDataServiceType::class.java)
   private val applier =
     Mockito.mock(MDMLibraryApplier::class.java)
   private val watcher =
-    MDMConfigurationWatcher(this.context, this.reader, this.applier)
+    MDMConfigurationWatcher(this.context, this.reader, this.dataService, this.applier)
 
   /**
    * Starting the watcher applies the current configuration.
@@ -57,10 +75,11 @@ class MDMConfigurationWatcherTest {
   @Test
   fun startAppliesCurrentConfiguration() {
     Mockito.`when`(this.reader.readConfiguration())
-      .thenReturn(this.configurationA)
+      .thenReturn(this.dataA)
 
     this.startWatcher()
 
+    Mockito.verify(this.dataService).setMostRecent(this.dataA)
     Mockito.verify(this.applier, Mockito.times(1))
       .apply(this.configurationA)
   }
@@ -73,7 +92,7 @@ class MDMConfigurationWatcherTest {
   @Test
   fun unchangedConfigurationIsNotReapplied() {
     Mockito.`when`(this.reader.readConfiguration())
-      .thenReturn(this.configurationA)
+      .thenReturn(this.dataA)
 
     val receiver =
       this.startWatcher()
@@ -90,8 +109,8 @@ class MDMConfigurationWatcherTest {
   @Test
   fun changedConfigurationIsReapplied() {
     Mockito.`when`(this.reader.readConfiguration())
-      .thenReturn(this.configurationA)
-      .thenReturn(this.configurationB)
+      .thenReturn(this.dataA)
+      .thenReturn(this.dataB)
 
     val receiver =
       this.startWatcher()
@@ -107,8 +126,10 @@ class MDMConfigurationWatcherTest {
 
   @Test
   fun stopUnregistersReceiver() {
+    val emptyData =
+      MDMData(rawValues = emptyMap(), parseResult = this.emptyConfiguration)
     Mockito.`when`(this.reader.readConfiguration())
-      .thenReturn(this.emptyConfiguration)
+      .thenReturn(emptyData)
 
     val receiver =
       this.startWatcher()

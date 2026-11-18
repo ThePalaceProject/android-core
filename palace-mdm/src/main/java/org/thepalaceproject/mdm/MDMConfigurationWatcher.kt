@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import org.slf4j.LoggerFactory
 
 /**
  * A watcher for the managed device (MDM) configuration.
@@ -25,8 +26,12 @@ import android.content.IntentFilter
 class MDMConfigurationWatcher(
   private val context: Context,
   private val reader: MDMConfigurationReader,
+  private val dataService: MDMDataServiceType,
   private val applier: MDMLibraryApplier,
 ) {
+  private val logger =
+    LoggerFactory.getLogger(MDMConfigurationWatcher::class.java)
+
   private var lastApplied: MDMConfigurationParseResult? = null
   private var receiver: BroadcastReceiver? = null
 
@@ -66,11 +71,16 @@ class MDMConfigurationWatcher(
   }
 
   private fun applyCurrent() {
-    val result =
+    val data =
       this.reader.readConfiguration()
+    this.dataService.setMostRecent(data)
+    val result =
+      data.parseResult
     if (result == this.lastApplied) {
+      this.logger.debug("MDM configuration unchanged ({}); not re-applying", result)
       return
     }
+    this.logger.debug("MDM configuration changed from {} to {}; applying", this.lastApplied, result)
     this.lastApplied = result
     this.applier.apply(result)
   }

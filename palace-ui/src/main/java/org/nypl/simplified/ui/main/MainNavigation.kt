@@ -32,6 +32,7 @@ import org.nypl.simplified.ui.settings.SettingsDebugMenuBooksFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuDRMFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuErrorsFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuFragment
+import org.nypl.simplified.ui.settings.SettingsDebugMenuMDMFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuNetworkFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuRegistryFragment
 import org.nypl.simplified.ui.settings.SettingsDebugMenuStartupFragment
@@ -240,6 +241,10 @@ object MainNavigation {
 
     fun openDebugStartupSettings() {
       this.stackPush(SettingsDebugMenuStartupFragment.createScreenDefinition(Unit))
+    }
+
+    fun openDebugMDMSettings() {
+      this.stackPush(SettingsDebugMenuMDMFragment.createScreenDefinition(Unit))
     }
 
     fun openDebugNetworkSettings() {

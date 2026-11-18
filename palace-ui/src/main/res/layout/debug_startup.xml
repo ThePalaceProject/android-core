@@ -106,15 +106,4 @@
         android:enabled="true"
         android:text="User has accepted the audiobook battery dialog?" />
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/debugStartupEnableMDMLibraries"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:checked="false"
-        android:enabled="true"
-        android:text="Enable libraries from the managed device configuration?" />
-
 </LinearLayout>
