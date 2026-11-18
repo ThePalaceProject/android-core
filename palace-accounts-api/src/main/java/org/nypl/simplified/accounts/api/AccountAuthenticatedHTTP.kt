@@ -122,4 +122,44 @@ object AccountAuthenticatedHTTP {
     } else {
       ErrorIsUnrecoverable
     }
+
+  /**
+   * Produce the message shown to the user for a failed request, given a possibly-not-present
+   * problem report.
+   *
+   * When the server supplies a usable `detail`, that text is what the user sees: it is written
+   * by the library and is very nearly always more useful than anything the app could say. The
+   * report's `title` is used as framing above it, unless the server set `show_title` to false,
+   * which marks a `detail` that is meant to stand on its own. A library whose blocking-rule
+   * message redirects a patron elsewhere uses that to drop the standard "Blocked by library
+   * policy." framing.
+   *
+   * [fallback] is returned whenever the server gave us nothing worth showing, so a report with
+   * no `detail` reads exactly as it did before this function existed.
+   */
+
+  fun problemReportMessage(
+    problemReport: LSHTTPProblemReport?,
+    fallback: String,
+  ): String {
+    if (problemReport == null) {
+      return fallback
+    }
+
+    val detail = problemReport.detail
+    if (detail == null || detail.isBlank()) {
+      return fallback
+    }
+
+    val title = problemReport.title
+    if (title == null || title.isBlank()) {
+      return detail
+    }
+
+    if (problemReport.showTitle) {
+      return "$title\n\n$detail"
+    } else {
+      return detail
+    }
+  }
 }

@@ -202,9 +202,23 @@ object PatronUserProfiles {
       }
 
       else -> {
-        taskRecorder.addAttributesIfPresent(result.properties.problemReport?.toMap())
+        val problemReport = result.properties.problemReport
+        taskRecorder.addAttributesIfPresent(problemReport?.toMap())
+
+        /*
+         * This is the path a patron blocked by a library policy arrives on: basic
+         * authentication has no separate authenticate call, so the manager answers the patron
+         * profile request itself with a 403 and a problem document. Prefer the library's own
+         * message over the HTTP status, which tells the patron nothing. The status is still
+         * recorded in the error code, and the report in the attributes added above.
+         */
+
         taskRecorder.currentStepFailed(
-          message = "Server error: ${result.properties.status} ${result.properties.message}",
+          message =
+            AccountAuthenticatedHTTP.problemReportMessage(
+              problemReport = problemReport,
+              fallback = "Server error: ${result.properties.status} ${result.properties.message}",
+            ),
           errorCode = "httpError ${result.properties.status} $patronSettingsURI",
           exception = exception,
           extraMessages = listOf(),
