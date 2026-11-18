@@ -38,7 +38,6 @@ class SettingsDebugMenuStartupFragment :
   private lateinit var hasSeenLibrarySelector: SwitchCompat
   private lateinit var hasSeenNotifications: SwitchCompat
   private lateinit var failNextBoot: SwitchCompat
-  private lateinit var itemMDM: View
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
@@ -82,12 +81,6 @@ class SettingsDebugMenuStartupFragment :
       SettingsDebugModel.hasSeenLibrarySelection()
     this.hasSeenAudiobookBatteryDialog.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.updatePreferences { p -> p.copy(audioBookBatteryDialogAccepted = checked) }
-    }
-
-    this.itemMDM =
-      view.findViewById(R.id.debugStartupMDM)
-    this.itemMDM.setOnClickListener {
-      MainNavigation.Settings.openDebugMDMSettings()
     }
   }
 }
