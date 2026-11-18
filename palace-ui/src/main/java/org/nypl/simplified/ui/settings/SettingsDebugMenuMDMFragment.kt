@@ -3,6 +3,7 @@ package org.nypl.simplified.ui.settings
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
@@ -32,6 +33,7 @@ class SettingsDebugMenuMDMFragment :
       ScreenSettingsDebugMenuMDM()
   }
 
+  private lateinit var enableLibraries: SwitchCompat
   private lateinit var toolbarBack: View
   private lateinit var dataText: TextView
   private lateinit var errorsText: TextView
@@ -51,6 +53,14 @@ class SettingsDebugMenuMDMFragment :
       view.findViewById(R.id.debugMdmData)
     this.errorsText =
       view.findViewById(R.id.debugMdmErrors)
+
+    this.enableLibraries =
+      view.findViewById(R.id.debugMdmEnableLibraries)
+    this.enableLibraries.isChecked =
+      SettingsDebugModel.enableMDMLibraries()
+    this.enableLibraries.setOnCheckedChangeListener { _, checked ->
+      SettingsDebugModel.setEnableMDMLibraries(checked)
+    }
   }
 
   override fun onResume() {
