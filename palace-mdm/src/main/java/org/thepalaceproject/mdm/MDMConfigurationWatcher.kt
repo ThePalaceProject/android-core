@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory
 class MDMConfigurationWatcher(
   private val context: Context,
   private val reader: MDMConfigurationReader,
+  private val dataService: MDMDataServiceType,
   private val applier: MDMLibraryApplier,
 ) {
   private val logger =
@@ -70,8 +71,11 @@ class MDMConfigurationWatcher(
   }
 
   private fun applyCurrent() {
-    val result =
+    val data =
       this.reader.readConfiguration()
+    this.dataService.setMostRecent(data)
+    val result =
+      data.parseResult
     if (result == this.lastApplied) {
       this.logger.debug("MDM configuration unchanged ({}); not re-applying", result)
       return

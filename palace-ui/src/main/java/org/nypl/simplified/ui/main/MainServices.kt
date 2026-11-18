@@ -117,6 +117,8 @@ import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
 import org.thepalaceproject.mdm.MDMConfigurationReader
 import org.thepalaceproject.mdm.MDMConfigurationWatcher
+import org.thepalaceproject.mdm.MDMDataService
+import org.thepalaceproject.mdm.MDMDataServiceType
 import org.thepalaceproject.mdm.MDMLibraryApplier
 import org.thepalaceproject.opds.client.OPDSClient
 import org.thepalaceproject.opds.client.OPDSClientParameters
@@ -566,6 +568,13 @@ internal object MainServices {
         serviceConstructor = { DiagnosticsService.create() },
       )
 
+    val mdmDataService =
+      addService(
+        message = strings.bootingGeneral("MDM data"),
+        interfaceType = MDMDataServiceType::class.java,
+        serviceConstructor = { MDMDataService() },
+      )
+
     val lsHTTP =
       addService(
         message = strings.bootingGeneral("LSHTTP"),
@@ -994,6 +1003,7 @@ internal object MainServices {
     MDMConfigurationWatcher(
       context = context,
       reader = MDMConfigurationReader(context),
+      dataService = mdmDataService,
       applier =
         MDMLibraryApplier(
           profiles = profilesControllerTypeService,

@@ -47,11 +47,12 @@ class MDMConfigurationReaderTest {
     // `manager.applicationRestrictions` is left unstubbed: an unstubbed mock
     // returns null, as the real manager does when the device is not managed.
 
-    val result =
+    val data =
       MDMConfigurationReader(this.context).readConfiguration()
 
-    assertTrue(result.configuration.libraryURIs.isEmpty())
-    assertTrue(result.invalidFields.isEmpty())
+    assertTrue(data.rawValues.isEmpty())
+    assertTrue(data.parseResult.configuration.libraryURIs.isEmpty())
+    assertTrue(data.parseResult.invalidFields.isEmpty())
   }
 
   /**
@@ -68,11 +69,18 @@ class MDMConfigurationReaderTest {
       )
     )
 
-    val result =
+    val data =
       MDMConfigurationReader(this.context).readConfiguration()
 
-    assertEquals(MDMConfiguration(listOf(this.libraryA, this.libraryB)), result.configuration)
-    assertTrue(result.invalidFields.isEmpty())
+    assertEquals(
+      mapOf(
+        "Library-0" to "urn:uuid:00000000-0000-4000-8000-000000000000",
+        "Library-2" to "urn:uuid:00000000-0000-4000-8000-000000000001",
+      ),
+      data.rawValues,
+    )
+    assertEquals(MDMConfiguration(listOf(this.libraryA, this.libraryB)), data.parseResult.configuration)
+    assertTrue(data.parseResult.invalidFields.isEmpty())
   }
 
   /**
@@ -89,13 +97,13 @@ class MDMConfigurationReaderTest {
       )
     )
 
-    val result =
+    val data =
       MDMConfigurationReader(this.context).readConfiguration()
 
-    assertEquals(MDMConfiguration(listOf(this.libraryA)), result.configuration)
-    assertEquals(1, result.invalidFields.size)
-    assertEquals("Library-1", result.invalidFields[0].field)
-    assertEquals("https://not-a-library.example.com", result.invalidFields[0].value)
+    assertEquals(MDMConfiguration(listOf(this.libraryA)), data.parseResult.configuration)
+    assertEquals(1, data.parseResult.invalidFields.size)
+    assertEquals("Library-1", data.parseResult.invalidFields[0].field)
+    assertEquals("https://not-a-library.example.com", data.parseResult.invalidFields[0].value)
   }
 
   /**
@@ -113,11 +121,11 @@ class MDMConfigurationReaderTest {
       )
     )
 
-    val result =
+    val data =
       MDMConfigurationReader(this.context).readConfiguration()
 
-    assertEquals(MDMConfiguration(listOf(this.libraryA, this.libraryB)), result.configuration)
-    assertTrue(result.invalidFields.isEmpty())
+    assertEquals(MDMConfiguration(listOf(this.libraryA, this.libraryB)), data.parseResult.configuration)
+    assertTrue(data.parseResult.invalidFields.isEmpty())
   }
 
   /**
@@ -132,11 +140,11 @@ class MDMConfigurationReaderTest {
       )
     )
 
-    val result =
+    val data =
       MDMConfigurationReader(this.context).readConfiguration()
 
-    assertTrue(result.configuration.libraryURIs.isEmpty())
-    assertTrue(result.invalidFields.isEmpty())
+    assertTrue(data.parseResult.configuration.libraryURIs.isEmpty())
+    assertTrue(data.parseResult.invalidFields.isEmpty())
   }
 
   /**
@@ -151,11 +159,12 @@ class MDMConfigurationReaderTest {
     // `bundle.getString("Library-0")` is left unstubbed: it returns null,
     // matching the real Bundle for values that are not strings.
 
-    val result =
+    val data =
       MDMConfigurationReader(this.context).readConfiguration()
 
-    assertTrue(result.configuration.libraryURIs.isEmpty())
-    assertTrue(result.invalidFields.isEmpty())
+    assertTrue(data.rawValues.isEmpty())
+    assertTrue(data.parseResult.configuration.libraryURIs.isEmpty())
+    assertTrue(data.parseResult.invalidFields.isEmpty())
   }
 
   private fun mockBundle(values: Map<String, String>) {

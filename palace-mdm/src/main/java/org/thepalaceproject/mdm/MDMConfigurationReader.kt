@@ -19,15 +19,20 @@ class MDMConfigurationReader(
     LoggerFactory.getLogger(MDMConfigurationReader::class.java)
 
   /**
-   * @return The current managed device configuration
+   * @return The current managed device configuration data: the raw values
+   * as received from the device management system, and the result of
+   * parsing them
    */
-  fun readConfiguration(): MDMConfigurationParseResult {
+  fun readConfiguration(): MDMData {
     val manager =
       this.context.getSystemService(RestrictionsManager::class.java)
-    val bundle =
-      manager.applicationRestrictions
-    this.logger.debug("MDM application restrictions bundle: {}", bundle)
-    return MDMConfigurationParser.parse(this.toValues(bundle))
+    val values =
+      this.toValues(manager.applicationRestrictions)
+    this.logger.debug("MDM application restrictions: {}", values)
+    return MDMData(
+      rawValues = values,
+      parseResult = MDMConfigurationParser.parse(values),
+    )
   }
 
   private fun toValues(bundle: Bundle?): Map<String, String> {

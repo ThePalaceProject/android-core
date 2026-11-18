@@ -39,6 +39,7 @@ class SettingsDebugMenuStartupFragment :
   private lateinit var hasSeenNotifications: SwitchCompat
   private lateinit var failNextBoot: SwitchCompat
   private lateinit var enableMDMLibraries: SwitchCompat
+  private lateinit var itemMDM: View
   private lateinit var toolbarBack: View
 
   override fun onViewCreated(
@@ -90,6 +91,12 @@ class SettingsDebugMenuStartupFragment :
       SettingsDebugModel.enableMDMLibraries()
     this.enableMDMLibraries.setOnCheckedChangeListener { _, checked ->
       SettingsDebugModel.setEnableMDMLibraries(checked)
+    }
+
+    this.itemMDM =
+      view.findViewById(R.id.debugStartupMDM)
+    this.itemMDM.setOnClickListener {
+      MainNavigation.Settings.openDebugMDMSettings()
     }
   }
 }
