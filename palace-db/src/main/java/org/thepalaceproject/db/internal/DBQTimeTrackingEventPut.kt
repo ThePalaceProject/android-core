@@ -12,6 +12,7 @@ import org.nypl.simplified.books.time.tracking.api.TimeTrackingStopped
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingTime
 import org.thepalaceproject.db.api.DBTransactionType
 import org.thepalaceproject.db.api.queries.DBQTimeTrackingEventPutType
+import java.sql.Types
 import java.time.OffsetDateTime
 
 internal object DBQTimeTrackingEventPut : DBQTimeTrackingEventPutType {
@@ -116,22 +117,22 @@ internal object DBQTimeTrackingEventPut : DBQTimeTrackingEventPutType {
         if (entryID != null) {
           statement.setString(5, entryID)
         } else {
-          statement.setNull(5, java.sql.Types.VARCHAR)
+          statement.setNull(5, Types.VARCHAR)
         }
         if (duringMinute != null) {
           statement.setString(6, TimeTrackingTime.format(duringMinute))
         } else {
-          statement.setNull(6, java.sql.Types.VARCHAR)
+          statement.setNull(6, Types.VARCHAR)
         }
         if (secondsPlayed != null) {
           statement.setInt(7, secondsPlayed)
         } else {
-          statement.setNull(7, java.sql.Types.INTEGER)
+          statement.setNull(7, Types.INTEGER)
         }
         if (exception != null) {
           statement.setString(8, exception)
         } else {
-          statement.setNull(8, java.sql.Types.VARCHAR)
+          statement.setNull(8, Types.VARCHAR)
         }
         statement.executeUpdate()
       }

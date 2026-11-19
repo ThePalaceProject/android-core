@@ -38,6 +38,7 @@ import org.nypl.simplified.patron.api.PatronAuthorization
 import org.nypl.simplified.tests.TestDirectories
 import org.nypl.simplified.tests.mocking.MockAccount
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 
 class TimeTrackingRefreshTokenTest {
@@ -117,7 +118,7 @@ class TimeTrackingRefreshTokenTest {
       timeEntries = listOf(
         TimeTrackingEntry(
           id = "id",
-          duringMinute = java.time.OffsetDateTime.parse("2024-10-16T00:00:00Z"),
+          duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"),
           secondsPlayed = 60
         )
       )
