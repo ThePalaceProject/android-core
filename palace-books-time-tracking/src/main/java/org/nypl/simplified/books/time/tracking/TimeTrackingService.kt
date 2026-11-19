@@ -109,6 +109,10 @@ class TimeTrackingService private constructor(
     }
   }
 
+  override fun status(): TimeTrackingStatus {
+    return this.status.get()
+  }
+
   override fun onBookOpenedForTracking(
     accountID: AccountID,
     bookId: PlayerPalaceID,
