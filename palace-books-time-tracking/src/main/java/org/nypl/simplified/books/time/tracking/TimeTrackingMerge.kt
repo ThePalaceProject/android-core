@@ -32,9 +32,14 @@ import java.util.concurrent.TimeUnit
  * operates on spans that are over a minute old, because there might still be spans to come in
  * the current minute.
  *
- * The selection of spans, the insertion of the merged entries, and the deletion of the spans
- * are performed in a single database transaction. If the process fails at any point, the
- * transaction is rolled back and the spans are retried on a later tick; no time can be lost.
+ * The selection of spans is performed in a read-only transaction, and the insertion of the
+ * merged entries and the deletion of the spans are performed in a separate write-first
+ * transaction. The two phases are not combined, because in WAL mode a deferred transaction
+ * that reads and then writes can fail with SQLITE_BUSY_SNAPSHOT if another connection
+ * commits in between, and SQLite does not invoke the busy handler for that error, so a
+ * configured busy timeout cannot rescue it. The entry insertions and the span deletions are
+ * atomic within the write transaction: if the process fails at any point, the transaction is
+ * rolled back and the spans are retried on a later tick; no time can be lost.
  */
 
 class TimeTrackingMerge private constructor(
@@ -86,60 +91,85 @@ class TimeTrackingMerge private constructor(
         timeNow.minusSeconds(90L)
 
       /*
-       * Select every span that was received at least 90 seconds ago. By only inspecting spans
-       * that are at least this old, we know that we won't receive any new spans that fell
-       * within the minutes of those spans. This means that we can safely merge them into
-       * single time tracking entries without the risk of losing any time.
+       * Phase 1 (read): select every span that was received at least 90 seconds ago. By only
+       * inspecting spans that are at least this old, we know that we won't receive any new
+       * spans that fell within the minutes of those spans. This means that we can safely
+       * merge them into single time tracking entries without the risk of losing any time.
        *
-       * The selection, the insertion of the merged entries, and the deletion of the spans are
-       * performed in a single transaction.
+       * This is a read-only transaction. In WAL mode it acquires a read snapshot but not the
+       * write lock, so it neither blocks other writers nor is subject to SQLITE_BUSY_SNAPSHOT.
        */
 
-      this.database.openConnection().use { connection ->
-        connection.openTransaction().use { transaction ->
-          val spans =
+      val spans =
+        this.database.openConnection().use { connection ->
+          connection.openTransaction().use { transaction ->
             transaction.execute(DBQTimeTrackingSpanSelectType::class.java, timeOldest)
+          }
+        }
 
-          if (spans.isNotEmpty()) {
-            /*
-             * A span whose end time does not lie strictly after its start time carries no usable
-             * playback data; it is the product of a corrupted player report. Left in the table,
-             * it would violate the entry constraint on every tick and stall the pipeline for every
-             * book and account. Such spans are discarded and their presence is reported as a loss.
-             * The collector rejects these spans at insert time; this guard also covers spans that
-             * entered the table via the legacy-file migration.
-             */
+      if (spans.isNotEmpty()) {
+        /*
+         * A span whose end time does not lie strictly after its start time carries no usable
+         * playback data; it is the product of a corrupted player report. Left in the table,
+         * it would violate the entry constraint on every tick and stall the pipeline for every
+         * book and account. Such spans are discarded and their presence is reported as a loss.
+         * The collector rejects these spans at insert time; this guard also covers spans that
+         * entered the table via the legacy-file migration.
+         */
 
-            val validSpans =
-              spans.filter { s -> s.timeEnded.isAfter(s.timeStarted) }
-            val invalidSpans =
-              spans.filter { s -> !s.timeEnded.isAfter(s.timeStarted) }
+        val validSpans =
+          spans.filter { s -> s.timeEnded.isAfter(s.timeStarted) }
+        val invalidSpans =
+          spans.filter { s -> !s.timeEnded.isAfter(s.timeStarted) }
 
-            if (validSpans.isNotEmpty()) {
-              val entries = TimeTrackingMerge.mergeEntries(validSpans)
-              for (entry in entries) {
-                transaction.execute(DBQTimeTrackingEntryPutType::class.java, entry)
-                transaction.execute(
-                  DBQTimeTrackingEventPutType::class.java,
-                  TimeTrackingEntryCreated(
-                    time = timeNow,
-                    libraryID = entry.libraryID.toString(),
-                    bookID = entry.bookID.value,
-                    entryID = entry.timeEntry.id,
-                    duringMinute = entry.timeEntry.duringMinute,
-                    secondsPlayed = entry.timeEntry.secondsPlayed,
-                  ),
-                )
-              }
+        val entries =
+          if (validSpans.isNotEmpty()) {
+            TimeTrackingMerge.mergeEntries(validSpans)
+          } else {
+            emptyList()
+          }
+
+        /*
+         * Phase 2 (write): insert the merged entries, record an event for each, and delete the
+         * source spans.
+         *
+         * This is a separate, write-first transaction. Its first statement is a write, so it
+         * acquires the write lock immediately and never performs a read-to-write snapshot
+         * upgrade. In WAL mode, a deferred transaction that reads and then writes can fail with
+         * SQLITE_BUSY_SNAPSHOT if another connection commits in between, and SQLite does not
+         * invoke the busy handler for that error, so a configured busy timeout cannot rescue it.
+         * Keeping the read phase and the write phase in separate transactions means the write
+         * phase can only ever see the plain SQLITE_BUSY error, which the busy handler retries.
+         *
+         * The entry insertions and the span deletions are atomic within this transaction: if the
+         * process fails at any point, the transaction is rolled back and the spans are retried on
+         * a later tick. No time can be lost.
+         */
+
+        this.database.openConnection().use { connection ->
+          connection.openTransaction().use { transaction ->
+            for (entry in entries) {
+              transaction.execute(DBQTimeTrackingEntryPutType::class.java, entry)
+              transaction.execute(
+                DBQTimeTrackingEventPutType::class.java,
+                TimeTrackingEntryCreated(
+                  time = timeNow,
+                  libraryID = entry.libraryID.toString(),
+                  bookID = entry.bookID.value,
+                  entryID = entry.timeEntry.id,
+                  duringMinute = entry.timeEntry.duringMinute,
+                  secondsPlayed = entry.timeEntry.secondsPlayed,
+                ),
+              )
             }
 
             val spanIds =
               spans.map { s -> s.id.toString() }
             transaction.execute(DBQTimeTrackingSpanDeleteType::class.java, spanIds)
             transaction.commit()
-            committedInvalidSpans = invalidSpans
           }
         }
+        committedInvalidSpans = invalidSpans
       }
 
       /*
