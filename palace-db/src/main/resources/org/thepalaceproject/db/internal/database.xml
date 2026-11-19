@@ -76,4 +76,172 @@ CREATE TABLE account_registry_settings (
 ]]></Statement>
     </Schema>
 
+    <Schema versionCurrent="3">
+        <Comment>
+            The time tracking tables store the data of the audiobook time tracking pipeline.
+
+            time_tracking_spans stores the raw playback spans reported by the player, pending
+            merging into entries. time_tracking_entries stores the merged entries that have
+            not yet been acknowledged as delivered to the server; a row is deleted only when
+            delivery is confirmed. time_tracking_events is an append-only event log of the
+            operations performed by the pipeline, subject to a bounded retention period.
+
+            The column formats are enforced with CHECK constraints that invoke the REGEX
+            function (registered on the connection before the schema is executed). The
+            identifier fields are checked against the UUID and ULID formats, the time fields
+            against the rendering used by the pipeline (the span start and end times and the
+            entry minutes preserve their original offset and sub-second precision, and the
+            times that are used only in database comparisons are a fixed-width UTC time at
+            whole-second granularity), and the event log's operation field against the set of
+            known operations, with the remaining event fields checked for the presence or
+            absence that each operation requires.
+        </Comment>
+
+        <Statement><![CDATA[
+CREATE TABLE time_tracking_spans (
+  tts_span_uuid      TEXT    NOT NULL,
+  tts_account_uuid   TEXT    NOT NULL,
+  tts_library_id     TEXT    NOT NULL,
+  tts_book_id        TEXT    NOT NULL,
+  tts_time_started   TEXT    NOT NULL,
+  tts_time_ended     TEXT    NOT NULL,
+  tts_time_received  TEXT    NOT NULL,
+  tts_target_uri     TEXT    NOT NULL,
+
+  CONSTRAINT time_tracking_spans_primary_key
+    PRIMARY KEY (tts_span_uuid),
+
+  CONSTRAINT time_tracking_spans_check_span_uuid
+    CHECK (REGEX('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', tts_span_uuid) = 1),
+
+  CONSTRAINT time_tracking_spans_check_account_uuid
+    CHECK (REGEX('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', tts_account_uuid) = 1),
+
+  CONSTRAINT time_tracking_spans_check_time_started
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', tts_time_started) = 1),
+
+  CONSTRAINT time_tracking_spans_check_time_ended
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', tts_time_ended) = 1),
+
+  CONSTRAINT time_tracking_spans_check_time_received
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$', tts_time_received) = 1)
+) STRICT
+]]></Statement>
+
+        <Statement><![CDATA[
+CREATE TABLE time_tracking_entries (
+  tte_entry_ulid     TEXT    NOT NULL,
+  tte_account_uuid   TEXT    NOT NULL,
+  tte_library_id     TEXT    NOT NULL,
+  tte_book_id        TEXT    NOT NULL,
+  tte_target_uri     TEXT    NOT NULL,
+  tte_during_minute  TEXT    NOT NULL,
+  tte_seconds_played INTEGER NOT NULL,
+
+  CONSTRAINT time_tracking_entries_primary_key
+    PRIMARY KEY (tte_entry_ulid),
+
+  CONSTRAINT time_tracking_entries_check_seconds
+    CHECK (tte_seconds_played >= 0 AND tte_seconds_played <= 60),
+
+  CONSTRAINT time_tracking_entries_check_entry_ulid
+    CHECK (REGEX('^[0-9A-HJKMNP-TV-Z]{26}$', tte_entry_ulid) = 1),
+
+  CONSTRAINT time_tracking_entries_check_account_uuid
+    CHECK (REGEX('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', tte_account_uuid) = 1),
+
+  CONSTRAINT time_tracking_entries_check_during_minute
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', tte_during_minute) = 1)
+) STRICT
+]]></Statement>
+
+        <Statement><![CDATA[
+CREATE TABLE time_tracking_events (
+  ttev_sequence       INTEGER PRIMARY KEY AUTOINCREMENT,
+  ttev_time           TEXT    NOT NULL,
+  ttev_operation      TEXT    NOT NULL,
+  ttev_library_id     TEXT    NOT NULL,
+  ttev_book_id        TEXT    NOT NULL,
+  ttev_entry_ulid     TEXT,
+  ttev_during_minute  TEXT,
+  ttev_seconds_played INTEGER,
+  ttev_exception      TEXT,
+
+  CONSTRAINT time_tracking_events_check_time
+    CHECK (REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$', ttev_time) = 1),
+
+  CONSTRAINT time_tracking_events_check_entry_ulid_format
+    CHECK (
+      ttev_entry_ulid IS NULL
+      OR REGEX('^[0-9A-HJKMNP-TV-Z]{26}$', ttev_entry_ulid) = 1
+    ),
+
+  CONSTRAINT time_tracking_events_check_operation
+    CHECK (ttev_operation IN (
+      'TimeTrackingStarted',
+      'TimeTrackingStopped',
+      'TimeTrackingEntryCreated',
+      'TimeTrackingSendAttempt',
+      'TimeTrackingSendAttemptSucceeded',
+      'TimeTrackingSendAttemptFailed',
+      'TimeTrackingSendAttemptFailedExceptionally',
+      'TimeTrackingSendAttemptFailedPermanently'
+    )),
+
+  CONSTRAINT time_tracking_events_check_entry_ulid
+    CHECK (
+      (ttev_operation IN (
+        'TimeTrackingEntryCreated',
+        'TimeTrackingSendAttempt',
+        'TimeTrackingSendAttemptSucceeded',
+        'TimeTrackingSendAttemptFailed',
+        'TimeTrackingSendAttemptFailedExceptionally',
+        'TimeTrackingSendAttemptFailedPermanently'
+      ) AND ttev_entry_ulid IS NOT NULL)
+      OR
+      (ttev_operation IN (
+        'TimeTrackingStarted',
+        'TimeTrackingStopped'
+      ) AND ttev_entry_ulid IS NULL)
+    ),
+
+  CONSTRAINT time_tracking_events_check_during_minute
+    CHECK (
+      (ttev_operation = 'TimeTrackingEntryCreated' AND ttev_during_minute IS NOT NULL)
+      OR
+      (ttev_operation <> 'TimeTrackingEntryCreated' AND ttev_during_minute IS NULL)
+    ),
+
+  CONSTRAINT time_tracking_events_check_during_minute_format
+    CHECK (
+      ttev_during_minute IS NULL
+      OR REGEX('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$', ttev_during_minute) = 1
+    ),
+
+  CONSTRAINT time_tracking_events_check_seconds_played
+    CHECK (
+      (ttev_operation NOT IN ('TimeTrackingStarted', 'TimeTrackingStopped')
+        AND ttev_seconds_played IS NOT NULL
+        AND ttev_seconds_played >= 0
+        AND ttev_seconds_played <= 60)
+      OR
+      (ttev_operation IN ('TimeTrackingStarted', 'TimeTrackingStopped')
+        AND ttev_seconds_played IS NULL)
+    ),
+
+  CONSTRAINT time_tracking_events_check_exception
+    CHECK (
+      (ttev_operation = 'TimeTrackingSendAttemptFailedExceptionally' AND ttev_exception IS NOT NULL)
+      OR
+      (ttev_operation <> 'TimeTrackingSendAttemptFailedExceptionally' AND ttev_exception IS NULL)
+    )
+) STRICT
+]]></Statement>
+
+        <Statement><![CDATA[
+CREATE INDEX time_tracking_events_time_index
+  ON time_tracking_events (ttev_time)
+]]></Statement>
+    </Schema>
+
 </Schemas>

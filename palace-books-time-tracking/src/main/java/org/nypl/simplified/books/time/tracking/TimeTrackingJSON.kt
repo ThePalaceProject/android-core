@@ -31,7 +31,7 @@ object TimeTrackingJSON {
     request.timeEntries.forEach { entry ->
       val entryNode = this.objectMapper.createObjectNode()
       entryNode.put(this.NODE_ID, entry.id)
-      entryNode.put(this.NODE_DURING_MINUTE, entry.duringMinute)
+      entryNode.put(this.NODE_DURING_MINUTE, entry.duringMinute.toString())
       entryNode.put(this.NODE_SECONDS_PLAYED, entry.secondsPlayed)
       timeEntriesArray.add(entryNode)
     }

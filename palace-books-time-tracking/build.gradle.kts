@@ -7,6 +7,8 @@ dependencies {
 
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-accounts-database-api"))
+    implementation(project(":palace-books-time-tracking-api"))
+    implementation(project(":palace-db-api"))
     implementation(project(":palace-diagnostics-api"))
     implementation(project(":palace-json-core"))
     implementation(project(":palace-profiles-api"))

@@ -4,18 +4,14 @@ import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jmulticlose.core.CloseableCollection
 import io.reactivex.Observable
 import org.librarysimplified.audiobook.time_tracking.PlayerTimeTracked
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingReceivedSpan
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.db.api.DBType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingSpanPutType
 import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
 import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption.ATOMIC_MOVE
-import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-import java.nio.file.StandardOpenOption.CREATE
-import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
-import java.nio.file.StandardOpenOption.WRITE
-import java.time.ZoneOffset
+import java.time.OffsetDateTime
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -23,17 +19,18 @@ import java.util.concurrent.TimeUnit
 /**
  * The collector service.
  *
- * This listens for a stream of "time tracked" events and serializes them into a directory. It
- * also records, for debugging purposes, when time tracking has "started" and "stopped" (ie, a
- * book has opened or closed).
+ * This listens for a stream of "time tracked" events and records them as spans in the
+ * database. It also records, in the event log, when time tracking has "started" and
+ * "stopped" (ie, a book has opened or closed).
  */
 
 class TimeTrackingCollector private constructor(
+  private val database: DBType,
   private val profiles: ProfilesControllerType,
   private val status: AttributeReadableType<TimeTrackingStatus>,
   private val timeSegments: Observable<PlayerTimeTracked>,
-  private val debugDirectory: Path,
-  private val outputDirectory: Path,
+  private val audit: TimeTrackingAudit,
+  private val clock: () -> OffsetDateTime,
   private val diagnostics: DiagnosticsServiceType,
 ) : TimeTrackingCollectorServiceType {
   private val logger =
@@ -95,17 +92,39 @@ class TimeTrackingCollector private constructor(
             return
           }
 
-          Files.createDirectories(this.outputDirectory)
+          /*
+           * A span whose end time does not lie strictly after its start time carries no usable
+           * playback data; it is the product of a corrupted player report. It is rejected here
+           * so that it cannot reach the merge, where a negative duration would violate the
+           * entry constraint and stall the pipeline for every book and account.
+           */
 
-          val outFile =
-            this.outputDirectory.resolve("${time.id}.ttspan")
-          val outFileTmp =
-            this.outputDirectory.resolve("${time.id}.ttspan.tmp")
+          if (!time.timeEnded.isAfter(time.timeStarted)) {
+            this.diagnostics.report(
+              code = DiagnosticCodes.TIME_TRACKING_LOSS,
+              data =
+                mapOf(
+                  Pair("Reason", "nonPositiveDuration"),
+                  Pair("Book", statusNow.bookId.value),
+                  Pair("TimeStarted", time.timeStarted.toString()),
+                  Pair("TimeEnded", time.timeEnded.toString()),
+                ),
+            )
+            this.logger.warn(
+              "Time loss: span for book {} has a non-positive duration",
+              statusNow.bookId,
+            )
+            return
+          }
 
-          val utcStart =
-            time.timeStarted.withOffsetSameInstant(ZoneOffset.UTC)
-          val utcEnd =
-            time.timeEnded.withOffsetSameInstant(ZoneOffset.UTC)
+          /*
+           * The start and end times are stored with their original offset preserved. The
+           * minute to which an entry applies (and which is sent to the server) is derived
+           * from the start time, so preserving the offset keeps the values sent to the
+           * server identical to the times that the player reported. The receive time, by
+           * contrast, comes from the application clock (UTC) and is used only for the
+           * database merge threshold, so it is normalized to UTC by the storage layer.
+           */
 
           val span =
             TimeTrackingReceivedSpan(
@@ -113,16 +132,18 @@ class TimeTrackingCollector private constructor(
               accountID = statusNow.accountID,
               libraryID = account.provider.id,
               bookID = statusNow.bookId,
-              timeStarted = utcStart,
-              timeEnded = utcEnd,
+              timeStarted = time.timeStarted,
+              timeEnded = time.timeEnded,
+              timeReceived = this.clock.invoke(),
               targetURI = statusNow.timeTrackingUri,
             )
 
-          Files.newOutputStream(outFileTmp, WRITE, CREATE, TRUNCATE_EXISTING).use { s ->
-            span.toProperties().store(s, "")
-            s.flush()
+          this.database.openConnection().use { connection ->
+            connection.openTransaction().use { transaction ->
+              transaction.execute(DBQTimeTrackingSpanPutType::class.java, span)
+              transaction.commit()
+            }
           }
-          Files.move(outFileTmp, outFile, ATOMIC_MOVE, REPLACE_EXISTING)
         }
 
         TimeTrackingStatus.Inactive -> {
@@ -158,48 +179,61 @@ class TimeTrackingCollector private constructor(
     }
   }
 
-  companion object {
-    fun create(
-      profiles: ProfilesControllerType,
-      status: AttributeReadableType<TimeTrackingStatus>,
-      timeSegments: Observable<PlayerTimeTracked>,
-      debugDirectory: Path,
-      outputDirectory: Path,
-      diagnostics: DiagnosticsServiceType,
-    ): TimeTrackingCollectorServiceType =
-      TimeTrackingCollector(
-        profiles = profiles,
-        status = status,
-        timeSegments = timeSegments,
-        debugDirectory = debugDirectory,
-        outputDirectory = outputDirectory,
-        diagnostics = diagnostics,
-      )
-  }
-
   private fun onStatusChanged(
     oldValue: TimeTrackingStatus,
     newValue: TimeTrackingStatus,
   ) {
     when (newValue) {
       is TimeTrackingStatus.Active -> {
-        TimeTrackingDebugging.onTimeTrackingStarted(
-          timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-          libraryId = newValue.libraryId,
-          bookId = newValue.bookId.value,
+        this.audit.timeTrackingStarted(
+          libraryID = newValue.libraryId,
+          bookID = newValue.bookId.value,
         )
       }
 
       TimeTrackingStatus.Inactive -> {
         if (oldValue is TimeTrackingStatus.Active) {
-          TimeTrackingDebugging.onTimeTrackingStopped(
-            timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-            libraryId = oldValue.libraryId,
-            bookId = oldValue.bookId.value,
+          this.audit.timeTrackingStopped(
+            libraryID = oldValue.libraryId,
+            bookID = oldValue.bookId.value,
           )
         }
       }
     }
+  }
+
+  companion object {
+    /**
+     * Create a new collector.
+     *
+     * @param database The database
+     * @param profiles The profiles controller
+     * @param status The time tracking status attribute
+     * @param timeSegments The observable stream of time tracked segments
+     * @param audit The event log
+     * @param clock The clock
+     * @param diagnostics The diagnostics service
+     *
+     * @return The collector
+     */
+    fun create(
+      database: DBType,
+      profiles: ProfilesControllerType,
+      status: AttributeReadableType<TimeTrackingStatus>,
+      timeSegments: Observable<PlayerTimeTracked>,
+      audit: TimeTrackingAudit,
+      clock: () -> OffsetDateTime,
+      diagnostics: DiagnosticsServiceType,
+    ): TimeTrackingCollectorServiceType =
+      TimeTrackingCollector(
+        database = database,
+        profiles = profiles,
+        status = status,
+        timeSegments = timeSegments,
+        audit = audit,
+        clock = clock,
+        diagnostics = diagnostics,
+      )
   }
 
   override fun awaitWrite(

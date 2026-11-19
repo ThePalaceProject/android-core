@@ -1,33 +1,42 @@
 package org.nypl.simplified.books.time.tracking
 
 import com.io7m.jmulticlose.core.CloseableCollection
+import org.nypl.simplified.accounts.database.api.AccountType
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryOutgoing
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.db.api.DBType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntryDeleteType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntrySelectType
 import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
 import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
-import java.nio.file.Files
-import java.nio.file.Path
 import java.time.Duration
+import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 
 /**
  * The sender service.
  *
- * The sender service attempts to send all time tracking entries that have been serialized into
- * a directory by the [TimeTrackingCollector] service. It is responsible for merging entries into
- * single requests in order to avoid overwhelming the remote side with lots of small requests, and
- * is responsible for deleting serialized tracking entries when the remote side has accepted
- * them.
+ * The sender service attempts to send all time tracking entries that have been recorded by
+ * the merge service. It is responsible for grouping entries into single requests in order to
+ * avoid overwhelming the remote side with lots of small requests, and is responsible for
+ * deleting entries from the database when the remote side has accepted them.
+ *
+ * An entry is deleted from the database only after the remote side has acknowledged
+ * receipt. Entries that fail to send are retained and retried on later ticks.
+ *
+ * If an entry refers to an account that no longer exists in the profile, it cannot be sent.
+ * Such entries are retained in the database (they may be settled manually), a diagnostic is
+ * reported once per account, and the entries are not retried.
  */
 
 class TimeTrackingSender private constructor(
+  private val database: DBType,
   private val profiles: ProfilesControllerType,
   private val httpCalls: TimeTrackingHTTPCallsType,
-  private val debugDirectory: Path,
-  private val inputDirectory: Path,
+  private val audit: TimeTrackingAudit,
   private val frequency: Duration,
   private val diagnostics: DiagnosticsServiceType,
 ) : TimeTrackingSenderServiceType {
@@ -35,9 +44,12 @@ class TimeTrackingSender private constructor(
     LoggerFactory.getLogger(TimeTrackingSender::class.java)
 
   private val tickWrite =
-    LinkedBlockingQueue<Unit>()
+    LinkedBlockingQueue<Unit>(1)
   private val resources =
     CloseableCollection.create()
+
+  private val orphanedAccountsReported =
+    mutableSetOf<UUID>()
 
   private val executor =
     Executors.newSingleThreadScheduledExecutor { r ->
@@ -68,35 +80,14 @@ class TimeTrackingSender private constructor(
     )
   }
 
-  private fun isFileSuitable(file: Path): Boolean {
-    if (!Files.isRegularFile(file)) {
-      return false
-    }
-    return file.toString().endsWith(".tteo")
-  }
-
   private fun onTrySend() {
     try {
-      val entryFiles: List<Path> =
-        Files.list(this.inputDirectory).use { inputStream ->
-          inputStream
-            .filter { p -> this.isFileSuitable(p) }
-            .collect(Collectors.toList())
+      val entries =
+        this.database.openConnection().use { connection ->
+          connection.openTransaction().use { transaction ->
+            transaction.execute(DBQTimeTrackingEntrySelectType::class.java, Unit)
+          }
         }
-
-      val entries = mutableListOf<TimeTrackingEntryOutgoing>()
-      for (entryFile in entryFiles) {
-        try {
-          entries.add(TimeTrackingEntryOutgoing.ofFile(entryFile))
-        } catch (e: Throwable) {
-          this.diagnostics.report(
-            code = DiagnosticCodes.TIME_TRACKING_LOSS,
-            data = mapOf(Pair("Reason", "parseFailed")),
-            throwable = e,
-          )
-          this.logger.warn("Unable to parse local time tracking entry: ", e)
-        }
-      }
 
       val grouped = TimeTrackingEntryOutgoing.group(entries)
       for ((key, outgoingEntries) in grouped) {
@@ -107,6 +98,8 @@ class TimeTrackingSender private constructor(
       }
     } catch (e: Throwable) {
       this.logger.debug("Failed to send time tracking entries: ", e)
+    } finally {
+      this.tickWrite.offer(Unit)
     }
   }
 
@@ -114,23 +107,19 @@ class TimeTrackingSender private constructor(
     key: TimeTrackingEntryOutgoing.Key,
     outgoingEntries: List<TimeTrackingEntryOutgoing>,
   ) {
+    for (e in outgoingEntries) {
+      this.audit.sendAttempt(e)
+    }
+
+    val account: AccountType
     try {
-      Files.createDirectories(this.debugDirectory)
-      Files.createDirectories(this.inputDirectory)
+      account = this.profiles.profileCurrent().account(key.accountID)
+    } catch (e: Throwable) {
+      this.orphanedBatch(key, outgoingEntries, e)
+      return
+    }
 
-      outgoingEntries.forEach { e ->
-        TimeTrackingDebugging.onTimeTrackingSendAttempt(
-          timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-          libraryId = key.libraryID.toString(),
-          bookId = key.bookID.value,
-          entryId = e.timeEntry.id,
-          seconds = e.timeEntry.secondsPlayed,
-        )
-      }
-
-      val account =
-        this.profiles.profileCurrent().account(key.accountID)
-
+    try {
       val response =
         this.httpCalls.registerTimeTrackingInfo(
           account = account,
@@ -145,113 +134,156 @@ class TimeTrackingSender private constructor(
 
       /*
        * If the responses list is empty, and the count suggests that all entries succeeded, we
-       * log success and delete the entry. Unfortunately, the spec leaves open the possibility
-       * that there will be a non-zero number of failures, and nothing in the responses list. In
-       * that edge case, we won't know _which_ entries failed and so we can do nothing other than
-       * send every entry again. The server is responsible for rejecting any entry that it has
-       * already received, so this should be safe.
+       * log success and delete the entries. Unfortunately, the spec leaves open the
+       * possibility that there will be a non-zero number of failures, and nothing in the
+       * responses list. In that edge case, we won't know _which_ entries failed and so we can
+       * do nothing other than send every entry again. The server is responsible for rejecting
+       * any entry that it has already received, so this should be safe.
        */
 
       if (response.responses.isEmpty()) {
         if (response.summary.successes == outgoingEntries.size && response.summary.failures == 0) {
-          outgoingEntries.forEach { e -> this.entrySentSuccessfully(e) }
+          this.entriesSentSuccessfully(outgoingEntries)
           return
         }
 
         check(response.summary.failures != 0)
         outgoingEntries.forEach { e ->
-          TimeTrackingDebugging.onTimeTrackingSendAttemptFailed(
-            timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-            libraryId = key.libraryID.toString(),
-            bookId = key.bookID.value,
-            entryId = e.timeEntry.id,
-          )
+          this.audit.sendAttemptFailed(e)
         }
         return
       }
 
       /*
-       * For each successful response, we need to log the successful send attempt and then delete
-       * the entry so that it isn't sent again. For each failed attempt, we simply log the failure.
+       * For each successful response, we need to log the successful send attempt and then
+       * delete the entry so that it isn't sent again. For each failed attempt, we simply log
+       * the failure.
        */
 
+      val succeededEntries = mutableListOf<TimeTrackingEntryOutgoing>()
+      val permanentEntries = mutableListOf<TimeTrackingEntryOutgoing>()
+
       for (r in response.responses) {
-        val e = outgoingEntries.firstOrNull { entry -> entry.timeEntry.id == r.id }
-        if (r.isStatusSuccess()) {
-          if (e != null) {
-            this.entrySentSuccessfully(e)
-          }
-        } else if (r.isStatusFailedPermanently()) {
-          if (e != null) {
-            this.entryFailedPermanently(e)
-          }
-        } else {
-          if (e != null) {
-            TimeTrackingDebugging.onTimeTrackingSendAttemptFailed(
-              timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-              libraryId = key.libraryID.toString(),
-              bookId = key.bookID.value,
-              entryId = e.timeEntry.id,
-            )
-          }
+        val e = this.findEntry(outgoingEntries, r.id)
+        if (e == null) {
+          continue
         }
+        if (r.isStatusSuccess()) {
+          succeededEntries.add(e)
+        } else if (r.isStatusFailedPermanently()) {
+          permanentEntries.add(e)
+        } else {
+          this.audit.sendAttemptFailed(e)
+        }
+      }
+
+      for (e in succeededEntries) {
+        this.audit.sendAttemptSucceeded(e)
+      }
+      for (e in permanentEntries) {
+        this.audit.sendAttemptFailedPermanently(e)
+      }
+
+      val deletedIds =
+        succeededEntries
+          .map { e -> e.timeEntry.id }
+          .plus(permanentEntries.map { e -> e.timeEntry.id })
+      if (deletedIds.isNotEmpty()) {
+        this.deleteEntries(deletedIds)
       }
     } catch (e: Throwable) {
       this.logger.debug("Failed to send time tracking entries: ", e)
       outgoingEntries.forEach { entry ->
-        TimeTrackingDebugging.onTimeTrackingSendAttemptFailedExceptionally(
-          timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-          libraryId = key.libraryID.toString(),
-          bookId = key.bookID.value,
-          entryId = entry.timeEntry.id,
-          exception = e,
-        )
+        this.audit.sendAttemptFailedExceptionally(entry, e)
       }
-    } finally {
-      this.tickWrite.offer(Unit)
     }
   }
 
-  private fun entryFailedPermanently(entry: TimeTrackingEntryOutgoing) {
-    TimeTrackingDebugging.onTimeTrackingSendAttemptFailedPermanently(
-      timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-      libraryId = entry.libraryID.toString(),
-      bookId = entry.bookID.value,
-      entryId = entry.timeEntry.id,
-    )
-
-    Files.deleteIfExists(
-      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo"),
-    )
+  private fun findEntry(
+    outgoingEntries: List<TimeTrackingEntryOutgoing>,
+    entryId: String,
+  ): TimeTrackingEntryOutgoing? {
+    for (entry in outgoingEntries) {
+      if (entry.timeEntry.id == entryId) {
+        return entry
+      }
+    }
+    return null
   }
 
-  private fun entrySentSuccessfully(entry: TimeTrackingEntryOutgoing) {
-    TimeTrackingDebugging.onTimeTrackingSendAttemptSucceeded(
-      timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-      libraryId = entry.libraryID.toString(),
-      bookId = entry.bookID.value,
-      entryId = entry.timeEntry.id,
-    )
+  private fun orphanedBatch(
+    key: TimeTrackingEntryOutgoing.Key,
+    outgoingEntries: List<TimeTrackingEntryOutgoing>,
+    exception: Throwable,
+  ) {
+    /*
+     * The entries cannot be sent: the account no longer exists. Retain the entries in the
+     * database so that they can be inspected and settled manually, and report the situation
+     * once per account.
+     */
+    if (!this.orphanedAccountsReported.contains(key.accountID.uuid)) {
+      this.orphanedAccountsReported.add(key.accountID.uuid)
+      this.diagnostics.report(
+        code = DiagnosticCodes.TIME_TRACKING_ORPHANED,
+        data =
+          mapOf(
+            Pair("Account", key.accountID.toString()),
+            Pair("Entries", outgoingEntries.size.toString()),
+          ),
+        throwable = exception,
+      )
+      this.logger.warn(
+        "Time tracking entries for account {} cannot be sent: the account no longer exists",
+        key.accountID,
+      )
+    }
+  }
 
-    Files.deleteIfExists(
-      this.inputDirectory.resolve("${entry.timeEntry.id}.tteo"),
-    )
+  private fun entriesSentSuccessfully(entries: List<TimeTrackingEntryOutgoing>) {
+    for (e in entries) {
+      this.audit.sendAttemptSucceeded(e)
+    }
+    val ids = entries.map { e -> e.timeEntry.id }
+    if (ids.isNotEmpty()) {
+      this.deleteEntries(ids)
+    }
+  }
+
+  private fun deleteEntries(ids: List<String>) {
+    this.database.openConnection().use { connection ->
+      connection.openTransaction().use { transaction ->
+        transaction.execute(DBQTimeTrackingEntryDeleteType::class.java, ids)
+        transaction.commit()
+      }
+    }
   }
 
   companion object {
+    /**
+     * Create a new sender service.
+     *
+     * @param database The database
+     * @param profiles The profiles controller
+     * @param httpCalls The HTTP calls object
+     * @param audit The event log
+     * @param frequency The frequency of ticks
+     * @param diagnostics The diagnostics service
+     *
+     * @return The sender service
+     */
     fun create(
+      database: DBType,
       profiles: ProfilesControllerType,
       httpCalls: TimeTrackingHTTPCallsType,
-      debugDirectory: Path,
-      inputDirectory: Path,
+      audit: TimeTrackingAudit,
       frequency: Duration,
       diagnostics: DiagnosticsServiceType,
     ): TimeTrackingSenderServiceType =
       TimeTrackingSender(
+        database = database,
         profiles = profiles,
         httpCalls = httpCalls,
-        debugDirectory = debugDirectory,
-        inputDirectory = inputDirectory,
+        audit = audit,
         frequency = frequency,
         diagnostics = diagnostics,
       )

@@ -24,6 +24,9 @@ object Reports {
   var reportLibrary: String = "Unknown"
 
   @Volatile
+  var reportTimeTracking: () -> Map<String, String> = { emptyMap() }
+
+  @Volatile
   var reportScreenDPI: Int = 0
 
   @Volatile
@@ -100,13 +103,14 @@ object Reports {
     try {
       val files =
         listOf(
-          File(File(context.filesDir, "v4.0"), "time_tracking"),
           File(context.cacheDir, "logs"),
         )
 
       val reportZip = File(context.cacheDir, "report.zip")
       reportZip.delete()
-      compressZipfile(files, reportZip)
+      val timeTrackingData =
+        this.reportTimeTracking()
+      compressZipfile(files, reportZip, timeTrackingData)
 
       val zipContentURI =
         this.mapFileToContentURI(context, reportZip)
@@ -156,15 +160,37 @@ object Reports {
     file: File,
   ) = FileProvider.getUriForFile(context, context.packageName + ".fileProvider", file)
 
+  /**
+   * Compress the given source files into a zip file, and additionally emit the given
+   * in-memory entries into the same archive.
+   *
+   * The in-memory entries are written within the same [ZipOutputStream] session as the files.
+   * This is required because there is no supported way to append entries to an existing zip
+   * archive; opening an existing file for append and writing new entries would produce an
+   * archive whose central directory lists only the appended entries, making the original
+   * contents unreachable to readers.
+   *
+   * @param sources The files to compress
+   * @param outputFile The output zip file
+   * @param inMemoryEntries The in-memory entries (name to text content) to include
+   */
+
   @JvmStatic
   @Throws(IOException::class)
-  private fun compressZipfile(
+  fun compressZipfile(
     sources: List<File>,
     outputFile: File,
+    inMemoryEntries: Map<String, String>,
   ) {
     ZipOutputStream(FileOutputStream(outputFile)).use { zipFile ->
       for (file in sources) {
         compressToZipFile(file, zipFile)
+      }
+      for ((name, content) in inMemoryEntries) {
+        val entry = ZipEntry(name)
+        zipFile.putNextEntry(entry)
+        zipFile.write(content.toByteArray(Charsets.UTF_8))
+        zipFile.closeEntry()
       }
     }
   }

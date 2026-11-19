@@ -15,7 +15,7 @@ import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountLoginState
 import org.nypl.simplified.accounts.api.AccountPassword
 import org.nypl.simplified.accounts.api.AccountUsername
-import org.nypl.simplified.books.time.tracking.TimeTrackingEntry
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntry
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingRequest
 import org.nypl.simplified.books.time.tracking.TimeTrackingServerResponse
@@ -27,6 +27,7 @@ import org.nypl.simplified.tests.mocking.MockContext
 import org.nypl.simplified.tests.mocking.MockProfilesController
 import java.net.InetAddress
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 
 class TimeTrackingHttpCallsTest {
@@ -88,7 +89,7 @@ class TimeTrackingHttpCallsTest {
       timeEntries = listOf(
         TimeTrackingEntry(
           id = "id",
-          duringMinute = "2024-10-16T00:00:00",
+          duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"),
           secondsPlayed = 60
         )
       )
@@ -135,10 +136,10 @@ class TimeTrackingHttpCallsTest {
         libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
         timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
         timeEntries = listOf(
-          TimeTrackingEntry(id = "id", duringMinute = "", 10),
-          TimeTrackingEntry(id = "id2", duringMinute = "", 10),
-          TimeTrackingEntry(id = "id3", duringMinute = "", 10),
-          TimeTrackingEntry(id = "id4", duringMinute = "", 10)
+          TimeTrackingEntry(id = "id", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10),
+          TimeTrackingEntry(id = "id2", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10),
+          TimeTrackingEntry(id = "id3", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10),
+          TimeTrackingEntry(id = "id4", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10)
         )
       )
 
@@ -197,9 +198,9 @@ class TimeTrackingHttpCallsTest {
         libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
         timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
         timeEntries = listOf(
-          TimeTrackingEntry(id = "id", duringMinute = "", 10),
-          TimeTrackingEntry(id = "id2", duringMinute = "", 10),
-          TimeTrackingEntry(id = "id3", duringMinute = "", 10)
+          TimeTrackingEntry(id = "id", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10),
+          TimeTrackingEntry(id = "id2", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10),
+          TimeTrackingEntry(id = "id3", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10)
         )
       )
 
@@ -255,17 +256,17 @@ class TimeTrackingHttpCallsTest {
       timeEntries = listOf(
         TimeTrackingEntry(
           id = "id0",
-          duringMinute = "2024-10-16T00:00:00",
+          duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"),
           secondsPlayed = 60
         ),
         TimeTrackingEntry(
           id = "id1",
-          duringMinute = "2024-10-16T00:00:00",
+          duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"),
           secondsPlayed = 60
         ),
         TimeTrackingEntry(
           id = "id2",
-          duringMinute = "2024-10-16T00:00:00",
+          duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"),
           secondsPlayed = 60
         )
       )
@@ -298,9 +299,9 @@ class TimeTrackingHttpCallsTest {
         libraryId = URI.create("urn:uuid:f8f6b138-02ba-4624-802b-0556278228d5"),
         timeTrackingUri = this.webServer.url("/timeTracking").toUri(),
         timeEntries = listOf(
-          TimeTrackingEntry(id = "id", duringMinute = "", 10),
-          TimeTrackingEntry(id = "id2", duringMinute = "", 10),
-          TimeTrackingEntry(id = "id3", duringMinute = "", 10)
+          TimeTrackingEntry(id = "id", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10),
+          TimeTrackingEntry(id = "id2", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10),
+          TimeTrackingEntry(id = "id3", duringMinute = OffsetDateTime.parse("2024-10-16T00:00:00Z"), 10)
         )
       )
 

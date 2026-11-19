@@ -7,6 +7,7 @@ dependencies {
 
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-accounts-json"))
+    implementation(project(":palace-books-time-tracking-api"))
     implementation(project(":palace-db-api"))
     implementation(project(":palace-links"))
     implementation(project(":palace-parser-api"))
@@ -14,6 +15,7 @@ dependencies {
 
     implementation(libs.google.protobuf)
     implementation(libs.irradia.mime.api)
+    implementation(libs.palace.audiobook.manifest.api)
     implementation(libs.irradia.mime.vanilla)
     implementation(libs.jackson.annotations)
     implementation(libs.jackson.core)

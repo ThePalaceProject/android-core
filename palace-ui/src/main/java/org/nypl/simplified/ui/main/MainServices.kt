@@ -67,7 +67,10 @@ import org.nypl.simplified.books.controller.api.BookRevokeStringResourcesType
 import org.nypl.simplified.books.controller.api.BooksControllerType
 import org.nypl.simplified.books.controller.api.BooksPreviewControllerType
 import org.nypl.simplified.books.formats.api.BookFormatSupportType
+import org.nypl.simplified.books.time.tracking.TimeTrackingAudit
 import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
+import org.nypl.simplified.books.time.tracking.TimeTrackingMigration
+import org.nypl.simplified.books.time.tracking.TimeTrackingReport
 import org.nypl.simplified.books.time.tracking.TimeTrackingService
 import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
 import org.nypl.simplified.boot.api.BootEvent
@@ -159,9 +162,7 @@ internal object MainServices {
     val directoryStorageDownloads: File,
     val directoryStorageDocuments: File,
     val directoryStorageProfiles: File,
-    val directoryStorageTimeTrackingSender: File,
-    val directoryStorageTimeTrackingCollector: File,
-    val directoryStorageTimeTrackingDebug: File,
+    val directoryStorageTimeTrackingLegacy: File,
     val directoryStorageBoundless: File,
   )
 
@@ -176,14 +177,14 @@ internal object MainServices {
       File(directoryStorageBaseVersioned, "documents")
     val directoryStorageProfiles =
       File(directoryStorageBaseVersioned, "profiles")
-    val directoryStorageTimeTracking =
+    /*
+     * The time tracking data used to be stored in a directory tree. It is now stored in the
+     * database. This directory is retained solely so that any data left in it by older
+     * versions of the app can be migrated into the database on start-up; it is not created
+     * here, because a fresh installation has nothing to migrate.
+     */
+    val directoryStorageTimeTrackingLegacy =
       File(directoryStorageBaseVersioned, "time_tracking")
-    val directoryStorageTimeTrackingDebug =
-      File(directoryStorageTimeTracking, "debug")
-    val directoryStorageTimeTrackingSender =
-      File(directoryStorageTimeTracking, "sender")
-    val directoryStorageTimeTrackingCollector =
-      File(directoryStorageTimeTracking, "collector")
     val directoryStorageBoundless =
       File(directoryStorageBaseVersioned, "boundless")
 
@@ -191,18 +192,9 @@ internal object MainServices {
     logger.debug("directoryStorageDownloads:             {}", directoryStorageDownloads)
     logger.debug("directoryStorageDocuments:             {}", directoryStorageDocuments)
     logger.debug("directoryStorageProfiles:              {}", directoryStorageProfiles)
-    logger.debug("directoryStorageTimeTracking:          {}", directoryStorageTimeTracking)
     logger.debug(
-      "directoryStorageTimeTrackingDebug:     {}",
-      directoryStorageTimeTrackingDebug,
-    )
-    logger.debug(
-      "directoryStorageTimeTrackingSender:    {}",
-      directoryStorageTimeTrackingSender,
-    )
-    logger.debug(
-      "directoryStorageTimeTrackingCollector: {}",
-      directoryStorageTimeTrackingCollector,
+      "directoryStorageTimeTrackingLegacy:  {}",
+      directoryStorageTimeTrackingLegacy,
     )
     logger.debug("directoryStorageBoundless:  {}", directoryStorageBoundless)
 
@@ -217,10 +209,6 @@ internal object MainServices {
         directoryStorageDownloads,
         directoryStorageDocuments,
         directoryStorageProfiles,
-        directoryStorageTimeTracking,
-        directoryStorageTimeTrackingSender,
-        directoryStorageTimeTrackingCollector,
-        directoryStorageTimeTrackingDebug,
         directoryStorageBoundless,
       )
 
@@ -246,9 +234,7 @@ internal object MainServices {
       directoryStorageDownloads = directoryStorageDownloads,
       directoryStorageDocuments = directoryStorageDocuments,
       directoryStorageProfiles = directoryStorageProfiles,
-      directoryStorageTimeTrackingDebug = directoryStorageTimeTrackingDebug,
-      directoryStorageTimeTrackingSender = directoryStorageTimeTrackingSender,
-      directoryStorageTimeTrackingCollector = directoryStorageTimeTrackingCollector,
+      directoryStorageTimeTrackingLegacy = directoryStorageTimeTrackingLegacy,
       directoryStorageBoundless = directoryStorageBoundless,
     )
   }
@@ -739,6 +725,36 @@ internal object MainServices {
         },
       )
 
+    /*
+     * Migrate any time tracking data that was left in the legacy file-based storage by older
+     * versions of the app, and sweep the event log to its retention limit.
+     */
+    publishEvent(strings.bootingGeneral("time tracking migration"))
+    TimeTrackingMigration
+      .create(
+        database = database,
+        legacyDirectory = directories.directoryStorageTimeTrackingLegacy.toPath(),
+        diagnostics = diagnosticsService,
+      ).migrate()
+    val timeTrackingAudit =
+      TimeTrackingAudit.create(
+        database = database,
+        clock = { OffsetDateTime.now(UTC) },
+        diagnostics = diagnosticsService,
+      )
+    timeTrackingAudit.purgeOldEvents(OffsetDateTime.now(UTC).minusDays(365L))
+
+    Reports.reportTimeTracking = {
+      mapOf(
+        "time_tracking_spans.csv" to
+          TimeTrackingReport.spansCsv(database, OffsetDateTime.now(UTC)),
+        "time_tracking_entries.csv" to
+          TimeTrackingReport.entriesCsv(database),
+        "time_tracking_events.csv" to
+          TimeTrackingReport.eventsCsv(database, OffsetDateTime.now(UTC).minusDays(30L)),
+      )
+    }
+
     val authenticationDocumentParsers =
       addService(
         message = strings.bootingGeneral("authentication document parsers"),
@@ -954,13 +970,11 @@ internal object MainServices {
       interfaceType = TimeTrackingServiceType::class.java,
       serviceConstructor = {
         TimeTrackingService.create(
+          database = database,
           profiles = profilesControllerTypeService,
           httpCalls = TimeTrackingHTTPCalls(lsHTTP),
           clock = { OffsetDateTime.now(UTC) },
           timeSegments = PlayerModel.timeTracker.timeSegments,
-          debugDirectory = directories.directoryStorageTimeTrackingDebug.toPath(),
-          collectorDirectory = directories.directoryStorageTimeTrackingCollector.toPath(),
-          senderDirectory = directories.directoryStorageTimeTrackingSender.toPath(),
           diagnostics = diagnosticsService,
         )
       },

@@ -4,37 +4,49 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import io.azam.ulidj.ULID
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntry
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryCreated
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingEntryOutgoing
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingReceivedSpan
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.db.api.DBType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEntryPutType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingEventPutType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingSpanDeleteType
+import org.thepalaceproject.db.api.queries.DBQTimeTrackingSpanSelectType
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
+import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
 import java.net.URI
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
-import java.nio.file.StandardOpenOption.CREATE
-import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
-import java.nio.file.StandardOpenOption.WRITE
 import java.time.Duration
-import java.time.Instant
 import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 
 /**
  * The merge service.
  *
- * This takes spans of time that were serialized by the [TimeTrackingCollectorServiceType] and
- * merges them into time tracking entries to be sent to the server. Necessarily, it only operates
- * on spans that are over a minute old, because there might still be spans to come in the current
- * minute.
+ * This takes spans of time that have been recorded by the [TimeTrackingCollectorServiceType]
+ * and merges them into time tracking entries to be sent to the server. Necessarily, it only
+ * operates on spans that are over a minute old, because there might still be spans to come in
+ * the current minute.
+ *
+ * The selection of spans is performed in a read-only transaction, and the insertion of the
+ * merged entries and the deletion of the spans are performed in a separate write-first
+ * transaction. The two phases are not combined, because in WAL mode a deferred transaction
+ * that reads and then writes can fail with SQLITE_BUSY_SNAPSHOT if another connection
+ * commits in between, and SQLite does not invoke the busy handler for that error, so a
+ * configured busy timeout cannot rescue it. The entry insertions and the span deletions are
+ * atomic within the write transaction: if the process fails at any point, the transaction is
+ * rolled back and the spans are retried on a later tick; no time can be lost.
  */
 
 class TimeTrackingMerge private constructor(
+  private val database: DBType,
   private val clock: () -> OffsetDateTime,
-  private val debugDirectory: Path,
-  private val inboxDirectory: Path,
-  private val outboxDirectory: Path,
   private val frequency: Duration,
+  private val diagnostics: DiagnosticsServiceType,
 ) : TimeTrackingMergeServiceType {
   private val logger =
     LoggerFactory.getLogger(TimeTrackingMerge::class.java)
@@ -70,67 +82,106 @@ class TimeTrackingMerge private constructor(
     this.resources.add(AutoCloseable { this.tickWait.offer(Unit) })
   }
 
-  private fun isSpanFileSuitable(
-    timeOldest: Instant,
-    file: Path,
-  ): Boolean {
-    if (!Files.isRegularFile(file)) {
-      return false
-    }
-    if (!file.toString().endsWith(".ttspan")) {
-      return false
-    }
-
-    val fileTime = Files.getLastModifiedTime(file).toInstant()
-    return fileTime.isBefore(timeOldest)
-  }
-
   private fun tick() {
+    var committedInvalidSpans: List<TimeTrackingReceivedSpan> = emptyList()
     try {
       val timeNow =
-        this.clock
-          .invoke()
-          .toInstant()
+        this.clock.invoke()
       val timeOldest =
         timeNow.minusSeconds(90L)
 
       /*
-       * Collect every non-temporary file with a modification date that shows that the file is
-       * at least 90 seconds old. By only inspecting files that are at least this old, we know
-       * that we won't receive any new spans that fell within the minutes of those spans. This
-       * means that we can safely merge them into single time tracking entries without the risk
-       * of losing any time.
+       * Phase 1 (read): select every span that was received at least 90 seconds ago. By only
+       * inspecting spans that are at least this old, we know that we won't receive any new
+       * spans that fell within the minutes of those spans. This means that we can safely
+       * merge them into single time tracking entries without the risk of losing any time.
+       *
+       * This is a read-only transaction. In WAL mode it acquires a read snapshot but not the
+       * write lock, so it neither blocks other writers nor is subject to SQLITE_BUSY_SNAPSHOT.
        */
 
-      val spanFiles: List<Path> =
-        Files.list(this.inboxDirectory).use { inboxStream ->
-          inboxStream
-            .filter { p -> isSpanFileSuitable(timeOldest, p) }
-            .collect(Collectors.toList())
+      val spans =
+        this.database.openConnection().use { connection ->
+          connection.openTransaction().use { transaction ->
+            transaction.execute(DBQTimeTrackingSpanSelectType::class.java, timeOldest)
+          }
         }
 
-      val spans = mutableListOf<TimeTrackingReceivedSpan>()
-      for (file in spanFiles) {
-        spans.add(TimeTrackingReceivedSpan.ofFile(file))
+      if (spans.isNotEmpty()) {
+        /*
+         * A span whose end time does not lie strictly after its start time carries no usable
+         * playback data; it is the product of a corrupted player report. Left in the table,
+         * it would violate the entry constraint on every tick and stall the pipeline for every
+         * book and account. Such spans are discarded and their presence is reported as a loss.
+         * The collector rejects these spans at insert time; this guard also covers spans that
+         * entered the table via the legacy-file migration.
+         */
+
+        val validSpans =
+          spans.filter { s -> s.timeEnded.isAfter(s.timeStarted) }
+        val invalidSpans =
+          spans.filter { s -> !s.timeEnded.isAfter(s.timeStarted) }
+
+        val entries =
+          if (validSpans.isNotEmpty()) {
+            TimeTrackingMerge.mergeEntries(validSpans)
+          } else {
+            emptyList()
+          }
+
+        /*
+         * Phase 2 (write): insert the merged entries, record an event for each, and delete the
+         * source spans.
+         *
+         * This is a separate, write-first transaction. Its first statement is a write, so it
+         * acquires the write lock immediately and never performs a read-to-write snapshot
+         * upgrade. In WAL mode, a deferred transaction that reads and then writes can fail with
+         * SQLITE_BUSY_SNAPSHOT if another connection commits in between, and SQLite does not
+         * invoke the busy handler for that error, so a configured busy timeout cannot rescue it.
+         * Keeping the read phase and the write phase in separate transactions means the write
+         * phase can only ever see the plain SQLITE_BUSY error, which the busy handler retries.
+         *
+         * The entry insertions and the span deletions are atomic within this transaction: if the
+         * process fails at any point, the transaction is rolled back and the spans are retried on
+         * a later tick. No time can be lost.
+         */
+
+        this.database.openConnection().use { connection ->
+          connection.openTransaction().use { transaction ->
+            for (entry in entries) {
+              transaction.execute(DBQTimeTrackingEntryPutType::class.java, entry)
+              transaction.execute(
+                DBQTimeTrackingEventPutType::class.java,
+                TimeTrackingEntryCreated(
+                  time = timeNow,
+                  libraryID = entry.libraryID.toString(),
+                  bookID = entry.bookID.value,
+                  entryID = entry.timeEntry.id,
+                  duringMinute = entry.timeEntry.duringMinute,
+                  secondsPlayed = entry.timeEntry.secondsPlayed,
+                ),
+              )
+            }
+
+            val spanIds =
+              spans.map { s -> s.id.toString() }
+            transaction.execute(DBQTimeTrackingSpanDeleteType::class.java, spanIds)
+            transaction.commit()
+          }
+        }
+        committedInvalidSpans = invalidSpans
       }
 
       /*
-       * Merge the recorded spans into series of time tracking entries. This will, for example,
-       * merge spans that occurred within the same minute into a single time tracking entry, and
-       * split spans that crossed a minute boundary. Then, record each entry.
+       * The loss report is issued only after the transaction has been committed and the
+       * connection closed. The diagnostics service performs external work (the loaded
+       * implementation reports to a crash reporting service), and the database writer lock
+       * must not be held across that work. If the transaction fails, the invalid spans
+       * remain in the database and will be reported by a later tick.
        */
 
-      val entries = mergeEntries(spans)
-      for (entry in entries) {
-        this.writeEntry(entry)
-      }
-
-      /*
-       * Now delete the spans that were actually used.
-       */
-
-      for (span in spans) {
-        this.deleteSpan(span)
+      if (committedInvalidSpans.isNotEmpty()) {
+        this.reportInvalidSpans(committedInvalidSpans)
       }
     } catch (e: Throwable) {
       this.logger.error("Failed to process time tracking entries: ", e)
@@ -139,37 +190,31 @@ class TimeTrackingMerge private constructor(
     }
   }
 
-  private fun deleteSpan(span: TimeTrackingReceivedSpan) {
-    val file = this.inboxDirectory.resolve("${span.id}.ttspan")
-    this.logger.debug("Deleting span {}", file)
-    Files.deleteIfExists(file)
-  }
+  /**
+   * Report the given spans, which carry no usable playback data, as a loss.
+   *
+   * The spans have already been deleted from the database by the caller; this only
+   * records their presence so that the loss is observable.
+   *
+   * @param spans The invalid spans
+   */
 
-  private fun writeEntry(entry: TimeTrackingEntryOutgoing) {
-    val fileTmp =
-      this.outboxDirectory.resolve("${entry.timeEntry.id}.tteo.tmp")
-    val file =
-      this.outboxDirectory.resolve("${entry.timeEntry.id}.tteo")
-
-    this.logger.debug("Writing entry {}", file)
-    Files.newOutputStream(fileTmp, WRITE, CREATE, TRUNCATE_EXISTING).use { s ->
-      entry.toProperties().store(s, "")
-      s.flush()
+  private fun reportInvalidSpans(spans: List<TimeTrackingReceivedSpan>) {
+    for (span in spans) {
+      this.diagnostics.report(
+        code = DiagnosticCodes.TIME_TRACKING_LOSS,
+        data =
+          mapOf(
+            Pair("Reason", "invalidSpanDuration"),
+            Pair("Book", span.bookID.value),
+            Pair("TimeStarted", span.timeStarted.toString()),
+            Pair("TimeEnded", span.timeEnded.toString()),
+          ),
+      )
     }
-    Files.move(
-      fileTmp,
-      file,
-      StandardCopyOption.ATOMIC_MOVE,
-      StandardCopyOption.REPLACE_EXISTING,
-    )
-
-    TimeTrackingDebugging.onTimeTrackingEntryCreated(
-      timeTrackingDebugDirectory = this.debugDirectory.toFile(),
-      libraryId = entry.libraryID.toString(),
-      bookId = entry.bookID.value,
-      entryId = entry.timeEntry.id,
-      duringMinute = entry.timeEntry.duringMinute,
-      seconds = entry.timeEntry.secondsPlayed,
+    this.logger.warn(
+      "Discarded {} time tracking span(s) with a non-positive duration",
+      spans.size,
     )
   }
 
@@ -181,6 +226,16 @@ class TimeTrackingMerge private constructor(
       val targetURI: URI,
     )
 
+    /**
+     * Merge a list of spans into time tracking entries.
+     *
+     * This will, for example, merge spans that occurred within the same minute into a single
+     * time tracking entry, and split spans that crossed a minute boundary.
+     *
+     * @param spans The spans
+     *
+     * @return The merged entries
+     */
     fun mergeEntries(spans: List<TimeTrackingReceivedSpan>): List<TimeTrackingEntryOutgoing> {
       val spansByKey =
         mutableMapOf<MergeKey, MutableList<TimeTrackingReceivedSpan>>()
@@ -218,30 +273,51 @@ class TimeTrackingMerge private constructor(
         mutableMapOf<OffsetDateTime, Long>()
 
       for (span in keySpans) {
-        val spanSeconds =
-          Duration
-            .between(span.timeStarted, span.timeEnded)
-            .toMillis() /
-            1_000L
+        /*
+         * Spans with a non-positive duration carry no data. They should have been discarded by
+         * the tick before reaching here; this guard is defensive and also covers direct callers
+         * of mergeEntries.
+         */
 
-        val crossesMinuteBoundary =
-          span.timeStarted.minute != span.timeEnded.minute
+        if (!span.timeEnded.isAfter(span.timeStarted)) {
+          continue
+        }
 
-        val minuteCurr =
-          span.timeStarted.withSecond(0)
-        val minuteNext =
-          minuteCurr.plusMinutes(1L)
+        /*
+         * Walk the span one minute at a time, crediting each minute it touches with the number
+         * of whole seconds of the span that fall within it. This correctly attributes time to
+         * every minute the span crosses, including spans that cross more than one minute
+         * boundary. A minute is never credited with more than sixty seconds, so that
+         * overlapping spans cannot report more time than actually elapsed.
+         */
 
-        if (crossesMinuteBoundary) {
-          val addNext = span.timeEnded.second
-          val addCurr = 60 - span.timeStarted.second
-          secondsForMinute[minuteCurr] =
-            Math.min(60, (secondsForMinute[minuteCurr] ?: 0) + addCurr)
-          secondsForMinute[minuteNext] =
-            Math.min(60, (secondsForMinute[minuteNext] ?: 0) + addNext)
-        } else {
-          secondsForMinute[minuteCurr] =
-            Math.min(60, (secondsForMinute[minuteCurr] ?: 0) + spanSeconds)
+        var minuteStart =
+          span.timeStarted.truncatedTo(ChronoUnit.MINUTES)
+        while (minuteStart.isBefore(span.timeEnded)) {
+          val minuteEnd =
+            minuteStart.plusMinutes(1L)
+          val overlapStart =
+            if (span.timeStarted.isAfter(minuteStart)) {
+              span.timeStarted
+            } else {
+              minuteStart
+            }
+          val overlapEnd =
+            if (span.timeEnded.isBefore(minuteEnd)) {
+              span.timeEnded
+            } else {
+              minuteEnd
+            }
+          if (overlapEnd.isAfter(overlapStart)) {
+            val secondsInMinute =
+              Duration
+                .between(overlapStart, overlapEnd)
+                .toMillis() /
+                1_000L
+            secondsForMinute[minuteStart] =
+              Math.min(60L, (secondsForMinute[minuteStart] ?: 0L) + secondsInMinute)
+          }
+          minuteStart = minuteEnd
         }
       }
 
@@ -256,7 +332,7 @@ class TimeTrackingMerge private constructor(
             timeEntry =
               TimeTrackingEntry(
                 id = ULID.random(),
-                duringMinute = minute.toString(),
+                duringMinute = minute,
                 secondsPlayed = seconds.toInt(),
               ),
           ),
@@ -265,19 +341,27 @@ class TimeTrackingMerge private constructor(
       return results.toList()
     }
 
+    /**
+     * Create a new merge service.
+     *
+     * @param database The database
+     * @param clock The clock
+     * @param frequency The frequency of ticks
+     * @param diagnostics The diagnostics service
+     *
+     * @return The merge service
+     */
     fun create(
+      database: DBType,
       clock: () -> OffsetDateTime,
       frequency: Duration,
-      inputDirectory: Path,
-      debugDirectory: Path,
-      outputDirectory: Path,
+      diagnostics: DiagnosticsServiceType,
     ): TimeTrackingMergeServiceType =
       TimeTrackingMerge(
+        database = database,
         clock = clock,
         frequency = frequency,
-        inboxDirectory = inputDirectory,
-        debugDirectory = debugDirectory,
-        outboxDirectory = outputDirectory,
+        diagnostics = diagnostics,
       )
   }
 
