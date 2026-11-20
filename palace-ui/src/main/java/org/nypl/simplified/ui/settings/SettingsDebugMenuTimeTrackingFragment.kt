@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.books.time.tracking.TimeTrackingDebugInfo
-import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingServiceType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainNavigation

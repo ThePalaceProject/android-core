@@ -51,7 +51,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
 import org.nypl.simplified.bookmarks.api.BookmarksForBook
-import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.taskrecorder.api.TaskRecorder

@@ -20,7 +20,7 @@ import org.nypl.simplified.accounts.api.AccountProviderType
 import org.nypl.simplified.books.time.tracking.TimeTrackingAudit
 import org.nypl.simplified.books.time.tracking.TimeTrackingCollector
 import org.nypl.simplified.books.time.tracking.TimeTrackingCollectorServiceType
-import org.nypl.simplified.books.time.tracking.TimeTrackingStatus
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStatus
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionParsers
 import org.nypl.simplified.accounts.json.AccountProviderDescriptionCollectionSerializers
 import org.nypl.simplified.tests.mocking.MockAccount

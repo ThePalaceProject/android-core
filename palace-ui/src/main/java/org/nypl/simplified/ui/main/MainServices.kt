@@ -72,7 +72,7 @@ import org.nypl.simplified.books.time.tracking.TimeTrackingHTTPCalls
 import org.nypl.simplified.books.time.tracking.TimeTrackingMigration
 import org.nypl.simplified.books.time.tracking.TimeTrackingReport
 import org.nypl.simplified.books.time.tracking.TimeTrackingService
-import org.nypl.simplified.books.time.tracking.TimeTrackingServiceType
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingServiceType
 import org.nypl.simplified.boot.api.BootEvent
 import org.nypl.simplified.boot.api.BootFailureTesting
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType

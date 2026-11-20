@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":palace-books-preview"))
     implementation(project(":palace-books-registry-api"))
     implementation(project(":palace-books-time-tracking"))
+    implementation(project(":palace-books-time-tracking-api"))
     implementation(project(":palace-boot-api"))
     implementation(project(":palace-buildconfig-api"))
     implementation(project(":palace-content-api"))

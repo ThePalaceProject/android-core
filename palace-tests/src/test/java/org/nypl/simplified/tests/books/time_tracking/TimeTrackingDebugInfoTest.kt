@@ -20,9 +20,9 @@ import org.nypl.simplified.books.time.tracking.api.TimeTrackingReceivedSpan
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttempt
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingSendAttemptFailedExceptionally
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingStarted
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingStatus
 import org.nypl.simplified.books.time.tracking.api.TimeTrackingStopped
 import org.nypl.simplified.books.time.tracking.TimeTrackingDebugInfo
-import org.nypl.simplified.books.time.tracking.TimeTrackingStatus
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType

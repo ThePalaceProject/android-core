@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":palace-books-controller-api"))
     implementation(project(":palace-books-database-api"))
     implementation(project(":palace-books-formats-api"))
-    implementation(project(":palace-books-time-tracking"))
+    implementation(project(":palace-books-time-tracking-api"))
     implementation(project(":palace-buildconfig-api"))
     implementation(project(":palace-diagnostics-api"))
     implementation(project(":palace-feeds-api"))

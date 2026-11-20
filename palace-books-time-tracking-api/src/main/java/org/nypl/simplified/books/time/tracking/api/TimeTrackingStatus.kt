@@ -1,4 +1,4 @@
-package org.nypl.simplified.books.time.tracking
+package org.nypl.simplified.books.time.tracking.api
 
 import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.nypl.simplified.accounts.api.AccountID
