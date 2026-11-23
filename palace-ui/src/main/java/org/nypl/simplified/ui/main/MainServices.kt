@@ -986,7 +986,10 @@ internal object MainServices {
       message = strings.bootingGeneral("audiobook now playing service"),
       interfaceType = AudiobookNowPlayingServiceType::class.java,
       serviceConstructor = {
-        AudiobookNowPlayingService(profilesControllerTypeService)
+        AudiobookNowPlayingService(
+          application = context,
+          profiles = profilesControllerTypeService,
+        )
       },
     )
 

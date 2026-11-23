@@ -53,7 +53,7 @@ object AudiobookOpener {
     book: Book,
     format: BookFormat,
     launchUI: Boolean,
-  ) {
+  ): CompletableFuture<Unit> {
     /*
      * Attach guard: if this book is already open, attach instead of re-opening. Re-running
      * the pipeline would call PlayerModel.openPlayerForManifest, which closes the current
@@ -69,7 +69,7 @@ object AudiobookOpener {
       if (launchUI) {
         this.launchPlayerActivity(context)
       }
-      return
+      return CompletableFuture.completedFuture(Unit)
     }
 
     val services =
@@ -159,7 +159,9 @@ object AudiobookOpener {
         palaceID = palaceID,
         launchUI = launchUI,
       )
-      return
+      val failure = CompletableFuture<Unit>()
+      failure.completeExceptionally(IllegalStateException("failure injection"))
+      return failure
     }
 
     /*
@@ -183,13 +185,12 @@ object AudiobookOpener {
       if (launchUI) {
         this.launchPlayerActivity(context)
       }
-      this.openPlayerWhenManifestIsReady(
+      return this.openPlayerWhenManifestIsReady(
         application = application,
         httpClient = httpClient,
         book = book,
         prepFuture = prepFuture,
       )
-      return
     }
 
     /*
@@ -216,13 +217,12 @@ object AudiobookOpener {
         if (launchUI) {
           this.launchPlayerActivity(context)
         }
-        this.openPlayerWhenManifestIsReady(
+        return this.openPlayerWhenManifestIsReady(
           application = application,
           httpClient = httpClient,
           book = book,
           prepFuture = prepFuture,
         )
-        return
       }
     }
 
@@ -247,6 +247,9 @@ object AudiobookOpener {
           services = services,
           target = AudioBookLink.Manifest(manifestURI),
         )
+
+      val result =
+        CompletableFuture<Unit>()
 
       val downloadFuture =
         PlayerModel.downloadParseAndCheckManifest(
@@ -278,12 +281,15 @@ object AudiobookOpener {
          */
 
         if (state !is PlayerModelState.PlayerManifestDownloadFailed) {
-          this.openPlayerWhenManifestIsReady(
-            application = application,
-            httpClient = httpClient,
-            book = book,
-            prepFuture = downloadFuture,
-          )
+          this
+            .openPlayerWhenManifestIsReady(
+              application = application,
+              httpClient = httpClient,
+              book = book,
+              prepFuture = downloadFuture,
+            ).whenComplete { _, error ->
+              this.completeResult(result, error)
+            }
           return@whenComplete
         }
 
@@ -309,14 +315,17 @@ object AudiobookOpener {
             parserExtensions = parserExtensions,
           )
 
-        this.openPlayerWhenManifestIsReady(
-          application = application,
-          httpClient = httpClient,
-          book = book,
-          prepFuture = parseFuture,
-        )
+        this
+          .openPlayerWhenManifestIsReady(
+            application = application,
+            httpClient = httpClient,
+            book = book,
+            prepFuture = parseFuture,
+          ).whenComplete { _, error ->
+            this.completeResult(result, error)
+          }
       }
-      return
+      return result
     }
 
     this.logger.debug("Parsing existing manifest.")
@@ -339,7 +348,7 @@ object AudiobookOpener {
     if (launchUI) {
       this.launchPlayerActivity(context)
     }
-    this.openPlayerWhenManifestIsReady(
+    return this.openPlayerWhenManifestIsReady(
       application = application,
       httpClient = httpClient,
       book = book,
@@ -358,17 +367,27 @@ object AudiobookOpener {
     httpClient: LSHTTPClientType,
     book: Book,
     prepFuture: CompletableFuture<Unit>,
-  ) {
-    prepFuture.whenComplete { _, _ ->
+  ): CompletableFuture<Unit> {
+    val result =
+      CompletableFuture<Unit>()
+    prepFuture.whenComplete { _, prepError ->
       val state =
         PlayerModel.state
       if (state !is PlayerModelState.PlayerManifestOK) {
+        if (prepError != null) {
+          result.completeExceptionally(prepError)
+        } else {
+          result.completeExceptionally(
+            IllegalStateException("Manifest did not reach PlayerManifestOK"),
+          )
+        }
         return@whenComplete
       }
 
       val parameters =
         AudioBookViewerModel.parameters
       if (parameters == null) {
+        result.completeExceptionally(IllegalStateException("No player parameters"))
         return@whenComplete
       }
 
@@ -385,11 +404,30 @@ object AudiobookOpener {
           playerID = parameters.playerID,
         )
 
-      openFuture.whenComplete { _, _ ->
+      openFuture.whenComplete { _, openError ->
         if (PlayerModel.state is PlayerModelState.PlayerOpen) {
           this.recordNowPlaying(book)
+          result.complete(Unit)
+        } else {
+          if (openError != null) {
+            result.completeExceptionally(openError)
+          } else {
+            result.completeExceptionally(IllegalStateException("Book did not open"))
+          }
         }
       }
+    }
+    return result
+  }
+
+  private fun completeResult(
+    result: CompletableFuture<Unit>,
+    error: Throwable?,
+  ) {
+    if (error == null) {
+      result.complete(Unit)
+    } else {
+      result.completeExceptionally(error)
     }
   }
 
