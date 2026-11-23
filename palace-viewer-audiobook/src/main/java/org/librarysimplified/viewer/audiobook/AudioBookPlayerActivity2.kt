@@ -412,17 +412,6 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
         } else {
           this.logger.debug("Book has no time tracking URI. No time tracking will occur.")
         }
-
-        PlayerModel.openPlayerForManifest(
-          authorizationHandler = AudioBookViewerModel.authorizationHandler,
-          bookCredentials = bookParameters.drmInfo.playerCredentials(),
-          bookSource = state.bookSource,
-          context = this.application,
-          fetchAll = true,
-          httpClient = this.httpClient,
-          manifest = state.manifest,
-          playerID = bookParameters.playerID,
-        )
       }
 
       is PlayerModelState.PlayerManifestParseFailed -> {
