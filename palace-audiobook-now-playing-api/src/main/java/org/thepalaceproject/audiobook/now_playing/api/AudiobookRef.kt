@@ -1,4 +1,4 @@
-package org.nypl.simplified.audiobook.nowplaying.api
+package org.thepalaceproject.audiobook.now_playing.api
 
 import org.nypl.simplified.accounts.api.AccountID
 import org.nypl.simplified.books.api.BookID

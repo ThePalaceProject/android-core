@@ -1,4 +1,4 @@
-package org.nypl.simplified.audiobook.nowplaying.api
+package org.thepalaceproject.audiobook.now_playing.api
 
 import com.io7m.jattribute.core.AttributeReadableType
 import java.util.Optional

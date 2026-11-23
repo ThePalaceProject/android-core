@@ -1,14 +1,14 @@
-package org.nypl.simplified.audiobook.nowplaying
+package org.thepalaceproject.audiobook.now_playing
 
 import com.io7m.jattribute.core.AttributeReadableType
 import com.io7m.jattribute.core.AttributeType
 import com.io7m.jattribute.core.Attributes
-import org.nypl.simplified.audiobook.nowplaying.api.AudiobookNowPlayingServiceType
-import org.nypl.simplified.audiobook.nowplaying.api.AudiobookRef
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookRef
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
 

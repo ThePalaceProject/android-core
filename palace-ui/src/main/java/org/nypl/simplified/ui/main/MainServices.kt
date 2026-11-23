@@ -47,8 +47,6 @@ import org.nypl.simplified.analytics.api.Analytics
 import org.nypl.simplified.analytics.api.AnalyticsConfiguration
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
-import org.nypl.simplified.audiobook.nowplaying.AudiobookNowPlayingService
-import org.nypl.simplified.audiobook.nowplaying.api.AudiobookNowPlayingServiceType
 import org.nypl.simplified.bookmarks.BookmarkService
 import org.nypl.simplified.bookmarks.api.BookmarkServiceProviderType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
@@ -117,6 +115,8 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.ui.settings.SettingsProfileEvents
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.audiobook.now_playing.AudiobookNowPlayingService
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType

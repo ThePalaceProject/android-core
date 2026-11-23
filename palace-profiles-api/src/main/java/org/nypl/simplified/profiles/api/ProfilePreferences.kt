@@ -2,8 +2,8 @@ package org.nypl.simplified.profiles.api
 
 import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.audiobook.nowplaying.api.AudiobookRef
 import org.nypl.simplified.reader.api.ReaderPreferences
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookRef
 
 /**
  * The preferences for a profile.

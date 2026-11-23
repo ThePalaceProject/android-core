@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.accounts.api.AccountID
-import org.nypl.simplified.audiobook.nowplaying.api.AudiobookRef
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookRef
 import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.profiles.ProfileDescriptionJSON
 import org.nypl.simplified.profiles.api.ProfileAttributes
