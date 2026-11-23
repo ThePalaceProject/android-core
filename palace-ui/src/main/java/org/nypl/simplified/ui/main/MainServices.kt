@@ -47,6 +47,8 @@ import org.nypl.simplified.analytics.api.Analytics
 import org.nypl.simplified.analytics.api.AnalyticsConfiguration
 import org.nypl.simplified.analytics.api.AnalyticsEvent
 import org.nypl.simplified.analytics.api.AnalyticsType
+import org.nypl.simplified.audiobook.nowplaying.AudiobookNowPlayingService
+import org.nypl.simplified.audiobook.nowplaying.api.AudiobookNowPlayingServiceType
 import org.nypl.simplified.bookmarks.BookmarkService
 import org.nypl.simplified.bookmarks.api.BookmarkServiceProviderType
 import org.nypl.simplified.bookmarks.api.BookmarkServiceType
@@ -977,6 +979,14 @@ internal object MainServices {
           timeSegments = PlayerModel.timeTracker.timeSegments,
           diagnostics = diagnosticsService,
         )
+      },
+    )
+
+    addService(
+      message = strings.bootingGeneral("audiobook now playing service"),
+      interfaceType = AudiobookNowPlayingServiceType::class.java,
+      serviceConstructor = {
+        AudiobookNowPlayingService(profilesControllerTypeService)
       },
     )
 

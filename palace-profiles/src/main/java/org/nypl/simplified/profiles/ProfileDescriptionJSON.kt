@@ -7,6 +7,8 @@ import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.audiobook.nowplaying.api.AudiobookRef
+import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.files.FileUtilities
 import org.nypl.simplified.json.core.JSONParseException
 import org.nypl.simplified.json.core.JSONParserUtilities
@@ -234,6 +236,9 @@ object ProfileDescriptionJSON {
     val enableMDMLibraries =
       JSONParserUtilities.getBooleanDefault(objectNode, "enableMDMLibraries", false)
 
+    val lastAudiobook =
+      this.deserializeLastAudiobook(objectNode)
+
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI,
@@ -241,6 +246,7 @@ object ProfileDescriptionJSON {
       hasSeenNotificationScreen = hasSeenNotificationScreen,
       isLCPManualPassphraseEnabled = false,
       mostRecentAccount = mostRecentAccount,
+      lastAudiobook = lastAudiobook,
       playbackRates = playbackRates,
       readerPreferences = readerPreferences,
       showDebugSettings = showDebugSettings,
@@ -316,6 +322,9 @@ object ProfileDescriptionJSON {
     val enableMDMLibraries =
       JSONParserUtilities.getBooleanDefault(objectNode, "enableMDMLibraries", false)
 
+    val lastAudiobook =
+      this.deserializeLastAudiobook(objectNode)
+
     return ProfilePreferences(
       dateOfBirth = dateOfBirth,
       downloadOnlyOnWIFI = downloadOnlyOnWIFI,
@@ -323,6 +332,7 @@ object ProfileDescriptionJSON {
       hasSeenNotificationScreen = false,
       isLCPManualPassphraseEnabled = false,
       mostRecentAccount = mostRecentAccount,
+      lastAudiobook = lastAudiobook,
       playbackRates = playbackRates,
       readerPreferences = readerPreferences,
       showDebugSettings = false,
@@ -412,6 +422,7 @@ object ProfileDescriptionJSON {
         hasSeenNotificationScreen = false,
         isLCPManualPassphraseEnabled = false,
         mostRecentAccount = mostRecentAccountFallback,
+        lastAudiobook = null,
         playbackRates = playbackRates,
         readerPreferences = readerPrefs,
         showDebugSettings = false,
@@ -504,6 +515,18 @@ object ProfileDescriptionJSON {
     }
   }
 
+  private fun deserializeLastAudiobook(objectNode: ObjectNode): AudiobookRef? {
+    val node = JSONParserUtilities.getObjectOrNull(objectNode, "lastAudiobook")
+    if (node == null) {
+      return null
+    }
+    val accountID =
+      AccountID(UUID.fromString(JSONParserUtilities.getString(node, "accountID")))
+    val bookID =
+      BookID.create(JSONParserUtilities.getString(node, "bookID"))
+    return AudiobookRef(accountID, bookID)
+  }
+
   /**
    * Serialize profile preferences to JSON.
    *
@@ -582,6 +605,14 @@ object ProfileDescriptionJSON {
       dateNode.put("date", this.standardDateFormatter().print(dateOfBirth.date))
       dateNode.put("isSynthesized", dateOfBirth.isSynthesized)
       output.set<ObjectNode>("dateOfBirth", dateNode)
+    }
+
+    val lastAudiobook = preferences.lastAudiobook
+    if (lastAudiobook != null) {
+      val lastAudiobookNode = objectMapper.createObjectNode()
+      lastAudiobookNode.put("accountID", lastAudiobook.accountID.uuid.toString())
+      lastAudiobookNode.put("bookID", lastAudiobook.bookID.value())
+      output.set<ObjectNode>("lastAudiobook", lastAudiobookNode)
     }
 
     return output

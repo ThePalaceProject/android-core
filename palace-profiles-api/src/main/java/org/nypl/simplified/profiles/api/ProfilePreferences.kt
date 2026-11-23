@@ -2,6 +2,7 @@ package org.nypl.simplified.profiles.api
 
 import org.librarysimplified.audiobook.api.PlayerPlaybackRate
 import org.nypl.simplified.accounts.api.AccountID
+import org.nypl.simplified.audiobook.nowplaying.api.AudiobookRef
 import org.nypl.simplified.reader.api.ReaderPreferences
 
 /**
@@ -32,6 +33,8 @@ data class ProfilePreferences(
   val playbackRates: Map<String, PlayerPlaybackRate>,
   /** The most recently used account provider. */
   val mostRecentAccount: AccountID,
+  /** @return The last audiobook that was opened, or `null` if there is none. */
+  val lastAudiobook: AudiobookRef?,
   /** @return `true` if the debug settings should be visible. */
   val showDebugSettings: Boolean,
   /** @return `true` if downloads should only occur when Wi-Fi is available. */

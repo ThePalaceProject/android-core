@@ -413,6 +413,7 @@ object ProfilesDatabases {
                 hasSeenNotificationScreen = false,
                 isLCPManualPassphraseEnabled = false,
                 mostRecentAccount = account.id,
+                lastAudiobook = null,
                 playbackRates = hashMapOf(),
                 readerPreferences = ReaderPreferences.builder().build(),
                 showDebugSettings = false,

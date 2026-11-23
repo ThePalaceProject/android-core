@@ -7,6 +7,7 @@ dependencies {
 
     implementation(project(":palace-accounts-api"))
     implementation(project(":palace-accounts-database-api"))
+    implementation(project(":palace-audiobook-now-playing-api"))
     implementation(project(":palace-feeds-api"))
     implementation(project(":palace-reader-api"))
 

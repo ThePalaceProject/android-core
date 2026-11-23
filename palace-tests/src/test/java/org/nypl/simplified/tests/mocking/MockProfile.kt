@@ -40,6 +40,7 @@ class MockProfile(
         hasSeenNotificationScreen = false,
         readerPreferences = ReaderPreferences.builder().build(),
         mostRecentAccount = this.accounts.firstKey(),
+        lastAudiobook = null,
         playbackRates = hashMapOf(),
         showDebugSettings = false,
         downloadOnlyOnWIFI = false,
