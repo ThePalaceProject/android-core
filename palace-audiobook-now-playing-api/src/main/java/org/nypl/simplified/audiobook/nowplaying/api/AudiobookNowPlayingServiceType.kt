@@ -1,18 +1,22 @@
 package org.nypl.simplified.audiobook.nowplaying.api
 
+import com.io7m.jattribute.core.AttributeReadableType
+import java.util.Optional
 import java.util.concurrent.CompletableFuture
 
 /**
  * The service that tracks which audiobook is currently open and can open one for playback.
  *
- * The recorded reference is persisted so that it survives process death.
+ * The currently-open audiobook is exposed as a read-only attribute so that observers can subscribe
+ * to it; updates are published on the UI thread. The recorded reference is persisted so that it
+ * survives process death.
  */
 
 interface AudiobookNowPlayingServiceType {
   /**
-   * @return The audiobook that is currently open, or null if none is open
+   * @return A read-only attribute holding the currently-open audiobook, or empty if none is open
    */
-  val current: AudiobookRef?
+  val current: AttributeReadableType<Optional<AudiobookRef>>
 
   /**
    * Set (or clear) the currently-open audiobook.
