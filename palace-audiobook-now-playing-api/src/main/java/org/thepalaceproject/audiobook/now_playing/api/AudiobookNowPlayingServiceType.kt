@@ -8,8 +8,8 @@ import java.util.concurrent.CompletableFuture
  * The service that tracks which audiobook is currently open and can open one for playback.
  *
  * The currently-open audiobook is exposed as a read-only attribute so that observers can subscribe
- * to it; updates are published on the UI thread. The recorded reference is persisted so that it
- * survives process death.
+ * to it; updates are published on the UI thread. The value is in memory and reflects the actual
+ * playback state; it is empty when no audiobook is open.
  */
 
 interface AudiobookNowPlayingServiceType {

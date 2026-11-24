@@ -252,7 +252,6 @@ class MDMLibraryApplierTest {
           readerPreferences = ReaderPreferences.builder().build(),
           playbackRates = mapOf(),
           mostRecentAccount = mostRecentAccount,
-          lastAudiobook = null,
           showDebugSettings = false,
           downloadOnlyOnWIFI = false,
           isLCPManualPassphraseEnabled = false,

@@ -988,7 +988,6 @@ internal object MainServices {
       serviceConstructor = {
         AudiobookNowPlayingService(
           application = context,
-          profiles = profilesControllerTypeService,
         )
       },
     )

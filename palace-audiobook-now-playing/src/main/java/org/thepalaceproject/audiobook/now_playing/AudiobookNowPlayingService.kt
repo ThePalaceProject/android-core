@@ -8,7 +8,6 @@ import org.librarysimplified.services.api.Services
 import org.librarysimplified.viewer.audiobook.AudiobookOpener
 import org.nypl.simplified.books.api.BookFormat
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
-import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.slf4j.Logger
@@ -20,13 +19,12 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 /**
- * Remembers the audiobook that was most recently opened, persisting it in the
- * current profile's preferences. The [current] attribute mirrors the stored
- * value so that it can be observed.
+ * Tracks which audiobook is currently open and can open one for playback. The
+ * [current] attribute is in memory and reflects the actual playback state; it
+ * is empty when no audiobook is open.
  */
 class AudiobookNowPlayingService(
   private val application: Application,
-  private val profiles: ProfilesControllerType,
 ) : AudiobookNowPlayingServiceType {
   private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -34,11 +32,11 @@ class AudiobookNowPlayingService(
     Attributes
       .create { e ->
         this.logger.debug("now-playing attribute error", e)
-      }.withValue(this.loadCurrent())
+      }.withValue(Optional.empty())
 
   /**
-   * @return The audiobook that was most recently opened, or none if there is
-   *   no current audiobook.
+   * @return The audiobook that is currently open, or none if there is no
+   *   current audiobook.
    */
   override val current: AttributeReadableType<Optional<AudiobookRef>> =
     this.currentAttribute
@@ -54,7 +52,6 @@ class AudiobookNowPlayingService(
       newRef = Optional.of(ref)
     }
     UIThread.runOnUIThread {
-      this.saveCurrent(newRef)
       this.currentAttribute.set(newRef)
     }
   }
@@ -110,28 +107,5 @@ class AudiobookNowPlayingService(
       format = format,
       launchUI = launchUI,
     )
-  }
-
-  private fun loadCurrent(): Optional<AudiobookRef> {
-    val ref =
-      this.profiles
-        .profileCurrent()
-        .preferences()
-        .lastAudiobook
-    if (ref == null) {
-      return Optional.empty()
-    }
-    return Optional.of(ref)
-  }
-
-  private fun saveCurrent(ref: Optional<AudiobookRef>) {
-    this.profiles.profileUpdate { d ->
-      d.copy(
-        preferences =
-          d.preferences.copy(
-            lastAudiobook = ref.orElse(null),
-          ),
-      )
-    }
   }
 }

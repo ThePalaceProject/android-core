@@ -7,12 +7,9 @@ import org.joda.time.DateTimeUtils
 import org.joda.time.DateTimeZone
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.nypl.simplified.accounts.api.AccountID
-import org.thepalaceproject.audiobook.now_playing.api.AudiobookRef
-import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.profiles.ProfileDescriptionJSON
 import org.nypl.simplified.profiles.api.ProfileAttributes
 import org.nypl.simplified.profiles.api.ProfileDateOfBirth
@@ -56,7 +53,6 @@ class ProfileDescriptionJSONTest {
           hasSeenNotificationScreen = false,
           readerPreferences = ReaderPreferences.builder().build(),
           mostRecentAccount = AccountID.generate(),
-          lastAudiobook = null,
           playbackRates = hashMapOf(),
           showDebugSettings = false,
           downloadOnlyOnWIFI = false,
@@ -255,78 +251,6 @@ class ProfileDescriptionJSONTest {
     assertEquals(mostRecentAccount, description.preferences.mostRecentAccount)
   }
 
-  @Test
-  fun testLastAudiobookRoundTrip() {
-    val mapper = ObjectMapper()
-    val ref =
-      AudiobookRef(
-        AccountID.generate(),
-        BookID.create("lastaudiobookbookid"),
-      )
-
-    val description_0 =
-      this.newDescriptionWithLastAudiobook(ref)
-
-    val node =
-      ProfileDescriptionJSON.serializeToJSON(mapper, description_0)
-    val description_1 =
-      ProfileDescriptionJSON.deserializeFromJSON(mapper, node, AccountID.generate())
-
-    assertEquals(ref, description_1.preferences.lastAudiobook)
-  }
-
-  /**
-   * A profile serialized by an older version of the app (one that predates the `lastAudiobook`
-   * field) must deserialize with the field at its default of `null`.
-   */
-
-  @Test
-  fun testLastAudiobookDefaultsToNullWhenAbsent() {
-    val mapper = ObjectMapper()
-    val ref =
-      AudiobookRef(
-        AccountID.generate(),
-        BookID.create("lastaudiobookbookid"),
-      )
-
-    val description_0 =
-      this.newDescriptionWithLastAudiobook(ref)
-
-    val node =
-      ProfileDescriptionJSON.serializeToJSON(mapper, description_0)
-    (node.get("preferences") as ObjectNode).remove("lastAudiobook")
-
-    val description_1 =
-      ProfileDescriptionJSON.deserializeFromJSON(mapper, node, AccountID.generate())
-
-    assertNull(description_1.preferences.lastAudiobook)
-  }
-
-  private fun newDescriptionWithLastAudiobook(lastAudiobook: AudiobookRef?): ProfileDescription =
-    ProfileDescription(
-      preferences =
-        ProfilePreferences(
-          dateOfBirth = null,
-          showTestingLibraries = false,
-          hasSeenLibrarySelectionScreen = false,
-          hasSeenNotificationScreen = false,
-          readerPreferences = ReaderPreferences.builder().build(),
-          mostRecentAccount = AccountID.generate(),
-          lastAudiobook = lastAudiobook,
-          playbackRates = hashMapOf(),
-          showDebugSettings = false,
-          downloadOnlyOnWIFI = false,
-          isLCPManualPassphraseEnabled = false,
-          audioBookPlaybackSkipIntervalForwardMs = 30_000L,
-          audioBookPlaybackSkipIntervalBackwardMs = 30_000L,
-          audioBookBatteryDialogAccepted = false,
-          showBookCoverDebugLabels = false,
-          preferOPDS20 = false,
-          enableMDMLibraries = false,
-        ),
-      attributes = ProfileAttributes(sortedMapOf()),
-    )
-
   private fun newDescription(enableMDMLibraries: Boolean): ProfileDescription =
     ProfileDescription(
       preferences =
@@ -337,7 +261,6 @@ class ProfileDescriptionJSONTest {
           hasSeenNotificationScreen = false,
           readerPreferences = ReaderPreferences.builder().build(),
           mostRecentAccount = AccountID.generate(),
-          lastAudiobook = null,
           playbackRates = hashMapOf(),
           showDebugSettings = false,
           downloadOnlyOnWIFI = false,
