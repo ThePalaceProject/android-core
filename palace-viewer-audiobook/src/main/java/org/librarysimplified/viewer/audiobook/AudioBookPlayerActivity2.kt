@@ -40,6 +40,7 @@ import org.librarysimplified.audiobook.manifest.api.PlayerPalaceID
 import org.librarysimplified.audiobook.views.PlayerBaseFragment
 import org.librarysimplified.audiobook.views.PlayerBookmarkModel
 import org.librarysimplified.audiobook.views.PlayerFragment
+import org.librarysimplified.audiobook.views.PlayerMiniFragment
 import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.audiobook.views.PlayerModelState
 import org.librarysimplified.audiobook.views.PlayerSleepTimerFragment
@@ -63,6 +64,7 @@ import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.images.ImageLoader2Type
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
 import org.thepalaceproject.palace.battery.BatteryModel
 import org.thepalaceproject.palace.diagnostics.api.DiagnosticCodes
 import org.thepalaceproject.palace.diagnostics.api.DiagnosticsServiceType
@@ -85,6 +87,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   private lateinit var timeTrackingService: TimeTrackingServiceType
   private lateinit var httpClient: LSHTTPClientType
   private lateinit var imageLoader: ImageLoader2Type
+  private lateinit var nowPlaying: AudiobookNowPlayingServiceType
 
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
   private var subscriptions: CompositeDisposable = CompositeDisposable()
@@ -107,6 +110,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       services.requireService(ProfilesControllerType::class.java)
     this.httpClient =
       services.requireService(LSHTTPClientType::class.java)
+    this.nowPlaying =
+      services.requireService(AudiobookNowPlayingServiceType::class.java)
 
     this.root = this.findViewById(R.id.audio_book_player_fragment_root)
     ScreenEdgeToEdgeFix.edgeToEdge(this.root)
@@ -194,6 +199,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
           is PlayerTOCFragment -> {
             this.switchFragment(PlayerFragment())
           }
+
+          is PlayerMiniFragment -> {
+            // The compact player is not shown in this activity.
+          }
         }
       }
 
@@ -220,10 +229,25 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
 
     try {
+      this.nowPlaying.setCurrent(null)
+    } catch (e: Exception) {
+      this.logger.debug("Failed to clear the current audiobook: ", e)
+    }
+
+    try {
       this.finish()
     } catch (e: Exception) {
       this.logger.debug("Failed to finish activity: ", e)
     }
+  }
+
+  private fun showCloseConfirmationDialog() {
+    MaterialAlertDialogBuilder(this)
+      .setMessage(R.string.audio_book_player_close_confirm)
+      .setNegativeButton(R.string.audio_book_player_close_cancel, null)
+      .setPositiveButton(R.string.audio_book_player_close_stop) { _, _ ->
+        this.close()
+      }.show()
   }
 
   @UiThread
@@ -793,7 +817,15 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       PlayerViewCommand.PlayerViewNavigationCloseAll -> {
-        this.close()
+        this.showCloseConfirmationDialog()
+      }
+
+      PlayerViewCommand.PlayerViewNavigationMinimize -> {
+        this.finish()
+      }
+
+      PlayerViewCommand.PlayerViewNavigationExpand -> {
+        // The compact player is not shown in this activity.
       }
 
       PlayerViewCommand.PlayerViewErrorsDownloadOpen -> {
