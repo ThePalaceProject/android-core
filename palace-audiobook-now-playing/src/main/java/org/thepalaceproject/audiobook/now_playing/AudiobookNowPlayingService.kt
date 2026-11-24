@@ -61,9 +61,13 @@ class AudiobookNowPlayingService(
 
   /**
    * @param ref The audiobook to open for playback.
+   * @param launchUI Whether to launch the in-app player screen.
    * @return A future that completes when the audiobook is open for playback.
    */
-  override fun openForPlayback(ref: AudiobookRef): CompletableFuture<Unit> {
+  override fun openForPlayback(
+    ref: AudiobookRef,
+    launchUI: Boolean,
+  ): CompletableFuture<Unit> {
     val registry =
       Services
         .serviceDirectory()
@@ -104,7 +108,7 @@ class AudiobookNowPlayingService(
       parameters = parameters,
       book = book,
       format = format,
-      launchUI = false,
+      launchUI = launchUI,
     )
   }
 

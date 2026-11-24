@@ -346,6 +346,7 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
           accountID = book.account,
           bookID = book.id,
         ),
+        launchUI = false,
       )
 
     /*

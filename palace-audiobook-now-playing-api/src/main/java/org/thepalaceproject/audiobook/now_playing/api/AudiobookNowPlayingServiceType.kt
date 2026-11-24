@@ -26,13 +26,17 @@ interface AudiobookNowPlayingServiceType {
   fun setCurrent(ref: AudiobookRef?)
 
   /**
-   * Open the given audiobook for playback without showing any user interface.
+   * Open the given audiobook for playback.
    *
-   * If the book is already open this is a no-op that completes immediately; otherwise the book is
-   * opened fresh.
+   * If the book is already open no re-open occurs: with [launchUI] set, the in-app player screen is
+   * (re)shown; otherwise this completes immediately. If the book is not open, it is opened fresh.
    *
    * @param ref The audiobook to open
+   * @param launchUI Whether to launch the in-app player screen
    * @return A future that completes when the book is open (or already was)
    */
-  fun openForPlayback(ref: AudiobookRef): CompletableFuture<Unit>
+  fun openForPlayback(
+    ref: AudiobookRef,
+    launchUI: Boolean,
+  ): CompletableFuture<Unit>
 }

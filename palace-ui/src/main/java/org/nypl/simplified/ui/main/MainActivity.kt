@@ -8,13 +8,19 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.audiobook.views.PlayerMiniFragment
+import org.librarysimplified.audiobook.views.PlayerModel
+import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountOIDC
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingServiceType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
@@ -30,6 +36,7 @@ import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREE
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
 import java.net.URI
 import java.util.UUID
 
@@ -49,6 +56,11 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
+  private lateinit var nowPlaying: AudiobookNowPlayingServiceType
+  private lateinit var timeTrackingService: TimeTrackingServiceType
+  private lateinit var miniPlayerHolder: View
+  private var playerSubscriptions: CompositeDisposable = CompositeDisposable()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(Bundle())
 
@@ -63,6 +75,13 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
     this.rootContainer = this.findViewById(R.id.mainFragmentRoot)
     ScreenEdgeToEdgeFix.edgeToEdge(this.rootContainer)
+
+    val services = Services.serviceDirectory()
+    this.nowPlaying =
+      services.requireService(AudiobookNowPlayingServiceType::class.java)
+    this.timeTrackingService =
+      services.requireService(TimeTrackingServiceType::class.java)
+    this.miniPlayerHolder = this.findViewById(R.id.mainMiniPlayerHolder)
   }
 
   override fun onNewIntent(
@@ -162,7 +181,22 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.onSplashScreenStatusChanged(newValue)
       },
     )
+    this.subscriptions.add(
+      this.nowPlaying.current.subscribe { _, newValue ->
+        if (newValue.isPresent) {
+          this.showMiniPlayer()
+        } else {
+          this.hideMiniPlayer()
+        }
+      },
+    )
     this.switchFragment(SplashFragment())
+
+    this.playerSubscriptions =
+      CompositeDisposable()
+    this.playerSubscriptions.add(
+      PlayerModel.viewCommands.subscribe(this::onMiniPlayerCommand),
+    )
 
     this.onBackPressedDispatcher.addCallback(
       this,
@@ -229,6 +263,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   override fun onStop() {
     super.onStop()
 
+    this.playerSubscriptions.dispose()
     this.subscriptions.close()
   }
 
@@ -238,5 +273,83 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       .beginTransaction()
       .replace(R.id.mainFragmentHolder, fragment)
       .commit()
+  }
+
+  private fun showMiniPlayer() {
+    val existing = this.supportFragmentManager.findFragmentByTag(MINI_PLAYER_TAG)
+    if (existing == null) {
+      this.supportFragmentManager
+        .beginTransaction()
+        .add(R.id.mainMiniPlayerHolder, PlayerMiniFragment(), MINI_PLAYER_TAG)
+        .commit()
+    }
+    this.miniPlayerHolder.visibility = View.VISIBLE
+  }
+
+  private fun hideMiniPlayer() {
+    val existing = this.supportFragmentManager.findFragmentByTag(MINI_PLAYER_TAG)
+    if (existing != null) {
+      this.supportFragmentManager
+        .beginTransaction()
+        .remove(existing)
+        .commit()
+    }
+    this.miniPlayerHolder.visibility = View.GONE
+  }
+
+  private fun onMiniPlayerCommand(command: PlayerViewCommand) {
+    when (command) {
+      PlayerViewCommand.PlayerViewNavigationCloseAll -> {
+        this.showCloseConfirmationDialog()
+      }
+
+      PlayerViewCommand.PlayerViewNavigationExpand -> {
+        this.expandMiniPlayer()
+      }
+
+      else -> {
+        // Cover updates and other commands are handled by the mini-player fragment.
+      }
+    }
+  }
+
+  private fun expandMiniPlayer() {
+    val ref = this.nowPlaying.current.get()
+    if (ref.isPresent) {
+      this.nowPlaying.openForPlayback(ref.get(), launchUI = true)
+    }
+  }
+
+  private fun showCloseConfirmationDialog() {
+    MaterialAlertDialogBuilder(this)
+      .setMessage(R.string.audioBookMiniPlayerCloseConfirm)
+      .setNegativeButton(R.string.audioBookMiniPlayerCloseCancel, null)
+      .setPositiveButton(R.string.audioBookMiniPlayerCloseStop) { _, _ ->
+        this.closeAudiobook()
+      }.show()
+  }
+
+  private fun closeAudiobook() {
+    try {
+      PlayerModel.closeBookOrDismissError()
+    } catch (e: Exception) {
+      this.logger.debug("Failed to close book: ", e)
+    }
+
+    try {
+      this.timeTrackingService.onBookClosed()
+    } catch (e: Exception) {
+      this.logger.debug("Failed to stop time tracking: ", e)
+    }
+
+    try {
+      this.nowPlaying.setCurrent(null)
+    } catch (e: Exception) {
+      this.logger.debug("Failed to clear the current audiobook: ", e)
+    }
+  }
+
+  private companion object {
+    private const val MINI_PLAYER_TAG = "miniPlayer"
   }
 }

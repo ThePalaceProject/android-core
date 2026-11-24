@@ -2,6 +2,9 @@
 
 <resources>
   <string name="accountAdd">Add Library</string>
+  <string name="audioBookMiniPlayerCloseCancel">Cancel</string>
+  <string name="audioBookMiniPlayerCloseConfirm">Stop playback?</string>
+  <string name="audioBookMiniPlayerCloseStop">Stop</string>
   <string name="accountAgeVerification">Age Verification</string>
   <string name="accountCOPPADeleteBooks">Delete books?</string>
   <string name="accountCOPPADeleteBooksConfirm">Changing your age will remove all books downloaded from the current account.</string>
