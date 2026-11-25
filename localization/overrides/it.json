@@ -59,7 +59,8 @@
     "selectionAlternateButton": "Aggiunga una biblioteca in seguito",
     "selectionButton": "Trova la sua biblioteca",
     "selectionTitle": "Legga e-book dalla sua biblioteca",
-    "tabHolds": "Prenotazioni"
+    "tabHolds": "Prenotazioni",
+    "audioBookMiniPlayerCloseStop": "Ferma"
   },
   "palace-ui/src/main/res/values/stringsBookRevoke.xml": {
     "revokeACSDeleteRights": "Cancellare le informazioni sui diritti di Adobe ACS…",
@@ -246,7 +247,8 @@
     "audio_book_player_bookmark_adding": "Aggiunta del segnalibro…",
     "audio_book_player_error_engine_open": "Impossibile inizializzare il motore audio",
     "audio_book_player_return_question": "Vuole restituirlo?",
-    "audio_book_player_return_title": "Il suo Audiobook ha finito"
+    "audio_book_player_return_title": "Il suo Audiobook ha finito",
+    "audio_book_player_close_stop": "Ferma"
   },
   "palace-viewer-epub-readium2/src/main/res/values/strings.xml": {
     "reader_bookmark_adding": "Aggiunta del segnalibro…",

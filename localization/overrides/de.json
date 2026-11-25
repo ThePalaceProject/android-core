@@ -26,7 +26,8 @@
     "accountSyncBookmarks": "Lesezeichen synchronisieren",
     "accountSyncBookmarksDescription": "Aktivieren Sie die Synchronisierung der Lesezeichen, um Ihre Leseposition und Lesezeichen auf allen Geräten zu speichern. Dies muss auf allen Geräten erfolgen, auf denen Sie auf Palace zugreifen, um die Leseposition zu synchronisieren.",
     "migrationFailure": "Es gab ein oder mehrere Probleme bei der Migration Ihrer Daten…",
-    "tabHolds": "Reservierungen"
+    "tabHolds": "Reservierungen",
+    "audioBookMiniPlayerCloseConfirm": "Wiedergabe stoppen?"
   },
   "palace-ui/src/main/res/values/stringsBookRevoke.xml": {
     "revokeACSDeleteRights": "Berechtigungsinformationen von Adobe ACS werden gelöscht…",
@@ -176,7 +177,8 @@
   "palace-viewer-audiobook/src/main/res/values/strings.xml": {
     "audio_book_player_bookmark_added": "Lesezeichen hinzugefügt",
     "audio_book_player_bookmark_adding": "Lesezeichen hinzufügen…",
-    "audio_book_player_return_title": "Ihr Hörbuch ist fertig."
+    "audio_book_player_return_title": "Ihr Hörbuch ist fertig.",
+    "audio_book_player_close_confirm": "Wiedergabe stoppen?"
   },
   "palace-viewer-epub-readium2/src/main/res/values/strings.xml": {
     "reader_bookmark_added": "Lesezeichen hinzugefügt",

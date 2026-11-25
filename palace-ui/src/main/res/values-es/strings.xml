@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accountAdd">Agregar biblioteca</string>
+    <string name="audioBookMiniPlayerCloseCancel">Cancelar</string>
+    <string name="audioBookMiniPlayerCloseConfirm">¿Dejar de reproducir?</string>
+    <string name="audioBookMiniPlayerCloseStop">Detener</string>
     <string name="accountAgeVerification">Verificación de la edad</string>
     <string name="accountCOPPADeleteBooks">¿Supir libros?</string>
     <string name="accountCOPPADeleteBooksConfirm">Cambiar su edad eliminará todos los libros descargados de la cuenta actual.</string>

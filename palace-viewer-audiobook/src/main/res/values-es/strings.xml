@@ -12,6 +12,9 @@
     <string name="audio_book_player_return_question">¿Te gustaría devolverlo?</string>
     <string name="audio_book_player_return_title">Su audiolibro ha terminado</string>
     <string name="audio_book_player_toc_title">Cuadro de contenidos</string>
+    <string name="audio_book_player_close_confirm">¿Dejar de reproducir?</string>
+    <string name="audio_book_player_close_stop">Detener</string>
+    <string name="audio_book_player_close_cancel">Cancelar</string>
     <string name="audio_book_player_ok">OK</string>
     <string name="audio_book_player_details">Detalles</string>
     <string name="audio_book_manifest_parse_error">El manifiesto del audiolibro no se pudo analizar.</string>
