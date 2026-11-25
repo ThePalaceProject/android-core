@@ -1,5 +1,6 @@
 package org.librarysimplified.viewer.audiobook
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.CheckBox
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.io7m.jattribute.core.AttributeSubscriptionType
 import io.reactivex.disposables.CompositeDisposable
 import org.librarysimplified.audiobook.api.PlayerBookmark
 import org.librarysimplified.audiobook.api.PlayerBookmarkKind
@@ -91,6 +93,8 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
 
   private var fragmentNow: Fragment = AudioBookLoadingFragment2()
   private var subscriptions: CompositeDisposable = CompositeDisposable()
+  private var stopPlaybackDialogSubscription: AttributeSubscriptionType? = null
+  private var stopPlaybackDialog: Dialog? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -127,6 +131,10 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     this.subscriptions.add(PlayerModel.stateEvents.subscribe(this::onModelStateEvent))
     this.subscriptions.add(PlayerModel.viewCommands.subscribe(this::onPlayerViewCommand))
     this.subscriptions.add(PlayerModel.playerEvents.subscribe(this::onPlayerEvent))
+    this.stopPlaybackDialogSubscription =
+      this.nowPlaying.stopPlaybackDialogOpen.subscribe { _, newValue ->
+        this.onStopPlaybackDialogOpenChanged(newValue)
+      }
 
     this.loadCoverImage()
 
@@ -186,6 +194,15 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
   override fun onStop() {
     super.onStop()
     this.subscriptions.dispose()
+    this.closeStopPlaybackDialogSubscription()
+  }
+
+  private fun closeStopPlaybackDialogSubscription() {
+    val subscription = this.stopPlaybackDialogSubscription
+    if (subscription != null) {
+      subscription.close()
+      this.stopPlaybackDialogSubscription = null
+    }
   }
 
   private fun handleBackPressed() =
@@ -241,13 +258,40 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
     }
   }
 
+  private fun onStopPlaybackDialogOpenChanged(open: Boolean) {
+    if (open) {
+      this.showCloseConfirmationDialog()
+    } else {
+      this.dismissCloseConfirmationDialog()
+    }
+  }
+
   private fun showCloseConfirmationDialog() {
-    MaterialAlertDialogBuilder(this)
-      .setMessage(R.string.audio_book_player_close_confirm)
-      .setNegativeButton(R.string.audio_book_player_close_cancel, null)
-      .setPositiveButton(R.string.audio_book_player_close_stop) { _, _ ->
-        this.close()
-      }.show()
+    val existing = this.stopPlaybackDialog
+    if (existing != null && existing.isShowing) {
+      return
+    }
+    val dialog =
+      MaterialAlertDialogBuilder(this)
+        .setMessage(R.string.audio_book_player_close_confirm)
+        .setNegativeButton(R.string.audio_book_player_close_cancel) { _, _ ->
+          this.nowPlaying.setStopPlaybackDialogOpen(false)
+        }.setPositiveButton(R.string.audio_book_player_close_stop) { _, _ ->
+          this.nowPlaying.setStopPlaybackDialogOpen(false)
+          this.close()
+        }.show()
+    dialog.setOnCancelListener {
+      this.nowPlaying.setStopPlaybackDialogOpen(false)
+    }
+    this.stopPlaybackDialog = dialog
+  }
+
+  private fun dismissCloseConfirmationDialog() {
+    val dialog = this.stopPlaybackDialog
+    if (dialog != null) {
+      dialog.dismiss()
+      this.stopPlaybackDialog = null
+    }
   }
 
   @UiThread
@@ -817,7 +861,7 @@ class AudioBookPlayerActivity2 : AppCompatActivity(R.layout.audio_book_player_ba
       }
 
       PlayerViewCommand.PlayerViewNavigationCloseAll -> {
-        this.showCloseConfirmationDialog()
+        this.nowPlaying.setStopPlaybackDialogOpen(true)
       }
 
       PlayerViewCommand.PlayerViewNavigationMinimize -> {

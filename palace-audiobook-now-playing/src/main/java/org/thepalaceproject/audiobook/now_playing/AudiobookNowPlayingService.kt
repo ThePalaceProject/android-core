@@ -34,12 +34,24 @@ class AudiobookNowPlayingService(
         this.logger.debug("now-playing attribute error", e)
       }.withValue(Optional.empty())
 
+  private val stopPlaybackDialogAttribute: AttributeType<Boolean> =
+    Attributes
+      .create { e ->
+        this.logger.debug("stop-playback-dialog attribute error", e)
+      }.withValue(false)
+
   /**
    * @return The audiobook that is currently open, or none if there is no
    *   current audiobook.
    */
   override val current: AttributeReadableType<Optional<AudiobookRef>> =
     this.currentAttribute
+
+  /**
+   * @return True while the "stop playback?" confirmation dialog should be open.
+   */
+  override val stopPlaybackDialogOpen: AttributeReadableType<Boolean> =
+    this.stopPlaybackDialogAttribute
 
   /**
    * @param ref The audiobook to remember as current, or `null` to clear it.
@@ -53,6 +65,20 @@ class AudiobookNowPlayingService(
     }
     UIThread.runOnUIThread {
       this.currentAttribute.set(newRef)
+      if (ref == null) {
+        // There is no open book, so there is no dialog to confirm stopping.
+        this.stopPlaybackDialogAttribute.set(false)
+      }
+    }
+  }
+
+  /**
+   * @param open True if the "stop playback?" confirmation dialog should be
+   *   open, false if it should be closed.
+   */
+  override fun setStopPlaybackDialogOpen(open: Boolean) {
+    UIThread.runOnUIThread {
+      this.stopPlaybackDialogAttribute.set(open)
     }
   }
 

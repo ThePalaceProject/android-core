@@ -19,11 +19,24 @@ interface AudiobookNowPlayingServiceType {
   val current: AttributeReadableType<Optional<AudiobookRef>>
 
   /**
+   * @return A read-only attribute that is true while the "stop playback?"
+   *   confirmation dialog should be open
+   */
+  val stopPlaybackDialogOpen: AttributeReadableType<Boolean>
+
+  /**
    * Set (or clear) the currently-open audiobook.
    *
    * @param ref The audiobook that is now open, or null to clear
    */
   fun setCurrent(ref: AudiobookRef?)
+
+  /**
+   * Set whether the "stop playback?" confirmation dialog should be open.
+   *
+   * @param open True if the dialog should be open, false if it should be closed
+   */
+  fun setStopPlaybackDialogOpen(open: Boolean)
 
   /**
    * Open the given audiobook for playback.

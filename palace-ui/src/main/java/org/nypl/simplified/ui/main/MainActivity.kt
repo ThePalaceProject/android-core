@@ -1,6 +1,7 @@
 package org.nypl.simplified.ui.main
 
 import android.app.ComponentCaller
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private lateinit var timeTrackingService: TimeTrackingServiceType
   private lateinit var miniPlayerHolder: View
   private var playerSubscriptions: CompositeDisposable = CompositeDisposable()
+  private var stopPlaybackDialog: Dialog? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(Bundle())
@@ -190,6 +192,11 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         }
       },
     )
+    this.subscriptions.add(
+      this.nowPlaying.stopPlaybackDialogOpen.subscribe { _, newValue ->
+        this.onStopPlaybackDialogOpenChanged(newValue)
+      },
+    )
     this.switchFragment(SplashFragment())
 
     this.playerSubscriptions =
@@ -300,7 +307,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private fun onMiniPlayerCommand(command: PlayerViewCommand) {
     when (command) {
       PlayerViewCommand.PlayerViewNavigationCloseAll -> {
-        this.showCloseConfirmationDialog()
+        this.nowPlaying.setStopPlaybackDialogOpen(true)
       }
 
       PlayerViewCommand.PlayerViewNavigationExpand -> {
@@ -320,13 +327,40 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
     }
   }
 
+  private fun onStopPlaybackDialogOpenChanged(open: Boolean) {
+    if (open) {
+      this.showCloseConfirmationDialog()
+    } else {
+      this.dismissCloseConfirmationDialog()
+    }
+  }
+
   private fun showCloseConfirmationDialog() {
-    MaterialAlertDialogBuilder(this)
-      .setMessage(R.string.audioBookMiniPlayerCloseConfirm)
-      .setNegativeButton(R.string.audioBookMiniPlayerCloseCancel, null)
-      .setPositiveButton(R.string.audioBookMiniPlayerCloseStop) { _, _ ->
-        this.closeAudiobook()
-      }.show()
+    val existing = this.stopPlaybackDialog
+    if (existing != null && existing.isShowing) {
+      return
+    }
+    val dialog =
+      MaterialAlertDialogBuilder(this)
+        .setMessage(R.string.audioBookMiniPlayerCloseConfirm)
+        .setNegativeButton(R.string.audioBookMiniPlayerCloseCancel) { _, _ ->
+          this.nowPlaying.setStopPlaybackDialogOpen(false)
+        }.setPositiveButton(R.string.audioBookMiniPlayerCloseStop) { _, _ ->
+          this.nowPlaying.setStopPlaybackDialogOpen(false)
+          this.closeAudiobook()
+        }.show()
+    dialog.setOnCancelListener {
+      this.nowPlaying.setStopPlaybackDialogOpen(false)
+    }
+    this.stopPlaybackDialog = dialog
+  }
+
+  private fun dismissCloseConfirmationDialog() {
+    val dialog = this.stopPlaybackDialog
+    if (dialog != null) {
+      dialog.dismiss()
+      this.stopPlaybackDialog = null
+    }
   }
 
   private fun closeAudiobook() {
