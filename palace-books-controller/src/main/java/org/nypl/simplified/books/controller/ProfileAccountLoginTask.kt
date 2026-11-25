@@ -9,6 +9,7 @@ import org.librarysimplified.http.api.LSHTTPClientType
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.AllowRedirects.DISALLOW_REDIRECTS
 import org.librarysimplified.http.api.LSHTTPRequestBuilderType.Method.Post
 import org.librarysimplified.http.api.LSHTTPResponseStatus
+import org.nypl.simplified.accounts.api.AccountAuthenticatedHTTP
 import org.nypl.simplified.accounts.api.AccountAuthenticationCredentials
 import org.nypl.simplified.accounts.api.AccountAuthenticationTokenInfo
 import org.nypl.simplified.accounts.api.AccountLoginState.AccountLoggedIn
@@ -202,8 +203,17 @@ class ProfileAccountLoginTask(
       }
 
       else -> {
+        /*
+         * Prefer the library's own message, when the server sent one, over the HTTP status.
+         * The status is still recorded in the error code and in the attributes added above.
+         */
+
         this.steps.currentStepFailed(
-          message = "Server error: ${result.properties.status} ${result.properties.message}",
+          message =
+            AccountAuthenticatedHTTP.problemReportMessage(
+              problemReport = problemReport,
+              fallback = "Server error: ${result.properties.status} ${result.properties.message}",
+            ),
           errorCode = "httpError ${result.properties.status} $uri",
           exception = exception,
           extraMessages = listOf(),
