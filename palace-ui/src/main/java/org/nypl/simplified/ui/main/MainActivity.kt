@@ -6,25 +6,25 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.io7m.jmulticlose.core.CloseableCollection
 import com.io7m.jmulticlose.core.CloseableCollectionType
 import com.io7m.jmulticlose.core.ClosingResourceFailedException
+import io.reactivex.disposables.CompositeDisposable
+import org.librarysimplified.audiobook.views.PlayerMiniFragment
+import org.librarysimplified.audiobook.views.PlayerModel
+import org.librarysimplified.audiobook.views.PlayerViewCommand
 import org.librarysimplified.reports.Reports
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
 import org.nypl.simplified.accounts.api.AccountOIDC
-import org.nypl.simplified.books.api.Book
-import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingServiceType
 import org.nypl.simplified.profiles.controller.api.ProfileAccountLoginRequest
 import org.nypl.simplified.profiles.controller.api.ProfilesControllerType
-import org.nypl.simplified.taskrecorder.api.TaskRecorder
-import org.nypl.simplified.threads.UIThread
 import org.nypl.simplified.ui.announcements.AnnouncementsDialog
 import org.nypl.simplified.ui.announcements.AnnouncementsModel
-import org.nypl.simplified.ui.errorpage.ErrorPageParameters
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_CONSUMED
 import org.nypl.simplified.ui.main.MainBackButtonConsumerType.Result.BACK_BUTTON_NOT_CONSUMED
 import org.nypl.simplified.ui.screen.ScreenEdgeToEdgeFix
@@ -35,9 +35,8 @@ import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREE
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_COMPLETED
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_LIBRARY_SELECTOR
 import org.nypl.simplified.ui.splash.SplashModel.SplashScreenStatus.SPLASH_SCREEN_NOTIFICATIONS
-import org.nypl.simplified.viewer.api.Viewers
-import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
 import java.net.URI
 import java.util.UUID
 
@@ -57,6 +56,11 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   private var subscriptions: CloseableCollectionType<ClosingResourceFailedException> =
     CloseableCollection.create()
 
+  private lateinit var nowPlaying: AudiobookNowPlayingServiceType
+  private lateinit var timeTrackingService: TimeTrackingServiceType
+  private lateinit var miniPlayerHolder: View
+  private var playerSubscriptions: CompositeDisposable = CompositeDisposable()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(Bundle())
 
@@ -71,6 +75,13 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
 
     this.rootContainer = this.findViewById(R.id.mainFragmentRoot)
     ScreenEdgeToEdgeFix.edgeToEdge(this.rootContainer)
+
+    val services = Services.serviceDirectory()
+    this.nowPlaying =
+      services.requireService(AudiobookNowPlayingServiceType::class.java)
+    this.timeTrackingService =
+      services.requireService(TimeTrackingServiceType::class.java)
+    this.miniPlayerHolder = this.findViewById(R.id.mainMiniPlayerHolder)
   }
 
   override fun onNewIntent(
@@ -170,7 +181,22 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
         this.onSplashScreenStatusChanged(newValue)
       },
     )
+    this.subscriptions.add(
+      this.nowPlaying.current.subscribe { _, newValue ->
+        if (newValue.isPresent) {
+          this.showMiniPlayer()
+        } else {
+          this.hideMiniPlayer()
+        }
+      },
+    )
     this.switchFragment(SplashFragment())
+
+    this.playerSubscriptions =
+      CompositeDisposable()
+    this.playerSubscriptions.add(
+      PlayerModel.viewCommands.subscribe(this::onMiniPlayerCommand),
+    )
 
     this.onBackPressedDispatcher.addCallback(
       this,
@@ -189,13 +215,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
             this.onAnnouncementsChanged(newValue)
           },
         )
-
-        val sub =
-          MainBackgroundBookOpenRequests.requestStream.subscribe { bookRequest ->
-            this.openBookFromBackgroundRequest(bookRequest)
-          }
-
-        this.subscriptions.add(AutoCloseable { sub.dispose() })
       }
 
       SPLASH_SCREEN_AWAITING_BOOT,
@@ -204,50 +223,6 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       -> {
         // No need to do anything.
       }
-    }
-  }
-
-  @UiThread
-  private fun openBookFromBackgroundRequest(bookRequest: MainBackgroundBookOpenRequests.BookOpenRequest) {
-    this.logger.debug("Received a request to open: {}", bookRequest)
-    UIThread.checkIsUIThread()
-
-    val services =
-      Services.serviceDirectory()
-    val profiles =
-      services.requireService(ProfilesControllerType::class.java)
-    val profile =
-      profiles.profileCurrent()
-
-    val viewerParameters =
-      ViewerParameters(
-        flags = mapOf(),
-        viewerID = bookRequest.playerID,
-        onLoginRequested = { accountID ->
-          try {
-            this.logger.debug("Bringing main activity to foreground...")
-            val activity = this
-            val intent = Intent(activity, MainActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-            activity.startActivity(intent)
-
-            this.logger.debug("Showing login dialog...")
-            MainNavigation.showLoginDialog(profile.account(accountID))
-          } catch (e: Throwable) {
-            this.logger.error("Unable to open login dialog: ", e)
-          }
-        },
-      )
-
-    try {
-      Viewers.openViewer(
-        context = this,
-        preferences = viewerParameters,
-        book = bookRequest.book,
-        format = bookRequest.bookFormat,
-      )
-    } catch (e: Throwable) {
-      this.openErrorForBookException(bookRequest.book, e)
     }
   }
 
@@ -288,6 +263,7 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
   override fun onStop() {
     super.onStop()
 
+    this.playerSubscriptions.dispose()
     this.subscriptions.close()
   }
 
@@ -299,48 +275,81 @@ class MainActivity : AppCompatActivity(R.layout.main_host) {
       .commit()
   }
 
-  private fun openErrorForBookException(
-    book: Book,
-    e: Throwable,
-  ) {
-    try {
-      val services =
-        Services.serviceDirectory()
-      val buildConfig =
-        services.requireService(BuildConfigurationServiceType::class.java)
-      val profiles =
-        services.requireService(ProfilesControllerType::class.java)
-      val account =
-        profiles
-          .profileCurrent()
-          .account(book.account)
-
-      val task = TaskRecorder.create()
-      task.beginNewStep("Attempting to open book...")
-      task.addAttribute("BookID", book.entry.id)
-      task.addAttribute("LibraryID", account.provider.id.toString())
-      task.addAttribute("Library", account.provider.displayName)
-      task.currentStepFailed(
-        message = e.message ?: e.javaClass.name,
-        errorCode = "error-book-open-failed",
-        exception = e,
-        extraMessages = listOf(),
-      )
-      val error = task.finishFailure<Unit>()
-
-      MainNavigation.openErrorPage(
-        activity = this,
-        parameters =
-          ErrorPageParameters(
-            emailAddress = buildConfig.supportErrorReportEmailAddress,
-            body = "",
-            subject = "[palace-error-report]",
-            attributes = error.attributes.toSortedMap(),
-            taskSteps = error.steps,
-          ),
-      )
-    } catch (e: Throwable) {
-      this.logger.error("Failed to open error page: ", e)
+  private fun showMiniPlayer() {
+    val existing = this.supportFragmentManager.findFragmentByTag(MINI_PLAYER_TAG)
+    if (existing == null) {
+      this.supportFragmentManager
+        .beginTransaction()
+        .add(R.id.mainMiniPlayerHolder, PlayerMiniFragment(), MINI_PLAYER_TAG)
+        .commit()
     }
+    this.miniPlayerHolder.visibility = View.VISIBLE
+  }
+
+  private fun hideMiniPlayer() {
+    val existing = this.supportFragmentManager.findFragmentByTag(MINI_PLAYER_TAG)
+    if (existing != null) {
+      this.supportFragmentManager
+        .beginTransaction()
+        .remove(existing)
+        .commit()
+    }
+    this.miniPlayerHolder.visibility = View.GONE
+  }
+
+  private fun onMiniPlayerCommand(command: PlayerViewCommand) {
+    when (command) {
+      PlayerViewCommand.PlayerViewNavigationCloseAll -> {
+        this.showCloseConfirmationDialog()
+      }
+
+      PlayerViewCommand.PlayerViewNavigationExpand -> {
+        this.expandMiniPlayer()
+      }
+
+      else -> {
+        // Cover updates and other commands are handled by the mini-player fragment.
+      }
+    }
+  }
+
+  private fun expandMiniPlayer() {
+    val ref = this.nowPlaying.current.get()
+    if (ref.isPresent) {
+      this.nowPlaying.openForPlayback(ref.get(), launchUI = true)
+    }
+  }
+
+  private fun showCloseConfirmationDialog() {
+    MaterialAlertDialogBuilder(this)
+      .setMessage(R.string.audioBookMiniPlayerCloseConfirm)
+      .setNegativeButton(R.string.audioBookMiniPlayerCloseCancel, null)
+      .setPositiveButton(R.string.audioBookMiniPlayerCloseStop) { _, _ ->
+        this.closeAudiobook()
+      }.show()
+  }
+
+  private fun closeAudiobook() {
+    try {
+      PlayerModel.closeBookOrDismissError()
+    } catch (e: Exception) {
+      this.logger.debug("Failed to close book: ", e)
+    }
+
+    try {
+      this.timeTrackingService.onBookClosed()
+    } catch (e: Exception) {
+      this.logger.debug("Failed to stop time tracking: ", e)
+    }
+
+    try {
+      this.nowPlaying.setCurrent(null)
+    } catch (e: Exception) {
+      this.logger.debug("Failed to clear the current audiobook: ", e)
+    }
+  }
+
+  private companion object {
+    private const val MINI_PLAYER_TAG = "miniPlayer"
   }
 }

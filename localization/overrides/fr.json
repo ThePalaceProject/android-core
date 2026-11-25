@@ -16,7 +16,8 @@
     "accountWantChildCard": "Voulez-vous une carte pour votre enfant ?",
     "migrationFailure": "Il y a eu un ou plusieurs problèmes pour migrer vos données…",
     "migrationOK": "OK",
-    "tabHolds": "Réservations"
+    "tabHolds": "Réservations",
+    "audioBookMiniPlayerCloseStop": "Arrêter"
   },
   "palace-ui/src/main/res/values/stringsBookRevoke.xml": {
     "revokeACSDeleteRights": "Supprimer l'information sur les droits d'Adobe ACS…",
@@ -138,7 +139,8 @@
     "audio_book_dismiss": "OK",
     "audio_book_player_bookmark_added": "Signet ajouté",
     "audio_book_player_bookmark_adding": "Ajouter un signet…",
-    "audio_book_player_ok": "OK"
+    "audio_book_player_ok": "OK",
+    "audio_book_player_close_stop": "Arrêter"
   },
   "palace-viewer-epub-readium2/src/main/res/values/strings.xml": {
     "reader_bookmark_added": "Signet ajouté",

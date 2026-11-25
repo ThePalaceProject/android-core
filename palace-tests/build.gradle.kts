@@ -38,6 +38,7 @@ val dependencyObjects =
         project(":palace-analytics-api"),
         project(":palace-analytics-circulation"),
         project(":palace-announcements"),
+        project(":palace-audiobook-now-playing-api"),
         project(":palace-bookmarks"),
         project(":palace-bookmarks-api"),
         project(":palace-books-api"),

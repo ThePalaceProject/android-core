@@ -15,7 +15,6 @@ import androidx.media3.session.SessionResult
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FluentFuture
 import com.google.common.util.concurrent.ListenableFuture
-import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.services.api.ServiceDirectoryType
 import org.librarysimplified.services.api.Services
 import org.nypl.simplified.books.api.Book
@@ -24,10 +23,10 @@ import org.nypl.simplified.books.api.BookID
 import org.nypl.simplified.books.book_registry.BookRegistryReadableType
 import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.futures.FluentFutureExtensions.map
-import org.nypl.simplified.ui.main.MainBackgroundBookOpenRequests
 import org.slf4j.LoggerFactory
-import java.util.UUID
-import java.util.concurrent.TimeoutException
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookRef
+import java.util.concurrent.TimeUnit
 
 class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callback {
   private val logger =
@@ -338,49 +337,26 @@ class PalaceMediaLibraryCallback : MediaLibraryService.MediaLibrarySession.Callb
       bookRegistry.bookOrException(BookID.create(mediaItem.mediaId))
     val book =
       bookWithStatus.book
-    val format =
-      book.findPreferredFormat()
-        ?: throw IllegalStateException("Book format for book %s was null".format(book))
-    val playerID =
-      UUID.randomUUID()
 
-    MainBackgroundBookOpenRequests.requestBookOpen(
-      MainBackgroundBookOpenRequests.BookOpenRequest(
-        book = book,
-        bookFormat = format,
-        playerID = playerID,
-      ),
-    )
+    val nowPlaying =
+      services.requireService(AudiobookNowPlayingServiceType::class.java)
+    val openFuture =
+      nowPlaying.openForPlayback(
+        AudiobookRef(
+          accountID = book.account,
+          bookID = book.id,
+        ),
+        launchUI = false,
+      )
 
     /*
-     * We'll wait 30 seconds for the audiobook to open. We have no choice but to wait here
-     * as Android Auto will make a request to the player as soon as this method returns (from
-     * the future in which it is running).
+     * Android Auto will make a request to the player as soon as this method returns (from the
+     * future in which it is running), so the book must be open before we return. Block until
+     * the open completes, with a timeout so a stalled open does not hold this thread
+     * indefinitely.
      */
 
-    val timeThen = java.time.Instant.now()
-    val timeExpire = timeThen.plusSeconds(30L)
-
-    while (true) {
-      this.logger.debug("onSetMediaItemsWithServices: Waiting for player instance {} to open...", playerID)
-
-      val timeNow = java.time.Instant.now()
-      if (timeNow.isAfter(timeExpire)) {
-        throw TimeoutException("Timed out waiting for audiobook to load.")
-      }
-
-      val openID = PlayerModel.playerID()
-      if (openID == playerID) {
-        this.logger.debug("onSetMediaItemsWithServices: Audiobook appears to have opened.")
-        break
-      }
-
-      try {
-        Thread.sleep(1_000L)
-      } catch (e: InterruptedException) {
-        Thread.currentThread().interrupt()
-      }
-    }
+    openFuture.get(30L, TimeUnit.SECONDS)
 
     this.logger.debug("onSetMediaItemsWithServices: finishing")
     return MediaSession.MediaItemsWithStartPosition(

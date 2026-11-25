@@ -18,6 +18,7 @@ import com.io7m.jmulticlose.core.CloseableCollection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.librarysimplified.audiobook.views.PlayerModel
 import org.librarysimplified.http.api.LSHTTPNetworkAccessType
 import org.librarysimplified.services.api.Services
 import org.librarysimplified.ui.R
@@ -36,6 +37,7 @@ import org.nypl.simplified.books.book_registry.BookStatus
 import org.nypl.simplified.books.book_registry.BookStatus.Loaned
 import org.nypl.simplified.books.book_registry.BookStatusEvent
 import org.nypl.simplified.books.controller.api.BooksControllerType
+import org.nypl.simplified.books.time.tracking.api.TimeTrackingServiceType
 import org.nypl.simplified.buildconfig.api.BuildConfigurationServiceType
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeld
 import org.nypl.simplified.feeds.api.FeedAvailabilityHeldReady
@@ -84,6 +86,7 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.viewer.api.Viewers
 import org.nypl.simplified.viewer.spi.ViewerParameters
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
 import org.thepalaceproject.opds.client.OPDSClientRequest
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.ADD_TO_HISTORY
 import org.thepalaceproject.opds.client.OPDSClientRequest.HistoryBehavior.CLEAR_HISTORY
@@ -656,6 +659,7 @@ sealed class CatalogFragment :
     }
 
   final override fun onBookRequestPreviewOpen(book: Book) {
+    this.stopAudiobookIfPlaying()
     try {
       BookPreviewActivity.startActivity(
         this.requireActivity(),
@@ -663,6 +667,39 @@ sealed class CatalogFragment :
       )
     } catch (e: Throwable) {
       this.logger.error("Failed to start activity: ", e)
+    }
+  }
+
+  // Stop any open audiobook so it is not left playing in the background while a preview plays.
+  private fun stopAudiobookIfPlaying() {
+    val services =
+      Services.serviceDirectory()
+    val nowPlaying =
+      services.requireService(AudiobookNowPlayingServiceType::class.java)
+    val current =
+      nowPlaying.current.get()
+    if (!current.isPresent) {
+      return
+    }
+
+    try {
+      PlayerModel.closeBookOrDismissError()
+    } catch (e: Exception) {
+      this.logger.debug("Failed to close book: ", e)
+    }
+
+    try {
+      services
+        .requireService(TimeTrackingServiceType::class.java)
+        .onBookClosed()
+    } catch (e: Exception) {
+      this.logger.debug("Failed to stop time tracking: ", e)
+    }
+
+    try {
+      nowPlaying.setCurrent(null)
+    } catch (e: Exception) {
+      this.logger.debug("Failed to clear the current audiobook: ", e)
     }
   }
 

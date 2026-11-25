@@ -38,7 +38,8 @@
     "migrationFailure": "Hubo uno o más problemas migrando sus datos…",
     "migrationSuccess": "¡Sus datos fueron migrados con éxito!",
     "selectionButton": "Encuentre su biblioteca",
-    "tabHolds": "Reservas"
+    "tabHolds": "Reservas",
+    "audioBookMiniPlayerCloseStop": "Detener"
   },
   "palace-ui/src/main/res/values/stringsBookRevoke.xml": {
     "revokeACSDeleteRights": "Eliminar la información de derechos de Adobe ACS…",
@@ -210,7 +211,8 @@
     "audio_book_manifest_parse_error": "El manifiesto del audiolibro no se pudo analizar.",
     "audio_book_player_bookmark_added": "Marcador añadido",
     "audio_book_player_bookmark_adding": "Añadiendo marcador…",
-    "audio_book_player_return_title": "Su audiolibro ha terminado"
+    "audio_book_player_return_title": "Su audiolibro ha terminado",
+    "audio_book_player_close_stop": "Detener"
   },
   "palace-viewer-epub-readium2/src/main/res/values/strings.xml": {
     "reader_bookmark_added": "Marcador añadido",

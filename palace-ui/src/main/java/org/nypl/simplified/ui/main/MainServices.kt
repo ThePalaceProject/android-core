@@ -115,6 +115,8 @@ import org.nypl.simplified.ui.screen.ScreenSizeInformationType
 import org.nypl.simplified.ui.settings.SettingsProfileEvents
 import org.readium.r2.lcp.LcpService
 import org.slf4j.LoggerFactory
+import org.thepalaceproject.audiobook.now_playing.AudiobookNowPlayingService
+import org.thepalaceproject.audiobook.now_playing.api.AudiobookNowPlayingServiceType
 import org.thepalaceproject.db.DBFactory
 import org.thepalaceproject.db.api.DBParameters
 import org.thepalaceproject.db.api.DBType
@@ -976,6 +978,16 @@ internal object MainServices {
           clock = { OffsetDateTime.now(UTC) },
           timeSegments = PlayerModel.timeTracker.timeSegments,
           diagnostics = diagnosticsService,
+        )
+      },
+    )
+
+    addService(
+      message = strings.bootingGeneral("audiobook now playing service"),
+      interfaceType = AudiobookNowPlayingServiceType::class.java,
+      serviceConstructor = {
+        AudiobookNowPlayingService(
+          application = context,
         )
       },
     )

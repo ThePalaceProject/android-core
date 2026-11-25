@@ -12,6 +12,9 @@
     <string name="audio_book_player_return_question">Möchten Sie es zurückgeben?</string>
     <string name="audio_book_player_return_title">Ihr Hörbuch ist fertig.</string>
     <string name="audio_book_player_toc_title">Inhaltsverzeichnis</string>
+    <string name="audio_book_player_close_confirm">Wiedergabe stoppen?</string>
+    <string name="audio_book_player_close_stop">Stopp</string>
+    <string name="audio_book_player_close_cancel">Stornierung</string>
     <string name="audio_book_player_ok">OK</string>
     <string name="audio_book_player_details">Einzelheiten</string>
     <string name="audio_book_manifest_parse_error">Das Hörbuchmanifest konnte nicht analysiert werden.</string>

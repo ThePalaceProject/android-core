@@ -12,6 +12,9 @@
     <string name="audio_book_player_return_question">Voulez-vous le rendre ?</string>
     <string name="audio_book_player_return_title">Votre livre audio est terminé</string>
     <string name="audio_book_player_toc_title">Table des matières</string>
+    <string name="audio_book_player_close_confirm">Arrêter la lecture ?</string>
+    <string name="audio_book_player_close_stop">Arrêter</string>
+    <string name="audio_book_player_close_cancel">Annuler</string>
     <string name="audio_book_player_ok">OK</string>
     <string name="audio_book_player_details">Détails</string>
     <string name="audio_book_manifest_parse_error">Le manifeste du livre audio n\'a pas pu être analysé.</string>
